@@ -11,11 +11,17 @@ class Service {
 
     static async findById(id) {
         const [rows] = await db.query(
-            `SELECT s.*, c.name as category_name, sel.business_name, u.username as seller_name
+            `SELECT s.*, c.name as category_name, sel.business_name, sel.verified, u.username as seller_name,
+                    rv.avg_rating, rv.review_count
              FROM services s
              LEFT JOIN categories c ON s.category_id = c.category_id
              LEFT JOIN sellers sel ON s.seller_id = sel.seller_id
              LEFT JOIN users u ON sel.user_id = u.user_id
+             LEFT JOIN (
+                 SELECT service_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count
+                 FROM reviews
+                 GROUP BY service_id
+             ) rv ON rv.service_id = s.service_id
              WHERE s.service_id = ?`,
             [id]
         );
@@ -24,10 +30,16 @@ class Service {
 
     static async getAll() {
         const [rows] = await db.query(
-            `SELECT s.*, c.name as category_name, sel.business_name
+            `SELECT s.*, c.name as category_name, sel.business_name, sel.verified,
+                    rv.avg_rating, rv.review_count
              FROM services s
              LEFT JOIN categories c ON s.category_id = c.category_id
              LEFT JOIN sellers sel ON s.seller_id = sel.seller_id
+             LEFT JOIN (
+                 SELECT service_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count
+                 FROM reviews
+                 GROUP BY service_id
+             ) rv ON rv.service_id = s.service_id
              WHERE s.status = 'active'
              ORDER BY s.created_at DESC`
         );
@@ -48,10 +60,16 @@ class Service {
 
     static async getByCategory(categoryId) {
         const [rows] = await db.query(
-            `SELECT s.*, c.name as category_name, sel.business_name
+            `SELECT s.*, c.name as category_name, sel.business_name, sel.verified,
+                    rv.avg_rating, rv.review_count
              FROM services s
              LEFT JOIN categories c ON s.category_id = c.category_id
              LEFT JOIN sellers sel ON s.seller_id = sel.seller_id
+             LEFT JOIN (
+                 SELECT service_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count
+                 FROM reviews
+                 GROUP BY service_id
+             ) rv ON rv.service_id = s.service_id
              WHERE s.category_id = ? AND s.status = 'active'
              ORDER BY s.created_at DESC`,
             [categoryId]
@@ -61,10 +79,16 @@ class Service {
 
     static async search(searchTerm) {
         const [rows] = await db.query(
-            `SELECT s.*, c.name as category_name, sel.business_name
+            `SELECT s.*, c.name as category_name, sel.business_name, sel.verified,
+                    rv.avg_rating, rv.review_count
              FROM services s
              LEFT JOIN categories c ON s.category_id = c.category_id
              LEFT JOIN sellers sel ON s.seller_id = sel.seller_id
+             LEFT JOIN (
+                 SELECT service_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count
+                 FROM reviews
+                 GROUP BY service_id
+             ) rv ON rv.service_id = s.service_id
              WHERE (s.title LIKE ? OR s.description LIKE ?) AND s.status = 'active'`,
             [`%${searchTerm}%`, `%${searchTerm}%`]
         );

@@ -1,58 +1,133 @@
 <%- include('partials/navbar') %>
 
 <div class="review-page">
-    <h1>Leave a Review</h1>
-    <p>Order #<%= order.order_id %></p>
-    
-    <% if (error) { %>
-        <div class="error-message"><%= error %></div>
-    <% } %>
-    
-    <form action="/reviews/create" method="POST" class="review-form">
-        <input type="hidden" name="order_id" value="<%= order.order_id %>">
-        
-        <% if (orderItems.length > 0) { %>
-            <input type="hidden" name="service_id" value="<%= orderItems[0].service_id %>">
-            
-            <h3>How was your experience?</h3>
-            <p>Rate the service: <%= orderItems[0].title %></p>
+    <div class="review-shell">
+        <header class="review-header">
+            <p class="review-eyebrow">Leave a Review</p>
+            <h1>How was your experience?</h1>
+            <p class="review-meta">
+                Order #<%= order.order_id %>
+                <% if (orderItems.length > 0) { %>
+                    · Service: <%= orderItems[0].title %>
+                <% } %>
+            </p>
+        </header>
+
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
         <% } %>
-        
-        <div class="rating-input">
-            <label>Rating:</label>
-            <div class="stars">
-                <input type="radio" name="rating" value="1" id="star1" required>
-                <label for="star1">★</label>
-                <input type="radio" name="rating" value="2" id="star2">
-                <label for="star2">★</label>
-                <input type="radio" name="rating" value="3" id="star3">
-                <label for="star3">★</label>
-                <input type="radio" name="rating" value="4" id="star4">
-                <label for="star4">★</label>
-                <input type="radio" name="rating" value="5" id="star5">
-                <label for="star5">★</label>
+
+        <form action="/reviews/create" method="POST" class="review-form">
+            <input type="hidden" name="order_id" value="<%= order.order_id %>">
+
+            <% if (orderItems.length > 0) { %>
+                <input type="hidden" name="service_id" value="<%= orderItems[0].service_id %>">
+            <% } %>
+
+            <section class="review-section">
+                <div class="rating-input">
+                    <label class="review-label">Rating</label>
+                    <div class="review-stars" aria-label="Rating from 1 to 5">
+                        <input type="radio" name="rating" value="5" id="star5" required>
+                        <label for="star5" title="5 stars">★</label>
+                        <input type="radio" name="rating" value="4" id="star4">
+                        <label for="star4" title="4 stars">★</label>
+                        <input type="radio" name="rating" value="3" id="star3">
+                        <label for="star3" title="3 stars">★</label>
+                        <input type="radio" name="rating" value="2" id="star2">
+                        <label for="star2" title="2 stars">★</label>
+                        <input type="radio" name="rating" value="1" id="star1">
+                        <label for="star1" title="1 star">★</label>
+                    </div>
+                    <p class="review-feedback" aria-live="polite"></p>
+                    <p class="review-hint">Tap a star to rate the service.</p>
+                </div>
+            </section>
+
+            <section class="review-section">
+                <label class="review-label" for="comment">Write a review</label>
+                <textarea id="comment" name="comment" rows="6" maxlength="400" placeholder="Share what went well, what could be better, and how communication felt."></textarea>
+                <small class="char-count">0/400 characters</small>
+            </section>
+
+            <section class="review-section">
+                <label class="review-label">Give a compliment (optional)</label>
+                <div class="tags-input">
+                    <label class="tag-pill" data-phrase="Their listing was clear and kept up to date."><input type="checkbox" name="tags" value="Updated listings"><span>Updated listings</span></label>
+                    <label class="tag-pill" data-phrase="They really went the extra mile by..."><input type="checkbox" name="tags" value="Goes the extra mile"><span>Goes the extra mile</span></label>
+                    <label class="tag-pill" data-phrase="You can tell they know their stuff when..."><input type="checkbox" name="tags" value="Knows their stuff"><span>Knows their stuff</span></label>
+                    <label class="tag-pill" data-phrase="Communication was smooth and responsive."><input type="checkbox" name="tags" value="Amazing chat"><span>Amazing chat</span></label>
+                </div>
+            </section>
+
+            <div class="review-form-actions">
+                <button type="submit" class="btn-primary">Submit Review</button>
+                <a href="/orders/<%= order.order_id %>" class="btn-secondary btn-cancel" data-confirm="Discard review?">Cancel</a>
             </div>
-        </div>
-        
-        <div class="form-group">
-            <label>Write a review:</label>
-            <textarea name="comment" rows="5" maxlength="400" placeholder="Share details about how it was like interacting with this seller"></textarea>
-            <small>0/400 characters</small>
-        </div>
-        
-        <div class="form-group">
-            <label>Give a compliment (optional):</label>
-            <div class="tags-input">
-                <label><input type="checkbox" name="tags" value="Updated listings"> Updated listings</label>
-                <label><input type="checkbox" name="tags" value="Goes the extra mile"> Goes the extra mile</label>
-                <label><input type="checkbox" name="tags" value="Knows their stuff"> Knows their stuff</label>
-                <label><input type="checkbox" name="tags" value="Amazing chat"> Amazing chat</label>
-            </div>
-        </div>
-        
-        <button type="submit" class="btn-primary">Submit Review</button>
-        <a href="/orders/<%= order.order_id %>" class="btn-secondary">Cancel</a>
-    </form>
+            <p class="review-trust-note">Your review helps others choose with confidence.</p>
+        </form>
+    </div>
 </div>
+
+<script>
+    (function () {
+        const form = document.querySelector('.review-form');
+        if (!form) return;
+        const textarea = form.querySelector('textarea[name="comment"]');
+        const counter = form.querySelector('.char-count');
+        const feedback = form.querySelector('.review-feedback');
+        const stars = form.querySelectorAll('input[name="rating"]');
+        const tagPills = form.querySelectorAll('.tag-pill');
+        const cancelLink = form.querySelector('.btn-cancel');
+        if (!textarea || !counter) return;
+        const max = parseInt(textarea.getAttribute('maxlength') || '0', 10);
+        const updateCount = () => {
+            counter.textContent = `${textarea.value.length}/${max} characters`;
+        };
+        textarea.addEventListener('input', updateCount);
+        updateCount();
+
+        const feedbackByRating = {
+            1: 'Thanks for the honesty — what could have been better?',
+            2: 'Thanks! What stood out?',
+            3: 'Glad to hear that — want to share more?',
+            4: 'Great! What made it a strong experience?',
+            5: 'Amazing — what made it exceptional?'
+        };
+
+        stars.forEach((star) => {
+            star.addEventListener('change', () => {
+                if (feedback) {
+                    feedback.textContent = feedbackByRating[star.value] || '';
+                }
+            });
+        });
+
+        tagPills.forEach((pill) => {
+            const input = pill.querySelector('input');
+            if (!input) return;
+            input.addEventListener('change', () => {
+                if (!input.checked) return;
+                const phrase = pill.getAttribute('data-phrase');
+                if (!phrase) return;
+                if (!textarea.value.trim()) {
+                    textarea.value = phrase;
+                } else if (!textarea.value.includes(phrase)) {
+                    textarea.value = `${textarea.value.trim()} ${phrase}`;
+                }
+                updateCount();
+            });
+        });
+
+        if (cancelLink) {
+            cancelLink.addEventListener('click', (event) => {
+                const message = cancelLink.getAttribute('data-confirm');
+                if (message && !window.confirm(message)) {
+                    event.preventDefault();
+                }
+            });
+        }
+    })();
+</script>
 
 <%- include('partials/footer') %>

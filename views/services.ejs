@@ -31,8 +31,19 @@
                     <div class="service-card">
                         <h3><%= service.title %></h3>
                         <p><%= service.description ? service.description.substring(0, 100) : '' %>...</p>
-                        <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
-                        <p class="category"><%= service.category_name %></p>
+                        <div class="service-meta">
+                            <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
+                            <p class="category"><%= service.category_name %></p>
+                        </div>
+                        <div class="service-trust">
+                            <span class="trust-badge"><%= service.verified ? 'Verified seller' : 'Trusted seller' %></span>
+                            <span class="trust-rating">
+                                <%= service.avg_rating ? parseFloat(service.avg_rating).toFixed(1) : 'No ratings yet' %>
+                                <% if (service.review_count) { %>
+                                    (<%= service.review_count %>)
+                                <% } %>
+                            </span>
+                        </div>
                         <a href="/services/<%= service.service_id %>" class="btn-view">View Details</a>
                     </div>
                 <% }); %>

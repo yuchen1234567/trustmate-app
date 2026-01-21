@@ -1,45 +1,122 @@
 <%- include('partials/navbar') %>
 
 <div class="review-page">
-    <h1>Edit Review</h1>
-    
-    <% if (error) { %>
-        <div class="error-message"><%= error %></div>
-    <% } %>
-    
-    <form action="/reviews/update/<%= review.review_id %>" method="POST" class="review-form">
-        <h3>Edit your review</h3>
-        
-        <div class="rating-input">
-            <label>Rating:</label>
-            <div class="stars">
-                <% for(let i = 1; i <= 5; i++) { %>
-                    <input type="radio" name="rating" value="<%= i %>" id="star<%= i %>" <%= review.rating == i ? 'checked' : '' %> required>
-                    <label for="star<%= i %>">★</label>
-                <% } %>
+    <div class="review-shell">
+        <header class="review-header">
+            <p class="review-eyebrow">Edit Review</p>
+            <h1>Update your feedback</h1>
+            <p class="review-meta">Make it as detailed or concise as you like.</p>
+        </header>
+
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+
+        <form action="/reviews/update/<%= review.review_id %>" method="POST" class="review-form">
+            <section class="review-section">
+                <div class="rating-input">
+                    <label class="review-label">Rating</label>
+                    <div class="review-stars" aria-label="Rating from 1 to 5">
+                        <% for(let i = 5; i >= 1; i--) { %>
+                            <input type="radio" name="rating" value="<%= i %>" id="star<%= i %>" <%= review.rating == i ? 'checked' : '' %> required>
+                            <label for="star<%= i %>" title="<%= i %> star<%= i === 1 ? '' : 's' %>">★</label>
+                        <% } %>
+                    </div>
+                    <p class="review-feedback" aria-live="polite"></p>
+                    <p class="review-hint">Update the score if your view changed.</p>
+                </div>
+            </section>
+
+            <section class="review-section">
+                <label class="review-label" for="comment">Follow-up review</label>
+                <textarea id="comment" name="comment" rows="6" maxlength="400" placeholder="Share what changed, or add details you missed the first time."><%= review.comment %></textarea>
+                <small class="char-count">0/400 characters</small>
+            </section>
+
+            <section class="review-section">
+                <label class="review-label">Give a compliment (optional)</label>
+                <div class="tags-input">
+                    <% const existingTags = review.tags ? review.tags.split(',') : []; %>
+                    <label class="tag-pill" data-phrase="Their listing was clear and kept up to date."><input type="checkbox" name="tags" value="Updated listings" <%= existingTags.includes('Updated listings') ? 'checked' : '' %>><span>Updated listings</span></label>
+                    <label class="tag-pill" data-phrase="They really went the extra mile by..."><input type="checkbox" name="tags" value="Goes the extra mile" <%= existingTags.includes('Goes the extra mile') ? 'checked' : '' %>><span>Goes the extra mile</span></label>
+                    <label class="tag-pill" data-phrase="You can tell they know their stuff when..."><input type="checkbox" name="tags" value="Knows their stuff" <%= existingTags.includes('Knows their stuff') ? 'checked' : '' %>><span>Knows their stuff</span></label>
+                    <label class="tag-pill" data-phrase="Communication was smooth and responsive."><input type="checkbox" name="tags" value="Amazing chat" <%= existingTags.includes('Amazing chat') ? 'checked' : '' %>><span>Amazing chat</span></label>
+                </div>
+            </section>
+
+            <div class="review-form-actions">
+                <button type="submit" class="btn-primary">Save Changes</button>
+                <a href="/orders/<%= review.order_id %>" class="btn-secondary btn-cancel" data-confirm="Discard review?">Cancel</a>
             </div>
-        </div>
-        
-        <div class="form-group">
-            <label>Follow-up review:</label>
-            <textarea name="comment" rows="5" maxlength="400" placeholder="Share more about your experience or the reason you're editing your review"><%= review.comment %></textarea>
-            <small>0/400 characters</small>
-        </div>
-        
-        <div class="form-group">
-            <label>Give a compliment (optional):</label>
-            <div class="tags-input">
-                <% const existingTags = review.tags ? review.tags.split(',') : []; %>
-                <label><input type="checkbox" name="tags" value="Updated listings" <%= existingTags.includes('Updated listings') ? 'checked' : '' %>> Updated listings</label>
-                <label><input type="checkbox" name="tags" value="Goes the extra mile" <%= existingTags.includes('Goes the extra mile') ? 'checked' : '' %>> Goes the extra mile</label>
-                <label><input type="checkbox" name="tags" value="Knows their stuff" <%= existingTags.includes('Knows their stuff') ? 'checked' : '' %>> Knows their stuff</label>
-                <label><input type="checkbox" name="tags" value="Amazing chat" <%= existingTags.includes('Amazing chat') ? 'checked' : '' %>> Amazing chat</label>
-            </div>
-        </div>
-        
-        <button type="submit" class="btn-primary">Submit</button>
-        <a href="/orders/<%= review.order_id %>" class="btn-secondary">Cancel</a>
-    </form>
+            <p class="review-trust-note">Your review helps others choose with confidence.</p>
+        </form>
+    </div>
 </div>
+
+<script>
+    (function () {
+        const form = document.querySelector('.review-form');
+        if (!form) return;
+        const textarea = form.querySelector('textarea[name="comment"]');
+        const counter = form.querySelector('.char-count');
+        const feedback = form.querySelector('.review-feedback');
+        const stars = form.querySelectorAll('input[name="rating"]');
+        const tagPills = form.querySelectorAll('.tag-pill');
+        const cancelLink = form.querySelector('.btn-cancel');
+        if (!textarea || !counter) return;
+        const max = parseInt(textarea.getAttribute('maxlength') || '0', 10);
+        const updateCount = () => {
+            counter.textContent = `${textarea.value.length}/${max} characters`;
+        };
+        textarea.addEventListener('input', updateCount);
+        updateCount();
+
+        const feedbackByRating = {
+            1: 'Thanks for the honesty — what could have been better?',
+            2: 'Thanks! What stood out?',
+            3: 'Glad to hear that — want to share more?',
+            4: 'Great! What made it a strong experience?',
+            5: 'Amazing — what made it exceptional?'
+        };
+
+        const initialStar = form.querySelector('input[name="rating"]:checked');
+        if (initialStar && feedback) {
+            feedback.textContent = feedbackByRating[initialStar.value] || '';
+        }
+
+        stars.forEach((star) => {
+            star.addEventListener('change', () => {
+                if (feedback) {
+                    feedback.textContent = feedbackByRating[star.value] || '';
+                }
+            });
+        });
+
+        tagPills.forEach((pill) => {
+            const input = pill.querySelector('input');
+            if (!input) return;
+            input.addEventListener('change', () => {
+                if (!input.checked) return;
+                const phrase = pill.getAttribute('data-phrase');
+                if (!phrase) return;
+                if (!textarea.value.trim()) {
+                    textarea.value = phrase;
+                } else if (!textarea.value.includes(phrase)) {
+                    textarea.value = `${textarea.value.trim()} ${phrase}`;
+                }
+                updateCount();
+            });
+        });
+
+        if (cancelLink) {
+            cancelLink.addEventListener('click', (event) => {
+                const message = cancelLink.getAttribute('data-confirm');
+                if (message && !window.confirm(message)) {
+                    event.preventDefault();
+                }
+            });
+        }
+    })();
+</script>
 
 <%- include('partials/footer') %>

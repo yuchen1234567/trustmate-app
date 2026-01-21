@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Session configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'dev-session-secret',
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
@@ -47,6 +47,9 @@ app.post('/register', userController.register);
 app.get('/login', userController.showLogin);
 app.post('/login', userController.login);
 app.get('/logout', userController.logout);
+app.get('/faq', (req, res) => {
+    res.render('faq');
+});
 
 // Services routes
 app.get('/services', serviceController.search);
@@ -76,6 +79,7 @@ app.post('/reviews/create', isAuthenticated, reviewController.create);
 app.get('/reviews/edit/:id', isAuthenticated, reviewController.showEdit);
 app.post('/reviews/update/:id', isAuthenticated, reviewController.update);
 app.get('/reviews/delete/:id', isAuthenticated, reviewController.delete);
+app.post('/reviews/:id/reply', isAuthenticated, isSeller, reviewController.reply);
 
 // Chat routes
 app.get('/chat/:orderId', isAuthenticated, chatController.show);

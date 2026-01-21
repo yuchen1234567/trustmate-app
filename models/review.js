@@ -52,6 +52,13 @@ class Review {
         );
     }
 
+    static async updateReply(id, reply) {
+        await db.query(
+            'UPDATE reviews SET seller_reply = ?, seller_reply_at = NOW() WHERE review_id = ?',
+            [reply, id]
+        );
+    }
+
     static async delete(id) {
         await db.query('DELETE FROM reviews WHERE review_id = ?', [id]);
     }

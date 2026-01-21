@@ -49,6 +49,15 @@
                         <% if (review.tags) { %>
                             <p class="tags">Tags: <%= review.tags %></p>
                         <% } %>
+                        <% if (review.seller_reply) { %>
+                            <div class="seller-reply">
+                                <p class="seller-reply-label">Seller reply</p>
+                                <p class="seller-reply-text"><%= review.seller_reply %></p>
+                                <% if (review.seller_reply_at) { %>
+                                    <p class="seller-reply-date"><%= new Date(review.seller_reply_at).toLocaleDateString() %></p>
+                                <% } %>
+                            </div>
+                        <% } %>
                         <p class="date"><%= new Date(review.created_at).toLocaleDateString() %></p>
                         
                         <% if (user) { %>
@@ -62,6 +71,14 @@
                                     <a href="/reviews/delete/<%= review.review_id %>" class="btn-small btn-danger" onclick="return confirm('Are you sure you want to delete this review?')">Delete (Admin)</a>
                                 <% } %>
                             </div>
+                        <% } %>
+
+                        <% if (canReply) { %>
+                            <form action="/reviews/<%= review.review_id %>/reply" method="POST" class="seller-reply-form">
+                                <label for="reply-<%= review.review_id %>">Reply to this review</label>
+                                <textarea id="reply-<%= review.review_id %>" name="reply" rows="3" maxlength="400" placeholder="Thank them, address concerns, or share next steps."><%= review.seller_reply || '' %></textarea>
+                                <button type="submit" class="btn-small btn-primary"><%= review.seller_reply ? 'Update reply' : 'Post reply' %></button>
+                            </form>
                         <% } %>
                     </div>
                 <% }); %>

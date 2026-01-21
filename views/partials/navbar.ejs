@@ -22,6 +22,7 @@
             <div class="nav-links">
                 <a href="/">Home</a>
                 <a href="/services">Explore</a>
+                <a href="/faq">FAQs</a>
                 
                 <% if (user) { %>
                     <a href="/cart">Cart</a>
@@ -30,7 +31,7 @@
                     <% if (user.role === 'seller' || user.role === 'admin') { %>
                         <a href="/seller/dashboard">Seller Dashboard</a>
                     <% } else { %>
-                        <a href="/seller/register">Become a Seller</a>
+                        <a href="/seller/register" class="nav-pill">Become a Seller</a>
                     <% } %>
                     
                     <% if (user.role === 'admin') { %>

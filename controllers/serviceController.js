@@ -1,6 +1,7 @@
 const Service = require('../models/service');
 const Category = require('../models/category');
 const Review = require('../models/review');
+const Seller = require('../models/seller');
 
 // Show all services (homepage)
 exports.index = async (req, res) => {
@@ -25,7 +26,15 @@ exports.show = async (req, res) => {
             return res.status(404).send('Service not found');
         }
 
-        res.render('serviceDetail', { service, reviews, avgRating });
+        let canReply = false;
+        if (req.session.user && req.session.user.role === 'seller') {
+            const seller = await Seller.findByUserId(req.session.user.user_id);
+            if (seller && service.seller_id === seller.seller_id) {
+                canReply = true;
+            }
+        }
+
+        res.render('serviceDetail', { service, reviews, avgRating, canReply });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error loading service');

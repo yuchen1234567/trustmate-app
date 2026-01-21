@@ -1,6 +1,8 @@
 const Review = require('../models/review');
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
+const Service = require('../models/service');
+const Seller = require('../models/seller');
 
 // Show review form
 exports.showCreate = async (req, res) => {
@@ -115,5 +117,40 @@ exports.delete = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.redirect('/orders');
+    }
+};
+
+// Seller reply to review
+exports.reply = async (req, res) => {
+    try {
+        const review = await Review.findById(req.params.id);
+        if (!review) {
+            return res.status(404).send('Review not found');
+        }
+
+        if (!req.session.user || req.session.user.role !== 'seller') {
+            return res.status(403).send('Access denied. Seller only.');
+        }
+
+        const seller = await Seller.findByUserId(req.session.user.user_id);
+        if (!seller) {
+            return res.status(403).send('Access denied. Seller only.');
+        }
+
+        const service = await Service.findById(review.service_id);
+        if (!service || service.seller_id !== seller.seller_id) {
+            return res.status(403).send('Access denied. You can only reply to reviews on your own services.');
+        }
+
+        const reply = (req.body.reply || '').trim();
+        if (!reply) {
+            return res.redirect(`/services/${review.service_id}`);
+        }
+
+        await Review.updateReply(req.params.id, reply);
+        res.redirect(`/services/${review.service_id}`);
+    } catch (error) {
+        console.error(error);
+        res.redirect('/services');
     }
 };

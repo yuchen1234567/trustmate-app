@@ -176,6 +176,8 @@ CREATE TABLE `reviews`  (
   `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `seller_reply` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `seller_reply_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`review_id`) USING BTREE,
   INDEX `order_id`(`order_id` ASC) USING BTREE,
   INDEX `user_id`(`user_id` ASC) USING BTREE,
@@ -187,7 +189,7 @@ CREATE TABLE `reviews`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- Records of reviews
-INSERT INTO `reviews` VALUES (1, 1, 2, 1, 5, 'Excellent service! Very professional and thorough.', 'Goes the extra mile,Amazing chat', '2026-01-20 23:57:08');
+INSERT INTO `reviews` VALUES (1, 1, 2, 1, 5, 'Excellent service! Very professional and thorough.', 'Goes the extra mile,Amazing chat', '2026-01-20 23:57:08', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for chats (NINTH - depends on orders and users)
