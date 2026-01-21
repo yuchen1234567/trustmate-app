@@ -1,0 +1,38 @@
+<%- include('partials/navbar') %>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="support-local-logo">
+                <h2>Support Local</h2>
+            </div>
+        </div>
+        
+        <h2>REGISTER</h2>
+        
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+        
+        <form action="/register" method="POST" class="auth-form">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Phone Number/email" required>
+            <input type="tel" name="phone" placeholder="Phone Number">
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="confirmPassword" placeholder="Confirm password" required>
+            
+            <button type="submit" class="btn-primary">NEXT</button>
+            
+            <div class="auth-divider">OR WITH</div>
+            
+            <p class="auth-link">Have an account? <a href="/login">login</a></p>
+            
+            <div class="terms">
+                <input type="checkbox" required>
+                <label>By registering, You agree to the Terms, Conditions and Policies of Local Help</label>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,63 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-dashboard">
+    <h1>Admin Dashboard</h1>
+    
+    <div class="dashboard-nav">
+        <a href="/admin/dashboard">Fraud Detection</a>
+        <a href="/admin/users" class="active">User Management</a>
+        <a href="/admin/orders">Order Management</a>
+        <a href="/admin/categories">Categories</a>
+    </div>
+    
+    <div class="user-management">
+        <h2>User Account Management</h2>
+        
+        <form action="/admin/users/search" method="GET" class="search-form">
+            <input type="text" name="search" placeholder="🔍 Search for User ID or Email">
+            <button type="submit">Search</button>
+        </form>
+        
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% const displayUsers = searchResults || users; %>
+                <% if (displayUsers.length === 0) { %>
+                    <tr><td colspan="6">No users found.</td></tr>
+                <% } else { %>
+                    <% displayUsers.forEach(user => { %>
+                        <tr>
+                            <td>User<%= String(user.user_id).padStart(2, '0') %></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.username %></td>
+                            <td><%= user.role %></td>
+                            <td><span class="status-badge status-<%= user.status %>"><%= user.status %></span></td>
+                            <td class="action-buttons">
+                                <a href="/admin/users/history/<%= user.user_id %>" class="btn-small btn-success">History</a>
+                                
+                                <% if (user.status === 'active') { %>
+                                    <a href="/admin/users/freeze/<%= user.user_id %>" class="btn-small btn-danger">Freeze Account</a>
+                                <% } else { %>
+                                    <a href="/admin/users/unfreeze/<%= user.user_id %>" class="btn-small btn-success">Unfreeze</a>
+                                <% } %>
+                                
+                                <a href="/admin/users/reset-password/<%= user.user_id %>" class="btn-small btn-warning" onclick="return confirm('Reset password to default?')">Password Reset</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

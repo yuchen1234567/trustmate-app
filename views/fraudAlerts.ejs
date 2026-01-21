@@ -1,0 +1,52 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-dashboard">
+    <h1>Fraud Alerts</h1>
+    
+    <div class="dashboard-nav">
+        <a href="/admin/dashboard">Dashboard</a>
+        <a href="/admin/fraud" class="active">All Alerts</a>
+        <a href="/admin/users">Users</a>
+    </div>
+    
+    <a href="/admin/dashboard" class="btn-secondary" style="display: inline-block; margin-bottom: 1rem;">Back to Dashboard</a>
+    
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Alert ID</th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (alerts.length === 0) { %>
+                <tr><td colspan="7">No alerts found.</td></tr>
+            <% } else { %>
+                <% alerts.forEach(alert => { %>
+                    <tr>
+                        <td>#<%= alert.alert_id %></td>
+                        <td><%= alert.username || 'N/A' %> (<%= alert.email || 'N/A' %>)</td>
+                        <td><%= alert.alert_type %></td>
+                        <td><%= alert.description %></td>
+                        <td><span class="status-badge status-<%= alert.status %>"><%= alert.status %></span></td>
+                        <td><%= new Date(alert.created_at).toLocaleDateString() %></td>
+                        <td>
+                            <% if (alert.status === 'pending') { %>
+                                <a href="/admin/fraud/review/<%= alert.alert_id %>" class="btn-small">Review</a>
+                            <% } %>
+                            <a href="/admin/fraud/resolve/<%= alert.alert_id %>" class="btn-small btn-success">Resolve</a>
+                            <a href="/admin/fraud/delete/<%= alert.alert_id %>" class="btn-small btn-danger" onclick="return confirm('Delete this alert?')">Delete</a>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<%- include('partials/footer') %>

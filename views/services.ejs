@@ -1,0 +1,44 @@
+<%- include('partials/navbar') %>
+
+<div class="services-page">
+    <div class="filter-section">
+        <h2>Product and Filter</h2>
+        
+        <form action="/services" method="GET" class="search-form">
+            <input type="text" name="q" placeholder="Search services..." value="<%= searchTerm %>">
+            <button type="submit">Search</button>
+        </form>
+        
+        <h3>Explore Type</h3>
+        <div class="categories-filter">
+            <% categories.forEach(category => { %>
+                <a href="/services?category=<%= category.category_id %>" 
+                   class="category-btn <%= selectedCategory == category.category_id ? 'active' : '' %>">
+                    <%= category.name %>
+                </a>
+            <% }); %>
+            <a href="/services" class="category-btn <%= !selectedCategory ? 'active' : '' %>">All</a>
+        </div>
+    </div>
+    
+    <div class="services-list">
+        <h2>Services</h2>
+        <div class="services-grid">
+            <% if (services.length === 0) { %>
+                <p>No services found.</p>
+            <% } else { %>
+                <% services.forEach(service => { %>
+                    <div class="service-card">
+                        <h3><%= service.title %></h3>
+                        <p><%= service.description ? service.description.substring(0, 100) : '' %>...</p>
+                        <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
+                        <p class="category"><%= service.category_name %></p>
+                        <a href="/services/<%= service.service_id %>" class="btn-view">View Details</a>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

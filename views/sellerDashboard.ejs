@@ -1,0 +1,50 @@
+<%- include('partials/navbar') %>
+
+<div class="seller-dashboard">
+    <h1>Seller Dashboard</h1>
+    <p>Welcome, <%= seller.business_name %>!</p>
+    
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>Total Services</h3>
+            <p class="stat-number"><%= services.length %></p>
+        </div>
+        <div class="stat-card">
+            <h3>Active Services</h3>
+            <p class="stat-number"><%= services.filter(s => s.status === 'active').length %></p>
+        </div>
+        <div class="stat-card">
+            <h3>Verified</h3>
+            <p class="stat-number"><%= seller.verified ? 'Yes' : 'No' %></p>
+        </div>
+    </div>
+    
+    <div class="dashboard-actions">
+        <h2>Manage Your Services</h2>
+        <a href="/seller/services/create" class="btn-primary">Add New Service</a>
+        <a href="/seller/services" class="btn-secondary">View All Services</a>
+    </div>
+    
+    <div class="recent-services">
+        <h2>Your Services</h2>
+        <% if (services.length === 0) { %>
+            <p>You haven't added any services yet.</p>
+        <% } else { %>
+            <div class="services-grid">
+                <% services.slice(0, 6).forEach(service => { %>
+                    <div class="service-card">
+                        <h3><%= service.title %></h3>
+                        <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
+                        <p class="status">Status: <%= service.status %></p>
+                        <div class="card-actions">
+                            <a href="/seller/services/edit/<%= service.service_id %>" class="btn-small">Edit</a>
+                            <a href="/seller/services/delete/<%= service.service_id %>" class="btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

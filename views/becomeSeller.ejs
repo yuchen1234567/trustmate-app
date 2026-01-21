@@ -1,0 +1,36 @@
+<%- include('partials/navbar') %>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="support-local-logo">
+                <h2>Support Local</h2>
+            </div>
+        </div>
+        
+        <h2>BECOME A SELLER</h2>
+        <p>Sign up to offer your services locally</p>
+        
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+        
+        <form action="/seller/register" method="POST" class="auth-form">
+            <input type="text" name="business_name" placeholder="Business Name" required>
+            <textarea name="description" placeholder="Describe your services" rows="4" required></textarea>
+            
+            <button type="submit" class="btn-primary">NEXT</button>
+            
+            <div class="auth-divider">OR WITH</div>
+            
+            <p class="auth-link">Have an account? <a href="/login">login</a></p>
+            
+            <div class="terms">
+                <input type="checkbox" required>
+                <label>By registering, You agree to the Terms, Conditions and Policies of Local Help</label>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

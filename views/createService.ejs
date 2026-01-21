@@ -1,0 +1,46 @@
+<%- include('partials/navbar') %>
+
+<div class="form-page">
+    <h1>Add New Service</h1>
+    
+    <% if (error) { %>
+        <div class="error-message"><%= error %></div>
+    <% } %>
+    
+    <form action="/seller/services/create" method="POST" class="service-form">
+        <div class="form-group">
+            <label>Service Title:</label>
+            <input type="text" name="title" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Description:</label>
+            <textarea name="description" rows="5" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Price ($):</label>
+            <input type="number" name="price" step="0.01" min="0" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Category:</label>
+            <select name="category_id" required>
+                <option value="">Select a category</option>
+                <% categories.forEach(category => { %>
+                    <option value="<%= category.category_id %>"><%= category.name %></option>
+                <% }); %>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Image URL (optional):</label>
+            <input type="text" name="image" placeholder="/images/service.png">
+        </div>
+        
+        <button type="submit" class="btn-primary">Create Service</button>
+        <a href="/seller/dashboard" class="btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<%- include('partials/footer') %>

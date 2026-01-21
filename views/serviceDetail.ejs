@@ -1,0 +1,73 @@
+<%- include('partials/navbar') %>
+
+<div class="service-detail">
+    <div class="service-info">
+        <h1><%= service.title %></h1>
+        <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
+        <p class="seller">Offered by: <%= service.business_name || service.seller_name %></p>
+        <p class="category">Category: <%= service.category_name %></p>
+        
+        <div class="description">
+            <h3>Description</h3>
+            <p><%= service.description %></p>
+        </div>
+        
+        <% if (user) { %>
+            <form action="/cart/add" method="POST" class="add-to-cart-form">
+                <input type="hidden" name="service_id" value="<%= service.service_id %>">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" value="1" min="1" max="10">
+                <button type="submit" class="btn-primary">Add to Cart</button>
+            </form>
+        <% } else { %>
+            <div class="login-prompt">
+                <p>Please log in to purchase this service</p>
+                <a href="/login" class="btn-primary">Login to Purchase</a>
+            </div>
+        <% } %>
+    </div>
+    
+    <div class="reviews-section">
+        <h2>Reviews</h2>
+        
+        <% if (avgRating && avgRating.review_count > 0) { %>
+            <div class="rating-summary">
+                <p>Average Rating: <%= avgRating.avg_rating ? avgRating.avg_rating.toFixed(1) : 'N/A' %> / 5</p>
+                <p>Total Reviews: <%= avgRating.review_count %></p>
+            </div>
+        <% } %>
+        
+        <div class="reviews-list">
+            <% if (reviews.length === 0) { %>
+                <p>No reviews yet.</p>
+            <% } else { %>
+                <% reviews.forEach(review => { %>
+                    <div class="review-card">
+                        <p class="reviewer"><strong><%= review.username %></strong></p>
+                        <p class="rating">Rating: <%= review.rating %> / 5</p>
+                        <p class="comment"><%= review.comment %></p>
+                        <% if (review.tags) { %>
+                            <p class="tags">Tags: <%= review.tags %></p>
+                        <% } %>
+                        <p class="date"><%= new Date(review.created_at).toLocaleDateString() %></p>
+                        
+                        <% if (user) { %>
+                            <div class="review-actions">
+                                <% if (user.user_id === review.user_id) { %>
+                                    <!-- Only review author can edit -->
+                                    <a href="/reviews/edit/<%= review.review_id %>" class="btn-small">Edit</a>
+                                    <a href="/reviews/delete/<%= review.review_id %>" class="btn-small btn-danger" onclick="return confirm('Are you sure you want to delete this review?')">Delete</a>
+                                <% } else if (user.role === 'admin') { %>
+                                    <!-- Admin can only delete, not edit -->
+                                    <a href="/reviews/delete/<%= review.review_id %>" class="btn-small btn-danger" onclick="return confirm('Are you sure you want to delete this review?')">Delete (Admin)</a>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

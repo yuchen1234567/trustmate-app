@@ -1,0 +1,42 @@
+<%- include('partials/navbar') %>
+
+<div class="hero-section">
+    <div class="hero-content">
+        <h1>ONE SEARCH AWAY FROM</h1>
+        <h1>FIND THE RIGHT PERSON</h1>
+        <div class="search-bar">
+            <form action="/services" method="GET">
+                <input type="text" name="q" placeholder="Find talent across 700+ categories">
+                <button type="submit">Connect with top talent →</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<section class="categories-section">
+    <h2>Explore Type</h2>
+    <div class="categories-grid">
+        <% categories.forEach(category => { %>
+            <a href="/services?category=<%= category.category_id %>" class="category-card">
+                <%= category.name %>
+            </a>
+        <% }); %>
+    </div>
+</section>
+
+<section class="popular-services">
+    <h2>Popular Services</h2>
+    <div class="services-grid">
+        <% services.slice(0, 8).forEach(service => { %>
+            <div class="service-card">
+                <h3><%= service.title %></h3>
+                <p><%= service.description ? service.description.substring(0, 100) : '' %>...</p>
+                <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
+                <p class="seller">by <%= service.business_name || 'Seller' %></p>
+                <a href="/services/<%= service.service_id %>" class="btn-view">View Details</a>
+            </div>
+        <% }); %>
+    </div>
+</section>
+
+<%- include('partials/footer') %>

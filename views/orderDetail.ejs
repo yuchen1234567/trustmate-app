@@ -1,0 +1,61 @@
+<%- include('partials/navbar') %>
+
+<div class="order-detail-page">
+    <h1>Order #<%= order.order_id %></h1>
+    
+    <div class="order-info">
+        <p><strong>Date:</strong> <%= new Date(order.created_at).toLocaleDateString() %></p>
+        <p><strong>Status:</strong> <span class="status-badge status-<%= order.status %>"><%= order.status %></span></p>
+        <p><strong>Total:</strong> $<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></p>
+    </div>
+    
+    <h2>Order Items</h2>
+    <table class="order-items-table">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% orderItems.forEach(item => { %>
+                <tr>
+                    <td>
+                        <div class="item-info">
+                            <div>
+                                <h4><%= item.title %></h4>
+                                <p><%= item.business_name %></p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>$<%= typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price || 0).toFixed(2) %></td>
+                    <td><%= item.quantity %></td>
+                    <td>$<%= typeof item.price === 'number' ? (item.price * item.quantity).toFixed(2) : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    
+    <div class="order-actions">
+        <% if (order.status === 'pending') { %>
+            <form action="/orders/<%= order.order_id %>/status" method="POST" style="display: inline;">
+                <input type="hidden" name="status" value="completed">
+                <button type="submit" class="btn-primary">Mark as Completed</button>
+            </form>
+            
+            <form action="/orders/<%= order.order_id %>/cancel" method="POST" style="display: inline;">
+                <button type="submit" class="btn-danger">Cancel Order</button>
+            </form>
+        <% } %>
+        
+        <% if (order.status === 'completed') { %>
+            <a href="/reviews/create/<%= order.order_id %>" class="btn-primary">Leave a Review</a>
+        <% } %>
+        
+        <a href="/chat/<%= order.order_id %>" class="btn-secondary">Chat</a>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

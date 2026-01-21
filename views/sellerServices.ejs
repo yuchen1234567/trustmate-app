@@ -1,0 +1,29 @@
+<%- include('partials/navbar') %>
+
+<div class="seller-services-page">
+    <h1>My Services</h1>
+    
+    <a href="/seller/services/create" class="btn-primary" style="display: inline-block; margin-bottom: 2rem;">Add New Service</a>
+    
+    <% if (services.length === 0) { %>
+        <p>You haven't added any services yet.</p>
+    <% } else { %>
+        <div class="services-grid">
+            <% services.forEach(service => { %>
+                <div class="service-card">
+                    <h3><%= service.title %></h3>
+                    <p><%= service.description ? service.description.substring(0, 100) : '' %>...</p>
+                    <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
+                    <p class="category"><%= service.category_name %></p>
+                    <p class="status">Status: <%= service.status %></p>
+                    <div class="card-actions">
+                        <a href="/seller/services/edit/<%= service.service_id %>" class="btn-small">Edit</a>
+                        <a href="/seller/services/delete/<%= service.service_id %>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this service?')">Delete</a>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

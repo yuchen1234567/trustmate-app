@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trustmate - Support Local</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/">
+                    <img src="/images/logo.png" alt="Trustmate Logo" class="logo-img">
+                    <div class="brand-text">
+                        <h1>TRUSTMATE</h1>
+                        <p class="tagline">Support Local</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/services">Explore</a>
+                
+                <% if (user) { %>
+                    <a href="/cart">Cart</a>
+                    <a href="/orders">My Orders</a>
+                    
+                    <% if (user.role === 'seller' || user.role === 'admin') { %>
+                        <a href="/seller/dashboard">Seller Dashboard</a>
+                    <% } else { %>
+                        <a href="/seller/register">Become a Seller</a>
+                    <% } %>
+                    
+                    <% if (user.role === 'admin') { %>
+                        <a href="/admin/dashboard">Admin</a>
+                    <% } %>
+                    
+                    <span class="user-info">Hello, <%= user.username %></span>
+                    <a href="/logout" class="btn-logout">Logout</a>
+                <% } else { %>
+                    <a href="/login" class="btn-login">Login</a>
+                    <a href="/register" class="btn-signup">Sign Up</a>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="main-content">

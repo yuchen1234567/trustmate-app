@@ -1,0 +1,55 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-dashboard">
+    <h1>User History</h1>
+    
+    <div class="user-info-card">
+        <h2><%= user.username %></h2>
+        <p>Email: <%= user.email %></p>
+        <p>Role: <%= user.role %></p>
+        <p>Status: <%= user.status %></p>
+        <p>Joined: <%= new Date(user.created_at).toLocaleDateString() %></p>
+    </div>
+    
+    <h2>Order History</h2>
+    
+    <% if (orders.length === 0) { %>
+        <p>No orders found for this user.</p>
+    <% } else { %>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orders.forEach(order => { %>
+                    <tr>
+                        <td>#<%= order.order_id %></td>
+                        <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+                        <td>$<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></td>
+                        <td><span class="status-badge status-<%= order.status %>"><%= order.status %></span></td>
+                        <td><a href="/orders/<%= order.order_id %>" class="btn-small">View</a></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } %>
+    
+    <a href="/admin/users" class="btn-secondary" style="display: inline-block; margin-top: 2rem;">Back to Users</a>
+</div>
+
+<style>
+.user-info-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+</style>
+
+<%- include('partials/footer') %>

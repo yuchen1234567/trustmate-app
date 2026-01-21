@@ -1,0 +1,47 @@
+<%- include('partials/navbar') %>
+
+<div class="form-page">
+    <h1>Edit Service</h1>
+    
+    <% if (error) { %>
+        <div class="error-message"><%= error %></div>
+    <% } %>
+    
+    <form action="/seller/services/update/<%= service.service_id %>" method="POST" class="service-form">
+        <div class="form-group">
+            <label>Service Title:</label>
+            <input type="text" name="title" value="<%= service.title %>" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Description:</label>
+            <textarea name="description" rows="5" required><%= service.description %></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Price ($):</label>
+            <input type="number" name="price" step="0.01" min="0" value="<%= service.price %>" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Category:</label>
+            <select name="category_id" required>
+                <% categories.forEach(category => { %>
+                    <option value="<%= category.category_id %>" <%= service.category_id == category.category_id ? 'selected' : '' %>>
+                        <%= category.name %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Image URL:</label>
+            <input type="text" name="image" value="<%= service.image || '' %>">
+        </div>
+        
+        <button type="submit" class="btn-primary">Update Service</button>
+        <a href="/seller/services" class="btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<%- include('partials/footer') %>

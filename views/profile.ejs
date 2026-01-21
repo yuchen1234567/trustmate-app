@@ -1,0 +1,49 @@
+<%- include('partials/navbar') %>
+
+<div class="profile-page">
+    <h1>My Profile</h1>
+    
+    <div class="profile-card">
+        <h2><%= user.username %></h2>
+        <p><strong>Email:</strong> <%= user.email %></p>
+        <p><strong>Phone:</strong> <%= user.phone || 'Not provided' %></p>
+        <p><strong>Role:</strong> <%= user.role %></p>
+        <p><strong>Status:</strong> <%= user.status %></p>
+        <p><strong>Member since:</strong> <%= new Date(user.created_at).toLocaleDateString() %></p>
+    </div>
+    
+    <div class="profile-actions">
+        <a href="/orders" class="btn-primary">My Orders</a>
+        <% if (user.role === 'seller' || user.role === 'admin') { %>
+            <a href="/seller/dashboard" class="btn-secondary">Seller Dashboard</a>
+        <% } else { %>
+            <a href="/seller/register" class="btn-secondary">Become a Seller</a>
+        <% } %>
+    </div>
+</div>
+
+<style>
+.profile-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: 2rem auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-card p {
+    margin: 1rem 0;
+}
+
+.profile-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.profile-actions a {
+    margin: 0 1rem;
+}
+</style>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,37 @@
+<%- include('partials/navbar') %>
+
+<div class="checkout-page">
+    <h1>Checkout</h1>
+    
+    <div class="checkout-container">
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <table class="summary-table">
+                <% cartItems.forEach(item => { %>
+                    <tr>
+                        <td><%= item.title %></td>
+                        <td>x<%= item.quantity %></td>
+                        <td>$<%= typeof item.price === 'number' ? (item.price * item.quantity).toFixed(2) : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %></td>
+                    </tr>
+                <% }); %>
+                <tr class="total-row">
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td><strong>$<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></strong></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="checkout-form">
+            <h2>Confirm Order</h2>
+            <p>No payment required. Click below to place your order.</p>
+            
+            <form action="/orders/create" method="POST">
+                <button type="submit" class="btn-primary">Place Order</button>
+            </form>
+            
+            <a href="/cart" class="btn-secondary">Back to Cart</a>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

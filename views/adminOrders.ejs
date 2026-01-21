@@ -1,0 +1,99 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-container">
+    <h1>Order Management</h1>
+    
+    <div class="admin-actions">
+        <a href="/admin/dashboard" class="btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-section">
+        <form action="/admin/orders" method="GET" class="search-form">
+            <input type="text" name="search" placeholder="Search by username or email..." value="<%= searchTerm %>">
+            <button type="submit" class="btn-primary">Search</button>
+            <% if (searchTerm) { %>
+                <a href="/admin/orders" class="btn-secondary">Clear</a>
+            <% } %>
+        </form>
+
+        <form action="/admin/orders" method="GET" class="filter-form">
+            <select name="status" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                <option value="pending" <%= selectedStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+                <option value="processing" <%= selectedStatus === 'processing' ? 'selected' : '' %>>Processing</option>
+                <option value="completed" <%= selectedStatus === 'completed' ? 'selected' : '' %>>Completed</option>
+                <option value="cancelled" <%= selectedStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="orders-section">
+        <% if (orders.length === 0) { %>
+            <p>No orders found.</p>
+        <% } else { %>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders.forEach(order => { %>
+                        <tr>
+                            <td>#<%= order.order_id %></td>
+                            <td><%= order.username %></td>
+                            <td><%= order.email %></td>
+                            <td>$<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></td>
+                            <td>
+                                <span class="status-badge status-<%= order.status %>">
+                                    <%= order.status %>
+                                </span>
+                            </td>
+                            <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+                            <td>
+                                <a href="/admin/orders/<%= order.order_id %>" class="btn-small">View Details</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+
+    <!-- Statistics -->
+    <div class="order-stats">
+        <h2>Order Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Orders</h3>
+                <p class="stat-number"><%= orders.length %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Pending</h3>
+                <p class="stat-number"><%= orders.filter(o => o.status === 'pending').length %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Processing</h3>
+                <p class="stat-number"><%= orders.filter(o => o.status === 'processing').length %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Completed</h3>
+                <p class="stat-number"><%= orders.filter(o => o.status === 'completed').length %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Cancelled</h3>
+                <p class="stat-number"><%= orders.filter(o => o.status === 'cancelled').length %></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

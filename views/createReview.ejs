@@ -1,0 +1,58 @@
+<%- include('partials/navbar') %>
+
+<div class="review-page">
+    <h1>Leave a Review</h1>
+    <p>Order #<%= order.order_id %></p>
+    
+    <% if (error) { %>
+        <div class="error-message"><%= error %></div>
+    <% } %>
+    
+    <form action="/reviews/create" method="POST" class="review-form">
+        <input type="hidden" name="order_id" value="<%= order.order_id %>">
+        
+        <% if (orderItems.length > 0) { %>
+            <input type="hidden" name="service_id" value="<%= orderItems[0].service_id %>">
+            
+            <h3>How was your experience?</h3>
+            <p>Rate the service: <%= orderItems[0].title %></p>
+        <% } %>
+        
+        <div class="rating-input">
+            <label>Rating:</label>
+            <div class="stars">
+                <input type="radio" name="rating" value="1" id="star1" required>
+                <label for="star1">★</label>
+                <input type="radio" name="rating" value="2" id="star2">
+                <label for="star2">★</label>
+                <input type="radio" name="rating" value="3" id="star3">
+                <label for="star3">★</label>
+                <input type="radio" name="rating" value="4" id="star4">
+                <label for="star4">★</label>
+                <input type="radio" name="rating" value="5" id="star5">
+                <label for="star5">★</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Write a review:</label>
+            <textarea name="comment" rows="5" maxlength="400" placeholder="Share details about how it was like interacting with this seller"></textarea>
+            <small>0/400 characters</small>
+        </div>
+        
+        <div class="form-group">
+            <label>Give a compliment (optional):</label>
+            <div class="tags-input">
+                <label><input type="checkbox" name="tags" value="Updated listings"> Updated listings</label>
+                <label><input type="checkbox" name="tags" value="Goes the extra mile"> Goes the extra mile</label>
+                <label><input type="checkbox" name="tags" value="Knows their stuff"> Knows their stuff</label>
+                <label><input type="checkbox" name="tags" value="Amazing chat"> Amazing chat</label>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn-primary">Submit Review</button>
+        <a href="/orders/<%= order.order_id %>" class="btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<%- include('partials/footer') %>
