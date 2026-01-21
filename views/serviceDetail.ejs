@@ -32,7 +32,7 @@
         
         <% if (avgRating && avgRating.review_count > 0) { %>
             <div class="rating-summary">
-                <p>Average Rating: <%= avgRating.avg_rating ? avgRating.avg_rating.toFixed(1) : 'N/A' %> / 5</p>
+                <p>Average Rating: <%= avgRating.avg_rating ? parseFloat(avgRating.avg_rating).toFixed(1) : 'N/A' %> / 5</p>
                 <p>Total Reviews: <%= avgRating.review_count %></p>
             </div>
         <% } %>
