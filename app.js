@@ -47,6 +47,12 @@ app.post('/register', userController.register);
 app.get('/login', userController.showLogin);
 app.post('/login', userController.login);
 app.get('/logout', userController.logout);
+app.get('/2fa/email', userController.showEmail2fa);
+app.post('/2fa/email/verify', userController.verifyEmail2fa);
+app.get('/2fa/email/resend', userController.resendEmail2fa);
+app.get('/2fa/phone', userController.showPhone2fa);
+app.post('/2fa/phone/verify', userController.verifyPhone2fa);
+app.get('/2fa/phone/resend', userController.resendPhone2fa);
 app.get('/faq', (req, res) => {
     res.render('faq');
 });

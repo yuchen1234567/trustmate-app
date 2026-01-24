@@ -309,6 +309,94 @@ body {
     margin-bottom: 1rem;
 }
 
+/* Two-factor auth */
+.twofa-container {
+    max-width: 720px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+}
+
+.twofa-card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.1);
+    text-align: center;
+}
+
+.twofa-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.twofa-subtext {
+    color: var(--text-muted);
+    margin: 0.75rem auto 2rem;
+    max-width: 520px;
+}
+
+.twofa-hint {
+    margin: 0 auto 1.5rem;
+    color: var(--text-muted);
+}
+
+.twofa-hint strong {
+    color: var(--text-primary);
+}
+
+.twofa-highlight {
+    display: inline-block;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.twofa-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.otp-inputs {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(44px, 1fr));
+    gap: 0.75rem;
+    justify-items: center;
+}
+
+.otp-input {
+    width: 100%;
+    max-width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    background: var(--surface-muted);
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.otp-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.2);
+}
+
+.twofa-resend {
+    display: inline-block;
+    margin-top: 1.25rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.twofa-resend:hover {
+    color: var(--accent);
+}
+
 /* Cart */
 .cart-table {
     width: 100%;
