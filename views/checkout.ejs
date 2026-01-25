@@ -1,37 +1,78 @@
 <%- include('partials/navbar') %>
 
-<div class="checkout-page">
-    <h1>Checkout</h1>
-    
-    <div class="checkout-container">
-        <div class="order-summary">
-            <h2>Order Summary</h2>
-            <table class="summary-table">
-                <% cartItems.forEach(item => { %>
-                    <tr>
-                        <td><%= item.title %></td>
-                        <td>x<%= item.quantity %></td>
-                        <td>$<%= typeof item.price === 'number' ? (item.price * item.quantity).toFixed(2) : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %></td>
-                    </tr>
-                <% }); %>
-                <tr class="total-row">
-                    <td colspan="2"><strong>Total</strong></td>
-                    <td><strong>$<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></strong></td>
-                </tr>
-            </table>
-        </div>
-        
-        <div class="checkout-form">
-            <h2>Confirm Order</h2>
-            <p>No payment required. Click below to place your order.</p>
-            
-            <form action="/orders/create" method="POST">
-                <button type="submit" class="btn-primary">Place Order</button>
-            </form>
-            
-            <a href="/cart" class="btn-secondary">Back to Cart</a>
-        </div>
+<div style="max-width: 980px; margin: 40px auto; padding: 0 16px;">
+  <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px;">
+    <div>
+      <h1 style="margin:0; font-size:28px;">Checkout</h1>
+      <p style="margin:8px 0 0; color:#666; font-size:14px;">Review your items and place your order.</p>
     </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1.4fr 1fr; gap:18px;">
+    <!-- Order Summary -->
+    <div style="background:#fff; border-radius:16px; padding:22px; border:1px solid rgba(0,0,0,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
+      <h2 style="margin:0 0 14px; font-size:18px;">Order Summary</h2>
+
+      <div style="border:1px solid #eee; border-radius:14px; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+          <tbody>
+            <% cartItems.forEach(item => { %>
+              <tr>
+                <td style="padding:12px 14px; border-bottom:1px solid #eee;">
+                  <div style="font-weight:700; color:#222;"><%= item.title %></div>
+                  <div style="color:#777; font-size:12px;">Qty: <%= item.quantity %></div>
+                </td>
+                <td style="padding:12px 14px; text-align:right; border-bottom:1px solid #eee; white-space:nowrap; font-weight:700;">
+                  $<%= typeof item.price === 'number'
+                    ? (item.price * item.quantity).toFixed(2)
+                    : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %>
+                </td>
+              </tr>
+            <% }); %>
+
+            <tr>
+              <td style="padding:14px; font-weight:800; font-size:14px;">Total</td>
+              <td style="padding:14px; text-align:right; font-weight:900; font-size:16px; white-space:nowrap;">
+                $<%= Number(total || 0).toFixed(2) %>
+
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:12px; color:#777; font-size:12px;">
+        Prices shown include quantity calculation.
+      </div>
+    </div>
+
+    <!-- Confirm Order -->
+    <div style="background:#fff; border-radius:16px; padding:22px; border:1px solid rgba(0,0,0,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
+      <h2 style="margin:0 0 10px; font-size:18px;">Confirm Order</h2>
+
+      <div style="background:#f7f7f7; border:1px solid #eee; padding:12px 14px; border-radius:14px; margin-bottom:14px;">
+        <p style="margin:0; color:#444; font-size:14px;">
+          No payment required. Click below to place your order.
+        </p>
+      </div>
+
+      <form action="/orders/create" method="POST" style="margin-bottom:10px;">
+        <button type="submit"
+          style="width:100%; padding:12px 16px; border:none; border-radius:12px; background:#222; color:#fff; font-weight:800; cursor:pointer;">
+          Place Order
+        </button>
+      </form>
+
+      <a href="/cart"
+        style="display:block; text-align:center; padding:12px 16px; border-radius:12px; border:1px solid #ddd; text-decoration:none; color:#222; font-weight:800;">
+        Back to Cart
+      </a>
+
+      <div style="margin-top:12px; color:#777; font-size:12px; line-height:1.5;">
+        By placing your order, you agree to our basic terms and confirm the order details are correct.
+      </div>
+    </div>
+  </div>
 </div>
 
 <%- include('partials/footer') %>
