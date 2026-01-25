@@ -1,133 +1,129 @@
 <%- include('partials/navbar') %>
 
-<div class="review-page">
-    <div class="review-shell">
-        <header class="review-header">
-            <p class="review-eyebrow">Leave a Review</p>
-            <h1>How was your experience?</h1>
-            <p class="review-meta">
-                Order #<%= order.order_id %>
-                <% if (orderItems.length > 0) { %>
-                    · Service: <%= orderItems[0].title %>
-                <% } %>
-            </p>
-        </header>
+<div style="max-width: 850px; margin: 40px auto; padding: 0 16px;">
+  <div style="background:#fff; border-radius:16px; padding:28px; border:1px solid rgba(0,0,0,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
 
-        <% if (error) { %>
-            <div class="error-message"><%= error %></div>
-        <% } %>
-
-        <form action="/reviews/create" method="POST" class="review-form">
-            <input type="hidden" name="order_id" value="<%= order.order_id %>">
-
-            <% if (orderItems.length > 0) { %>
-                <input type="hidden" name="service_id" value="<%= orderItems[0].service_id %>">
-            <% } %>
-
-            <section class="review-section">
-                <div class="rating-input">
-                    <label class="review-label">Rating</label>
-                    <div class="review-stars" aria-label="Rating from 1 to 5">
-                        <input type="radio" name="rating" value="5" id="star5" required>
-                        <label for="star5" title="5 stars">★</label>
-                        <input type="radio" name="rating" value="4" id="star4">
-                        <label for="star4" title="4 stars">★</label>
-                        <input type="radio" name="rating" value="3" id="star3">
-                        <label for="star3" title="3 stars">★</label>
-                        <input type="radio" name="rating" value="2" id="star2">
-                        <label for="star2" title="2 stars">★</label>
-                        <input type="radio" name="rating" value="1" id="star1">
-                        <label for="star1" title="1 star">★</label>
-                    </div>
-                    <p class="review-feedback" aria-live="polite"></p>
-                    <p class="review-hint">Tap a star to rate the service.</p>
-                </div>
-            </section>
-
-            <section class="review-section">
-                <label class="review-label" for="comment">Write a review</label>
-                <textarea id="comment" name="comment" rows="6" maxlength="400" placeholder="Share what went well, what could be better, and how communication felt."></textarea>
-                <small class="char-count">0/400 characters</small>
-            </section>
-
-            <section class="review-section">
-                <label class="review-label">Give a compliment (optional)</label>
-                <div class="tags-input">
-                    <label class="tag-pill" data-phrase="Their listing was clear and kept up to date."><input type="checkbox" name="tags" value="Updated listings"><span>Updated listings</span></label>
-                    <label class="tag-pill" data-phrase="They really went the extra mile by..."><input type="checkbox" name="tags" value="Goes the extra mile"><span>Goes the extra mile</span></label>
-                    <label class="tag-pill" data-phrase="You can tell they know their stuff when..."><input type="checkbox" name="tags" value="Knows their stuff"><span>Knows their stuff</span></label>
-                    <label class="tag-pill" data-phrase="Communication was smooth and responsive."><input type="checkbox" name="tags" value="Amazing chat"><span>Amazing chat</span></label>
-                </div>
-            </section>
-
-            <div class="review-form-actions">
-                <button type="submit" class="btn-primary">Submit Review</button>
-                <a href="/orders/<%= order.order_id %>" class="btn-secondary btn-cancel" data-confirm="Discard review?">Cancel</a>
-            </div>
-            <p class="review-trust-note">Your review helps others choose with confidence.</p>
-        </form>
+    <!-- Header -->
+    <div style="margin-bottom:18px;">
+      <h1 style="margin:0; font-size:28px;">Leave a Review</h1>
+      <p style="margin:8px 0 0; color:#666; font-size:14px;">
+        Order #<strong><%= order.order_id %></strong>
+      </p>
     </div>
+
+    <% if (error) { %>
+      <div style="background:#ffe6e6; color:#9a1b1b; border:1px solid #ffb4b4; padding:12px 14px; border-radius:12px; margin-bottom:16px;">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/reviews/create" method="POST">
+      <input type="hidden" name="order_id" value="<%= order.order_id %>">
+
+      <% if (orderItems.length > 0) { %>
+        <input type="hidden" name="service_id" value="<%= orderItems[0].service_id %>">
+
+        <div style="background:#f7f7f7; border:1px solid #eee; padding:14px 16px; border-radius:14px; margin-bottom:18px;">
+          <h3 style="margin:0 0 6px; font-size:16px;">How was your experience?</h3>
+          <p style="margin:0; color:#444;">
+            Rate the service: <strong><%= orderItems[0].title %></strong>
+          </p>
+        </div>
+      <% } %>
+
+      <!-- Rating -->
+      <div style="margin-bottom:18px;">
+        <label style="display:block; font-weight:700; margin-bottom:10px;">Rating</label>
+
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input type="radio" name="rating" value="1" id="star1" required>
+          <label for="star1" style="font-size:22px; cursor:pointer;">★</label>
+
+          <input type="radio" name="rating" value="2" id="star2">
+          <label for="star2" style="font-size:22px; cursor:pointer;">★</label>
+
+          <input type="radio" name="rating" value="3" id="star3">
+          <label for="star3" style="font-size:22px; cursor:pointer;">★</label>
+
+          <input type="radio" name="rating" value="4" id="star4">
+          <label for="star4" style="font-size:22px; cursor:pointer;">★</label>
+
+          <input type="radio" name="rating" value="5" id="star5">
+          <label for="star5" style="font-size:22px; cursor:pointer;">★</label>
+        </div>
+
+        <small style="display:block; margin-top:6px; color:#777;">
+          Select 1 (worst) to 5 (best)
+        </small>
+      </div>
+
+      <!-- Comment -->
+      <div style="margin-bottom:18px;">
+        <label style="display:block; font-weight:700; margin-bottom:8px;">Write a review (optional)</label>
+        <textarea id="comment" name="comment" rows="5" maxlength="400"
+          placeholder="Share your experience interacting with this seller..."
+          style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none; resize:vertical;"></textarea>
+        <small id="charCount" style="display:block; margin-top:6px; color:#777;">0/400 characters</small>
+      </div>
+
+      <!-- Tags -->
+      <div style="margin-bottom:22px;">
+        <label style="display:block; font-weight:700; margin-bottom:10px;">Give a compliment (optional)</label>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
+            <input type="checkbox" name="tags" value="Updated listings">
+            Updated listings
+          </label>
+
+          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
+            <input type="checkbox" name="tags" value="Goes the extra mile">
+            Goes the extra mile
+          </label>
+
+          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
+            <input type="checkbox" name="tags" value="Knows their stuff">
+            Knows their stuff
+          </label>
+
+          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
+            <input type="checkbox" name="tags" value="Amazing chat">
+            Amazing chat
+          </label>
+        </div>
+
+        <small style="display:block; margin-top:8px; color:#777;">
+          You can choose more than one.
+        </small>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex; gap:12px; align-items:center;">
+        <button type="submit"
+          style="padding:12px 18px; border:none; border-radius:12px; background:#222; color:#fff; font-weight:700; cursor:pointer;">
+          Submit Review
+        </button>
+
+        <a href="/orders/<%= order.order_id %>"
+          style="padding:12px 18px; border-radius:12px; border:1px solid #ddd; text-decoration:none; color:#222; font-weight:700;">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+  </div>
 </div>
 
+<!-- Character Counter (Optional, no CSS needed) -->
 <script>
-    (function () {
-        const form = document.querySelector('.review-form');
-        if (!form) return;
-        const textarea = form.querySelector('textarea[name="comment"]');
-        const counter = form.querySelector('.char-count');
-        const feedback = form.querySelector('.review-feedback');
-        const stars = form.querySelectorAll('input[name="rating"]');
-        const tagPills = form.querySelectorAll('.tag-pill');
-        const cancelLink = form.querySelector('.btn-cancel');
-        if (!textarea || !counter) return;
-        const max = parseInt(textarea.getAttribute('maxlength') || '0', 10);
-        const updateCount = () => {
-            counter.textContent = `${textarea.value.length}/${max} characters`;
-        };
-        textarea.addEventListener('input', updateCount);
-        updateCount();
+  const comment = document.getElementById("comment");
+  const charCount = document.getElementById("charCount");
 
-        const feedbackByRating = {
-            1: 'Thanks for the honesty — what could have been better?',
-            2: 'Thanks! What stood out?',
-            3: 'Glad to hear that — want to share more?',
-            4: 'Great! What made it a strong experience?',
-            5: 'Amazing — what made it exceptional?'
-        };
-
-        stars.forEach((star) => {
-            star.addEventListener('change', () => {
-                if (feedback) {
-                    feedback.textContent = feedbackByRating[star.value] || '';
-                }
-            });
-        });
-
-        tagPills.forEach((pill) => {
-            const input = pill.querySelector('input');
-            if (!input) return;
-            input.addEventListener('change', () => {
-                if (!input.checked) return;
-                const phrase = pill.getAttribute('data-phrase');
-                if (!phrase) return;
-                if (!textarea.value.trim()) {
-                    textarea.value = phrase;
-                } else if (!textarea.value.includes(phrase)) {
-                    textarea.value = `${textarea.value.trim()} ${phrase}`;
-                }
-                updateCount();
-            });
-        });
-
-        if (cancelLink) {
-            cancelLink.addEventListener('click', (event) => {
-                const message = cancelLink.getAttribute('data-confirm');
-                if (message && !window.confirm(message)) {
-                    event.preventDefault();
-                }
-            });
-        }
-    })();
+  if (comment && charCount) {
+    comment.addEventListener("input", () => {
+      charCount.textContent = `${comment.value.length}/400 characters`;
+    });
+  }
 </script>
 
 <%- include('partials/footer') %>
