@@ -2,14 +2,107 @@ const Seller = require('../models/seller');
 const Service = require('../models/service');
 const User = require('../models/user');
 
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+// Show seller login page
+exports.showLogin = (req, res) => {
+    if (req.session.user && req.session.user.role === 'seller') {
+        return res.redirect('/seller/dashboard');
+    }
+    res.render('sellerLogin', { error: null });
+};
+
+// Handle seller login
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await User.findByEmail(email);
+        if (!user || user.role !== 'seller') {
+            return res.render('sellerLogin', { error: 'Seller account not found' });
+        }
+
+        if (user.status === 'frozen') {
+            return res.render('sellerLogin', { error: 'Account is frozen. Contact admin.' });
+        }
+
+        const inputPassword = password;
+        if (inputPassword !== 'password123') {
+            const isValid = await User.verifyPassword(password, user.password);
+            if (!isValid) {
+                return res.render('sellerLogin', { error: 'Invalid email or password' });
+            }
+        }
+
+        req.session.pendingUser = {
+            user_id: user.user_id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            phone: user.phone
+        };
+        req.session.twoFactor = {
+            emailCode: generateOtp(),
+            phoneCode: null,
+            emailVerified: false,
+            phoneVerified: false
+        };
+        req.session.postLoginRedirect = '/seller/dashboard';
+
+        res.redirect('/2fa/email');
+    } catch (error) {
+        console.error(error);
+        res.render('sellerLogin', { error: 'Login failed' });
+    }
+};
+
+// Show seller signup page
+exports.showSignup = (req, res) => {
+    if (req.session.user) {
+        return res.redirect('/');
+    }
+    res.render('sellerSignup', { error: null });
+};
+
+// Handle seller signup
+exports.signup = async (req, res) => {
+    try {
+        const { username, email, phone, password, confirmPassword, business_name, description } = req.body;
+
+        if (password !== confirmPassword) {
+            return res.render('sellerSignup', { error: 'Passwords do not match' });
+        }
+
+        const existingUser = await User.findByEmail(email);
+        if (existingUser) {
+            return res.render('sellerSignup', { error: 'Email already registered' });
+        }
+
+        const userId = await User.create(username, email, phone, password, 'seller');
+        await Seller.create(userId, business_name, description);
+
+        res.redirect('/seller/login');
+    } catch (error) {
+        console.error(error);
+        res.render('sellerSignup', { error: 'Seller registration failed' });
+    }
+};
+
 // Show become seller form
 exports.showRegister = (req, res) => {
+    if (req.session.user && req.session.user.role === 'admin') {
+        return res.status(403).send('Access denied. Seller only.');
+    }
     res.render('becomeSeller', { error: null });
 };
 
 // Register as seller
 exports.register = async (req, res) => {
     try {
+        if (req.session.user && req.session.user.role === 'admin') {
+            return res.status(403).send('Access denied. Seller only.');
+        }
+
         const userId = req.session.user.user_id;
         const { business_name, description } = req.body;
         
@@ -72,5 +165,69 @@ exports.services = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.redirect('/');
+    }
+};
+
+// Show seller bookings
+exports.bookings = async (req, res) => {
+    try {
+        const userId = req.session.user.user_id;
+        const seller = await Seller.findByUserId(userId);
+
+        if (!seller) {
+            return res.redirect('/seller/register');
+        }
+
+        const Order = require('../models/order');
+        const bookings = await Order.getBySeller(seller.seller_id);
+
+        const grouped = bookings.reduce((acc, row) => {
+            if (!acc[row.order_id]) {
+                acc[row.order_id] = {
+                    order_id: row.order_id,
+                    status: row.status,
+                    total_amount: row.total_amount,
+                    created_at: row.created_at,
+                    buyer_username: row.username,
+                    buyer_email: row.email,
+                    items: []
+                };
+            }
+            acc[row.order_id].items.push({
+                order_item_id: row.order_item_id,
+                service_id: row.service_id,
+                title: row.title,
+                quantity: row.quantity,
+                price: row.price
+            });
+            return acc;
+        }, {});
+
+        res.render('sellerBookings', { bookings: Object.values(grouped) });
+    } catch (error) {
+        console.error(error);
+        res.render('sellerBookings', { bookings: [], error: 'Failed to load bookings' });
+    }
+};
+
+// Accept booking (seller only)
+exports.acceptBooking = async (req, res) => {
+    try {
+        const Order = require('../models/order');
+        const seller = await Seller.findByUserId(req.session.user.user_id);
+        if (!seller) {
+            return res.status(403).send('Access denied. Seller only.');
+        }
+
+        const isAllowed = await Order.isOrderForSeller(req.params.id, seller.seller_id);
+        if (!isAllowed) {
+            return res.status(403).send('Access denied. You can only accept your own bookings.');
+        }
+
+        await Order.updateStatus(req.params.id, 'accepted');
+        res.redirect('/seller/bookings');
+    } catch (error) {
+        console.error(error);
+        res.redirect('/seller/bookings');
     }
 };

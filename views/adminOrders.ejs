@@ -21,7 +21,7 @@
             <select name="status" onchange="this.form.submit()">
                 <option value="">All Statuses</option>
                 <option value="pending" <%= selectedStatus === 'pending' ? 'selected' : '' %>>Pending</option>
-                <option value="processing" <%= selectedStatus === 'processing' ? 'selected' : '' %>>Processing</option>
+                <option value="accepted" <%= selectedStatus === 'accepted' ? 'selected' : '' %>>Accepted</option>
                 <option value="completed" <%= selectedStatus === 'completed' ? 'selected' : '' %>>Completed</option>
                 <option value="cancelled" <%= selectedStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
             </select>
@@ -81,8 +81,8 @@
                 <p class="stat-number"><%= orders.filter(o => o.status === 'pending').length %></p>
             </div>
             <div class="stat-card">
-                <h3>Processing</h3>
-                <p class="stat-number"><%= orders.filter(o => o.status === 'processing').length %></p>
+                <h3>Accepted</h3>
+                <p class="stat-number"><%= orders.filter(o => o.status === 'accepted').length %></p>
             </div>
             <div class="stat-card">
                 <h3>Completed</h3>

@@ -1,0 +1,30 @@
+<%- include('partials/navbar') %>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="support-local-logo">
+                <h2>Support Local</h2>
+            </div>
+        </div>
+        
+        <h2>SELLER LOGIN</h2>
+        
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+        
+        <form action="/seller/login" method="POST" class="auth-form">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            
+            <button type="submit" class="btn-primary">NEXT</button>
+            
+            <div class="auth-divider">OR WITH</div>
+            
+            <p class="auth-link">Don't have a seller account? <a href="/seller/signup">sign up</a></p>
+        </form>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

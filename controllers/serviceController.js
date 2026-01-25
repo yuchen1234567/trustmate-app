@@ -78,10 +78,14 @@ exports.showCreate = async (req, res) => {
 exports.create = async (req, res) => {
     try {
         const { title, description, price, category_id } = req.body;
-        const sellerId = req.session.sellerId; // Assuming seller_id is stored in session
-
+        let sellerId = req.session.sellerId;
         if (!sellerId) {
-            return res.status(403).send('You must be a seller to create services');
+            const seller = await Seller.findByUserId(req.session.user.user_id);
+            if (!seller) {
+                return res.status(403).send('You must be a seller to create services');
+            }
+            sellerId = seller.seller_id;
+            req.session.sellerId = sellerId;
         }
 
         const image = req.body.image || '/images/default-service.png';

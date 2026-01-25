@@ -16,7 +16,7 @@ const isAdmin = (req, res, next) => {
 
 // Check if user is seller
 const isSeller = (req, res, next) => {
-    if (req.session && req.session.user && (req.session.user.role === 'seller' || req.session.user.role === 'admin')) {
+    if (req.session && req.session.user && req.session.user.role === 'seller') {
         return next();
     }
     res.status(403).send('Access denied. Seller only.');

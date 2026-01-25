@@ -73,7 +73,15 @@ const maskPhone = (phone) => {
     return `${'*'.repeat(digits.length - 2)}${digits.slice(-2)}`;
 };
 
-const getPostLoginRedirect = (user) => (user.role === 'admin' ? '/admin/dashboard' : '/');
+const getPostLoginRedirect = (user) => {
+    if (user.role === 'admin') {
+        return '/admin/dashboard';
+    }
+    if (user.role === 'seller') {
+        return '/seller/dashboard';
+    }
+    return '/';
+};
 
 // Handle login
 exports.login = async (req, res) => {

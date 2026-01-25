@@ -28,8 +28,9 @@
                     <a href="/cart">Cart</a>
                     <a href="/orders">My Orders</a>
                     
-                    <% if (user.role === 'seller' || user.role === 'admin') { %>
+                    <% if (user.role === 'seller') { %>
                         <a href="/seller/dashboard">Seller Dashboard</a>
+                        <a href="/seller/bookings">Bookings</a>
                     <% } else { %>
                         <a href="/seller/register" class="nav-pill">Become a Seller</a>
                     <% } %>
@@ -42,7 +43,9 @@
                     <a href="/logout" class="btn-logout">Logout</a>
                 <% } else { %>
                     <a href="/login" class="btn-login">Login</a>
+                    <a href="/seller/login" class="btn-login">Seller Login</a>
                     <a href="/register" class="btn-signup">Sign Up</a>
+                    <a href="/seller/signup" class="btn-signup">Seller Sign Up</a>
                 <% } %>
             </div>
         </div>

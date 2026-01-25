@@ -46,6 +46,10 @@ app.get('/register', userController.showRegister);
 app.post('/register', userController.register);
 app.get('/login', userController.showLogin);
 app.post('/login', userController.login);
+app.get('/seller/login', sellerController.showLogin);
+app.post('/seller/login', sellerController.login);
+app.get('/seller/signup', sellerController.showSignup);
+app.post('/seller/signup', sellerController.signup);
 app.get('/logout', userController.logout);
 app.get('/2fa/email', userController.showEmail2fa);
 app.post('/2fa/email/verify', userController.verifyEmail2fa);
@@ -98,6 +102,8 @@ app.get('/seller/register', isAuthenticated, sellerController.showRegister);
 app.post('/seller/register', isAuthenticated, sellerController.register);
 app.get('/seller/dashboard', isAuthenticated, isSeller, sellerController.dashboard);
 app.get('/seller/services', isAuthenticated, isSeller, sellerController.services);
+app.get('/seller/bookings', isAuthenticated, isSeller, sellerController.bookings);
+app.post('/seller/bookings/:id/accept', isAuthenticated, isSeller, sellerController.acceptBooking);
 
 // Seller service management
 app.get('/seller/services/create', isAuthenticated, isSeller, serviceController.showCreate);

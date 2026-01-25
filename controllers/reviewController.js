@@ -142,6 +142,10 @@ exports.reply = async (req, res) => {
             return res.status(403).send('Access denied. You can only reply to reviews on your own services.');
         }
 
+        if (review.seller_reply) {
+            return res.status(403).send('Access denied. You can only reply once to a review.');
+        }
+
         const reply = (req.body.reply || '').trim();
         if (!reply) {
             return res.redirect(`/services/${review.service_id}`);

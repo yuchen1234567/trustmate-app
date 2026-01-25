@@ -73,11 +73,11 @@
                             </div>
                         <% } %>
 
-                        <% if (canReply) { %>
+                        <% if (canReply && !review.seller_reply) { %>
                             <form action="/reviews/<%= review.review_id %>/reply" method="POST" class="seller-reply-form">
                                 <label for="reply-<%= review.review_id %>">Reply to this review</label>
-                                <textarea id="reply-<%= review.review_id %>" name="reply" rows="3" maxlength="400" placeholder="Thank them, address concerns, or share next steps."><%= review.seller_reply || '' %></textarea>
-                                <button type="submit" class="btn-small btn-primary"><%= review.seller_reply ? 'Update reply' : 'Post reply' %></button>
+                                <textarea id="reply-<%= review.review_id %>" name="reply" rows="3" maxlength="400" placeholder="Thank them, address concerns, or share next steps."></textarea>
+                                <button type="submit" class="btn-small btn-primary">Post reply</button>
                             </form>
                         <% } %>
                     </div>
