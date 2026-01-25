@@ -1,47 +1,79 @@
 <%- include('partials/navbar') %>
 
-<div class="form-page">
-    <h1>Edit Service</h1>
-    
+<div style="max-width: 850px; margin: 40px auto; padding: 0 16px;">
+  <div style="background:#fff; border-radius:16px; padding:28px; border:1px solid rgba(0,0,0,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
+
+    <div style="margin-bottom:18px;">
+      <h1 style="margin:0; font-size:28px;">Add New Service</h1>
+      <p style="margin:8px 0 0; color:#666; font-size:14px;">Fill in the service details below.</p>
+    </div>
+
     <% if (error) { %>
-        <div class="error-message"><%= error %></div>
+      <div style="background:#ffe6e6; color:#9a1b1b; border:1px solid #ffb4b4; padding:12px 14px; border-radius:12px; margin-bottom:16px;">
+        <%= error %>
+      </div>
     <% } %>
-    
-    <form action="/seller/services/update/<%= service.service_id %>" method="POST" class="service-form">
-        <div class="form-group">
-            <label>Service Title:</label>
-            <input type="text" name="title" value="<%= service.title %>" required>
+
+    <form action="/seller/services/create" method="POST">
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-weight:700; margin-bottom:8px;">Service Title</label>
+        <input type="text" name="title" required
+          placeholder="e.g., Home Cleaning (2 Hours)"
+          style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none;">
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-weight:700; margin-bottom:8px;">Description</label>
+        <textarea name="description" rows="5" required
+          placeholder="Describe what you offer, what’s included, and estimated time..."
+          style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none;"></textarea>
+        <small style="display:block; margin-top:6px; color:#777;">Tip: Include deliverables + timeframe.</small>
+      </div>
+
+      <!-- Price + Category in one row -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+        <div>
+          <label style="display:block; font-weight:700; margin-bottom:8px;">Price ($)</label>
+          <input type="number" name="price" step="0.01" min="0" required
+            placeholder="e.g., 49.90"
+            style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none;">
         </div>
-        
-        <div class="form-group">
-            <label>Description:</label>
-            <textarea name="description" rows="5" required><%= service.description %></textarea>
+
+        <div>
+          <label style="display:block; font-weight:700; margin-bottom:8px;">Category</label>
+          <select name="category_id" required
+            style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none; background:#fff;">
+            <option value="">Select a category</option>
+            <% categories.forEach(category => { %>
+              <option value="<%= category.category_id %>"><%= category.name %></option>
+            <% }); %>
+          </select>
         </div>
-        
-        <div class="form-group">
-            <label>Price ($):</label>
-            <input type="number" name="price" step="0.01" min="0" value="<%= service.price %>" required>
-        </div>
-        
-        <div class="form-group">
-            <label>Category:</label>
-            <select name="category_id" required>
-                <% categories.forEach(category => { %>
-                    <option value="<%= category.category_id %>" <%= service.category_id == category.category_id ? 'selected' : '' %>>
-                        <%= category.name %>
-                    </option>
-                <% }); %>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label>Image URL:</label>
-            <input type="text" name="image" value="<%= service.image || '' %>">
-        </div>
-        
-        <button type="submit" class="btn-primary">Update Service</button>
-        <a href="/seller/services" class="btn-secondary">Cancel</a>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <label style="display:block; font-weight:700; margin-bottom:8px;">Image URL (optional)</label>
+        <input type="text" name="image" placeholder="/images/service.png"
+          style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none;">
+        <small style="display:block; margin-top:6px; color:#777;">Leave blank to use a default image.</small>
+      </div>
+
+      <div style="display:flex; gap:12px; align-items:center;">
+        <button type="submit"
+          style="padding:12px 18px; border:none; border-radius:12px; background:#222; color:#fff; font-weight:700; cursor:pointer;">
+          Create Service
+        </button>
+
+        <a href="/seller/dashboard"
+          style="padding:12px 18px; border-radius:12px; border:1px solid #ddd; text-decoration:none; color:#222; font-weight:700;">
+          Cancel
+        </a>
+      </div>
+
     </form>
+
+  </div>
 </div>
 
 <%- include('partials/footer') %>
