@@ -479,6 +479,11 @@ body {
     color: #fff;
 }
 
+.status-accepted {
+    background: #2980b9;
+    color: #fff;
+}
+
 .status-cancelled {
     background: #e74c3c;
     color: #fff;
@@ -1367,6 +1372,8 @@ body {
 .hero-trust {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     gap: 0.5rem;
     margin-top: 1rem;
 }
@@ -1403,6 +1410,13 @@ body {
 .slide-card {
     display: grid;
     gap: 0.6rem;
+}
+
+.slide-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 12px;
 }
 
 .slide-title {
