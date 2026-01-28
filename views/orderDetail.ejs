@@ -2,10 +2,19 @@
 
 <div class="order-detail-page">
     <h1>Order #<%= order.order_id %></h1>
+
+    <% if (errorMessage) { %>
+        <div class="error-message" style="margin: 16px 0;"><%= errorMessage %></div>
+    <% } %>
+    <% if (successMessage) { %>
+        <div class="success-message" style="margin: 16px 0;"><%= successMessage %></div>
+    <% } %>
     
     <div class="order-info">
         <p><strong>Date:</strong> <%= new Date(order.created_at).toLocaleDateString() %></p>
         <p><strong>Status:</strong> <span class="status-badge status-<%= order.status %>"><%= order.status %></span></p>
+        <p><strong>Payment:</strong> <span class="status-badge status-<%= order.payment_status || 'pending' %>"><%= order.payment_status || 'pending' %></span></p>
+        <p><strong>Escrow:</strong> <span class="status-badge status-<%= order.escrow_status || 'none' %>"><%= order.escrow_status || 'none' %></span></p>
         <p><strong>Total:</strong> $<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></p>
     </div>
     
@@ -39,12 +48,19 @@
     </table>
     
     <div class="order-actions">
-        <% if (order.status === 'pending' || order.status === 'accepted') { %>
-            <form action="/orders/<%= order.order_id %>/status" method="POST" style="display: inline;">
-                <input type="hidden" name="status" value="completed">
-                <button type="submit" class="btn-primary">Mark as Completed</button>
+        <% if (user && user.role === 'buyer' && order.payment_status !== 'paid' && order.status !== 'cancelled') { %>
+            <form action="/payments/nets/retry/<%= order.order_id %>" method="POST" style="display: inline;">
+                <button type="submit" class="btn-primary">Pay with NETS QR</button>
             </form>
-            
+        <% } %>
+        <% if (order.status === 'pending' || order.status === 'accepted') { %>
+            <% if (order.payment_status === 'paid') { %>
+                <form action="/orders/<%= order.order_id %>/status" method="POST" style="display: inline;">
+                    <input type="hidden" name="status" value="completed">
+                    <button type="submit" class="btn-primary">Mark as Completed</button>
+                </form>
+            <% } %>
+
             <form action="/orders/<%= order.order_id %>/cancel" method="POST" style="display: inline;">
                 <button type="submit" class="btn-danger">Cancel Order</button>
             </form>

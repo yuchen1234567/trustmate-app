@@ -1,6 +1,7 @@
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const Cart = require('../models/cart');
+const Payment = require('../models/payment');
 
 // Show checkout page
 exports.showCheckout = async (req, res) => {
@@ -84,7 +85,23 @@ exports.show = async (req, res) => {
 exports.updateStatus = async (req, res) => {
     try {
         const { status } = req.body;
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.redirect('/orders');
+        }
+
+        if (status === 'completed' && order.payment_status !== 'paid') {
+            req.session.errorMessage = 'Payment must be completed before finishing the order.';
+            return res.redirect(`/orders/${req.params.id}`);
+        }
+
         await Order.updateStatus(req.params.id, status);
+
+        if (status === 'completed') {
+            if (order && order.payment_status === 'paid' && order.escrow_status === 'held') {
+                await Payment.updateByOrderId(req.params.id, { escrow_status: 'released' });
+            }
+        }
         res.redirect(`/orders/${req.params.id}`);
     } catch (error) {
         console.error(error);
@@ -95,6 +112,10 @@ exports.updateStatus = async (req, res) => {
 // Cancel order
 exports.cancel = async (req, res) => {
     try {
+        const order = await Order.findById(req.params.id);
+        if (order && order.payment_status === 'paid' && order.escrow_status === 'held') {
+            await Payment.markRefunded(req.params.id, 'buyer_cancelled');
+        }
         await Order.updateStatus(req.params.id, 'cancelled');
         res.redirect('/orders');
     } catch (error) {
@@ -163,7 +184,30 @@ exports.adminShow = async (req, res) => {
 exports.adminUpdateStatus = async (req, res) => {
     try {
         const { status } = req.body;
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            req.session.errorMessage = 'Order not found';
+            return res.redirect(`/admin/orders/${req.params.id}`);
+        }
+
+        if (status === 'completed' && order.payment_status !== 'paid') {
+            req.session.errorMessage = 'Cannot complete an unpaid order.';
+            return res.redirect(`/admin/orders/${req.params.id}`);
+        }
+
         await Order.updateStatus(req.params.id, status);
+
+        if (status === 'completed') {
+            if (order && order.payment_status === 'paid' && order.escrow_status === 'held') {
+                await Payment.updateByOrderId(req.params.id, { escrow_status: 'released' });
+            }
+        }
+
+        if (status === 'cancelled') {
+            if (order && order.payment_status === 'paid' && order.escrow_status === 'held') {
+                await Payment.markRefunded(req.params.id, 'admin_cancelled');
+            }
+        }
         
         req.session.successMessage = 'Order status updated successfully';
         res.redirect(`/admin/orders/${req.params.id}`);

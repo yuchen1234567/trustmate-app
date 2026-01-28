@@ -100,7 +100,7 @@ INSERT INTO `services` VALUES (4, 2, 'Mobile App Development', 'iOS and Android 
 INSERT INTO `services` VALUES (5, 1, 'Deep Cleaning', 'Thorough deep cleaning service for your entire home.', 120.00, 2, '/images/default-service.png', 'active', '2026-01-20 23:57:08');
 INSERT INTO `services` VALUES (6, 2, 'Logo Design', 'Professional logo design for your business.', 150.00, 3, '/images/default-service.png', 'active', '2026-01-20 23:57:08');
 INSERT INTO `services` VALUES (7, 2, 'Data Analysis', 'Comprehensive data analysis and visualization services.', 300.00, 4, '/images/default-service.png', 'active', '2026-01-20 23:57:08');
-INSERT INTO `services` VALUES (8, 1, 'Pet Sitting', 'Reliable pet sitting services while you\'re away.', 30.00, 2, '/images/default-service.png', 'active', '2026-01-20 23:57:08');
+INSERT INTO `services` VALUES (8, 1, 'Pet Sitting', "Reliable pet sitting services while you\'re away.", 30.00, 2, '/images/default-service.png', 'active', '2026-01-20 23:57:08');
 
 -- ----------------------------
 -- Table structure for cart (FIFTH - depends on users and services)
@@ -141,7 +141,40 @@ INSERT INTO `orders` VALUES (3, 1, 225.00, 'pending', '2026-01-21 00:33:19');
 INSERT INTO `orders` VALUES (4, 1, 75.00, 'completed', '2026-01-21 00:38:10');
 
 -- ----------------------------
--- Table structure for order_items (SEVENTH - depends on orders and services)
+-- Table structure for payments (SEVENTH - depends on orders and users)
+-- ----------------------------
+DROP TABLE IF EXISTS `payments`;
+CREATE TABLE `payments`  (
+  `payment_id` int NOT NULL AUTO_INCREMENT,
+  `order_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `provider` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount` decimal(10, 2) NOT NULL,
+  `currency` char(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SGD',
+  `status` enum('unpaid','pending','paid','failed','refunded') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'unpaid',
+  `escrow_status` enum('none','held','released','refunded') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'none',
+  `payment_reference` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `provider_txn_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `refund_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `refunded_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`payment_id`) USING BTREE,
+  UNIQUE INDEX `uniq_payments_order_id`(`order_id` ASC) USING BTREE,
+  INDEX `idx_payments_user_id`(`user_id` ASC) USING BTREE,
+  INDEX `idx_payments_reference`(`payment_reference` ASC) USING BTREE,
+  CONSTRAINT `payments_ibfk_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `payments_ibfk_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- Records of payments
+INSERT INTO `payments` VALUES (1, 1, 2, 'nets', 50.00, 'SGD', 'paid', 'released', NULL, NULL, NULL, NULL, '2026-01-20 23:57:08', '2026-01-20 23:57:08');
+INSERT INTO `payments` VALUES (2, 2, 2, 'nets', 500.00, 'SGD', 'pending', 'none', NULL, NULL, NULL, NULL, '2026-01-20 23:57:08', '2026-01-20 23:57:08');
+INSERT INTO `payments` VALUES (3, 3, 1, 'nets', 225.00, 'SGD', 'pending', 'none', NULL, NULL, NULL, NULL, '2026-01-21 00:33:19', '2026-01-21 00:33:19');
+INSERT INTO `payments` VALUES (4, 4, 1, 'nets', 75.00, 'SGD', 'paid', 'released', NULL, NULL, NULL, NULL, '2026-01-21 00:38:10', '2026-01-21 00:38:10');
+
+-- ----------------------------
+-- Table structure for order_items (EIGHTH - depends on orders and services)
 -- ----------------------------
 DROP TABLE IF EXISTS `order_items`;
 CREATE TABLE `order_items`  (

@@ -224,6 +224,11 @@ exports.acceptBooking = async (req, res) => {
             return res.status(403).send('Access denied. You can only accept your own bookings.');
         }
 
+        const order = await Order.findById(req.params.id);
+        if (!order || order.payment_status !== 'paid') {
+            return res.status(400).send('Payment pending. Only paid orders can be accepted.');
+        }
+
         await Order.updateStatus(req.params.id, 'accepted');
         res.redirect('/seller/bookings');
     } catch (error) {

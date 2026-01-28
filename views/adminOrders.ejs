@@ -40,6 +40,7 @@
                         <th>Customer</th>
                         <th>Email</th>
                         <th>Total Amount</th>
+                        <th>Payment</th>
                         <th>Status</th>
                         <th>Date</th>
                         <th>Actions</th>
@@ -52,6 +53,11 @@
                             <td><%= order.username %></td>
                             <td><%= order.email %></td>
                             <td>$<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></td>
+                            <td>
+                                <span class="status-badge status-<%= order.payment_status || 'pending' %>">
+                                    <%= order.payment_status || 'pending' %>
+                                </span>
+                            </td>
                             <td>
                                 <span class="status-badge status-<%= order.status %>">
                                     <%= order.status %>

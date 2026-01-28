@@ -11,9 +11,14 @@ class Order {
 
     static async findById(id) {
         const [rows] = await db.query(
-            `SELECT o.*, u.username, u.email
+            `SELECT o.*, u.username, u.email,
+                    COALESCE(p.status, 'unpaid') AS payment_status,
+                    COALESCE(p.escrow_status, 'none') AS escrow_status,
+                    p.provider AS payment_provider,
+                    p.payment_reference
              FROM orders o
              JOIN users u ON o.user_id = u.user_id
+             LEFT JOIN payments p ON p.order_id = o.order_id
              WHERE o.order_id = ?`,
             [id]
         );
@@ -22,7 +27,15 @@ class Order {
 
     static async getByUser(userId) {
         const [rows] = await db.query(
-            `SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC`,
+            `SELECT o.*,
+                    COALESCE(p.status, 'unpaid') AS payment_status,
+                    COALESCE(p.escrow_status, 'none') AS escrow_status,
+                    p.provider AS payment_provider,
+                    p.payment_reference
+             FROM orders o
+             LEFT JOIN payments p ON p.order_id = o.order_id
+             WHERE o.user_id = ?
+             ORDER BY o.created_at DESC`,
             [userId]
         );
         return rows;
@@ -30,9 +43,14 @@ class Order {
 
     static async getAll() {
         const [rows] = await db.query(
-            `SELECT o.*, u.username, u.email
+            `SELECT o.*, u.username, u.email,
+                    COALESCE(p.status, 'unpaid') AS payment_status,
+                    COALESCE(p.escrow_status, 'none') AS escrow_status,
+                    p.provider AS payment_provider,
+                    p.payment_reference
              FROM orders o
              JOIN users u ON o.user_id = u.user_id
+             LEFT JOIN payments p ON p.order_id = o.order_id
              ORDER BY o.created_at DESC`
         );
         return rows;
@@ -41,6 +59,10 @@ class Order {
     static async getBySeller(sellerId) {
         const [rows] = await db.query(
             `SELECT o.order_id, o.status, o.total_amount, o.created_at,
+                    COALESCE(p.status, 'unpaid') AS payment_status,
+                    COALESCE(p.escrow_status, 'none') AS escrow_status,
+                    p.provider AS payment_provider,
+                    p.payment_reference,
                     u.username, u.email,
                     oi.order_item_id, oi.service_id, oi.quantity, oi.price,
                     s.title
@@ -48,6 +70,7 @@ class Order {
              JOIN order_items oi ON oi.order_id = o.order_id
              JOIN services s ON oi.service_id = s.service_id
              JOIN users u ON o.user_id = u.user_id
+             LEFT JOIN payments p ON p.order_id = o.order_id
              WHERE s.seller_id = ?
              ORDER BY o.created_at DESC`,
             [sellerId]

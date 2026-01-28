@@ -36,6 +36,7 @@ const reviewController = require('./controllers/reviewController');
 const sellerController = require('./controllers/sellerController');
 const fraudController = require('./controllers/fraudController');
 const chatController = require('./controllers/chatController');
+const paymentController = require('./controllers/paymentController');
 
 // Import middleware
 const { isAuthenticated, isAdmin, isSeller } = require('./middleware');
@@ -82,6 +83,13 @@ app.get('/orders', isAuthenticated, orderController.index);
 app.get('/orders/:id', isAuthenticated, orderController.show);
 app.post('/orders/:id/cancel', isAuthenticated, orderController.cancel);
 app.post('/orders/:id/status', isAuthenticated, orderController.updateStatus);
+
+// Payment routes (NETS QR)
+app.post('/payments/nets/start', isAuthenticated, paymentController.startNetsPayment);
+app.post('/payments/nets/retry/:orderId', isAuthenticated, paymentController.retryNetsPayment);
+app.get('/payments/nets/success', isAuthenticated, paymentController.netsSuccess);
+app.get('/payments/nets/fail', isAuthenticated, paymentController.netsFail);
+app.get('/payments/nets/status/:txnRetrievalRef', paymentController.streamNetsStatus);
 
 // Review routes
 app.get('/reviews/create/:orderId', isAuthenticated, reviewController.showCreate);
