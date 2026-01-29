@@ -1,7 +1,7 @@
 <%- include('partials/navbar') %>
 
 <div class="admin-dashboard">
-    <h1>Admin Dashboard</h1>
+    <h1>Admin dashboard</h1>
     
     <div class="dashboard-nav">
         <a href="/admin/dashboard" class="active">Fraud Detection</a>
@@ -11,11 +11,11 @@
     </div>
     
     <div class="fraud-section">
-        <h2>Review Suspicious Activity</h2>
-        <p>for fraud detection</p>
+        <h2>Review flagged activity</h2>
+        <p>Overview of items awaiting review.</p>
         
         <div class="notifications">
-            <h3>NOTIFICATIONS <a href="/admin/fraud">VIEW ALL</a></h3>
+            <h3>Notifications <a href="/admin/fraud">View all</a></h3>
             
             <% if (alerts.length === 0) { %>
                 <p>No pending alerts.</p>
@@ -42,8 +42,8 @@
         </div>
         
         <div class="suspicious-users">
-            <h3>SUSPICIOUS USERS</h3>
-            <p>Users flagged for suspicious activity will appear here.</p>
+            <h3>Flagged users</h3>
+            <p>Users flagged for review will appear here.</p>
         </div>
     </div>
 </div>

@@ -1,7 +1,7 @@
 <%- include('partials/navbar') %>
 
 <div class="chats-page">
-    <h1>My Chats</h1>
+    <h1>Conversations</h1>
     
     <% if (chats.length === 0) { %>
         <p>No chats yet.</p>
@@ -10,9 +10,9 @@
             <% chats.forEach(chat => { %>
                 <div class="chat-item">
                     <h3>Order #<%= chat.order_id %></h3>
-                    <p>Chat with: <%= chat.other_user %></p>
+                    <p>Conversation with: <%= chat.other_user %></p>
                     <p>Total: $<%= typeof chat.total_amount === 'number' ? chat.total_amount.toFixed(2) : parseFloat(chat.total_amount || 0).toFixed(2) %></p>
-                    <a href="/chat/<%= chat.order_id %>" class="btn-view">Open Chat</a>
+                    <a href="/chat/<%= chat.order_id %>" class="btn-view">Open conversation</a>
                 </div>
             <% }); %>
         </div>

@@ -1,12 +1,12 @@
 <%- include('partials/navbar') %>
 
 <div class="chat-page">
-    <h1>Chat - Order #<%= order.order_id %></h1>
+    <h1>Conversation - Order #<%= order.order_id %></h1>
     
     <div class="chat-container">
         <div class="messages-list">
             <% if (messages.length === 0) { %>
-                <p>No messages yet. Start the conversation!</p>
+                <p>No messages yet. You can begin when ready.</p>
             <% } else { %>
                 <% messages.forEach(message => { %>
                     <div class="message <%= message.sender_id === user.user_id ? 'sent' : 'received' %>">
@@ -21,8 +21,8 @@
         <form action="/chat/send" method="POST" class="chat-form">
             <input type="hidden" name="order_id" value="<%= order.order_id %>">
             <input type="hidden" name="receiver_id" value="<%= order.user_id === user.user_id ? order.seller_id : order.user_id %>">
-            <input type="text" name="message" placeholder="Type here..." required>
-            <button type="submit">Send</button>
+            <input type="text" name="message" placeholder="Write a message..." required>
+            <button type="submit">Send message</button>
         </form>
         
         <div class="chat-actions">

@@ -1,7 +1,7 @@
 <%- include('partials/navbar') %>
 
 <div class="admin-container">
-    <h1>Order Management</h1>
+    <h1>Order management</h1>
     
     <div class="admin-actions">
         <a href="/admin/dashboard" class="btn-secondary">Back to Dashboard</a>
@@ -65,7 +65,7 @@
                             </td>
                             <td><%= new Date(order.created_at).toLocaleDateString() %></td>
                             <td>
-                                <a href="/admin/orders/<%= order.order_id %>" class="btn-small">View Details</a>
+                                <a href="/admin/orders/<%= order.order_id %>" class="btn-small">View details</a>
                             </td>
                         </tr>
                     <% }); %>

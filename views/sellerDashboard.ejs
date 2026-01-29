@@ -2,7 +2,7 @@
 
 <div class="seller-dashboard">
     <h1>Seller Dashboard</h1>
-    <p>Welcome, <%= seller.business_name %>!</p>
+    <p>Welcome, <%= seller.business_name %>.</p>
     
     <div class="dashboard-stats">
         <div class="stat-card">
@@ -20,16 +20,16 @@
     </div>
     
     <div class="dashboard-actions">
-        <h2>Manage Your Services</h2>
-        <a href="/seller/services/create" class="btn-primary">Add New Service</a>
-        <a href="/seller/services" class="btn-secondary">View All Services</a>
+        <h2>Manage your services</h2>
+        <a href="/seller/services/create" class="btn-primary">Add service</a>
+        <a href="/seller/services" class="btn-secondary">View services</a>
         <a href="/seller/bookings" class="btn-secondary">View Bookings</a>
     </div>
     
     <div class="recent-services">
         <h2>Your Services</h2>
         <% if (services.length === 0) { %>
-            <p>You haven't added any services yet.</p>
+            <p>No services listed yet.</p>
         <% } else { %>
             <div class="services-grid">
                 <% services.slice(0, 6).forEach(service => { %>

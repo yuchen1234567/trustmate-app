@@ -3,10 +3,10 @@
 <div class="seller-services-page">
     <h1>My Services</h1>
     
-    <a href="/seller/services/create" class="btn-primary" style="display: inline-block; margin-bottom: 2rem;">Add New Service</a>
+    <a href="/seller/services/create" class="btn-primary" style="display: inline-block; margin-bottom: 2rem;">Add service</a>
     
     <% if (services.length === 0) { %>
-        <p>You haven't added any services yet.</p>
+        <p>No services listed yet.</p>
     <% } else { %>
         <div class="services-grid">
             <% services.forEach(service => { %>

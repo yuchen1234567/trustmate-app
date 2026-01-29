@@ -1,7 +1,7 @@
 <%- include('partials/navbar') %>
 
 <div class="admin-dashboard">
-    <h1>Admin Dashboard</h1>
+    <h1>Admin dashboard</h1>
     
     <div class="dashboard-nav">
         <a href="/admin/dashboard">Fraud Detection</a>
@@ -11,10 +11,10 @@
     </div>
     
     <div class="user-management">
-        <h2>User Account Management</h2>
+        <h2>User account management</h2>
         
         <form action="/admin/users/search" method="GET" class="search-form">
-            <input type="text" name="search" placeholder="🔍 Search for User ID or Email">
+            <input type="text" name="search" placeholder="Search by user ID or email">
             <button type="submit">Search</button>
         </form>
         
@@ -45,12 +45,12 @@
                                 <a href="/admin/users/history/<%= user.user_id %>" class="btn-small btn-success">History</a>
                                 
                                 <% if (user.status === 'active') { %>
-                                    <a href="/admin/users/freeze/<%= user.user_id %>" class="btn-small btn-danger">Freeze Account</a>
+                                    <a href="/admin/users/freeze/<%= user.user_id %>" class="btn-small btn-danger">Freeze account</a>
                                 <% } else { %>
                                     <a href="/admin/users/unfreeze/<%= user.user_id %>" class="btn-small btn-success">Unfreeze</a>
                                 <% } %>
                                 
-                                <a href="/admin/users/reset-password/<%= user.user_id %>" class="btn-small btn-warning" onclick="return confirm('Reset password to default?')">Password Reset</a>
+                                <a href="/admin/users/reset-password/<%= user.user_id %>" class="btn-small btn-warning" onclick="return confirm('Reset password to default?')">Reset password</a>
                             </td>
                         </tr>
                     <% }); %>

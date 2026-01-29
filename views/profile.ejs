@@ -1,7 +1,7 @@
 <%- include('partials/navbar') %>
 
 <div class="profile-page">
-    <h1>My Profile</h1>
+    <h1>Profile</h1>
     
     <div class="profile-card">
         <h2><%= user.username %></h2>
@@ -13,11 +13,11 @@
     </div>
     
     <div class="profile-actions">
-        <a href="/orders" class="btn-primary">My Orders</a>
+        <a href="/orders" class="btn-primary">Orders</a>
         <% if (user.role === 'seller' || user.role === 'admin') { %>
             <a href="/seller/dashboard" class="btn-secondary">Seller Dashboard</a>
         <% } else { %>
-            <a href="/seller/register" class="btn-secondary">Become a Seller</a>
+            <a href="/seller/register" class="btn-secondary">Seller application</a>
         <% } %>
     </div>
 </div>
