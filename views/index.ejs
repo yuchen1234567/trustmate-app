@@ -4,9 +4,9 @@
     <div class="hero-content hero-grid">
         <div class="hero-text">
             <p class="hero-eyebrow">TrustMate Marketplace</p>
-            <h1>ONE SEARCH AWAY FROM</h1>
-            <h1>FIND THE RIGHT PERSON</h1>
-            <p class="hero-subtitle">Verified sellers, protected payments, and reviewed work you can trust.</p>
+            <h1>Trusted local services</h1>
+            <h1>with clear, verified reviews</h1>
+            <p class="hero-subtitle">A calm, dependable marketplace for verified sellers and completed work.</p>
             <div class="hero-trust">
                 <span class="trust-pill">Verified identities</span>
                 <span class="trust-pill">Secure payments</span>
@@ -14,8 +14,8 @@
             </div>
             <div class="search-bar">
                 <form action="/services" method="GET">
-                    <input type="text" name="q" placeholder="Find talent across 700+ categories">
-                    <button type="submit">Connect with top talent</button>
+                    <input type="text" name="q" placeholder="Find trusted services by category">
+                    <button type="submit">Browse services</button>
                 </form>
             </div>
         </div>
@@ -24,8 +24,8 @@
                 <div class="hero-slide">
                     <div class="slide-card">
                         <img class="slide-image" src="/images/sellers.png" alt="Illustration of verified sellers">
-                        <p class="slide-title">Why choose TrustMate</p>
-                        <p class="slide-text">Every seller is screened, reviewed, and ranked for consistency.</p>
+                        <p class="slide-title">Why TrustMate</p>
+                        <p class="slide-text">Every seller is verified and reviewed with consistent standards.</p>
                         <div class="slide-tag">Verified sellers</div>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                     <div class="slide-card">
                         <img class="slide-image" src="/images/payment.png" alt="Illustration of secure payments">
                         <p class="slide-title">How to book</p>
-                        <p class="slide-text">Search, compare, and book with protected payment milestones.</p>
+                        <p class="slide-text">Search, compare, and book with clear payment confirmation.</p>
                         <div class="slide-tag">Secure payments</div>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                     <div class="slide-card">
                         <img class="slide-image" src="/images/reviews.png" alt="Illustration of trusted reviews">
                         <p class="slide-title">Service confidence</p>
-                        <p class="slide-text">See real ratings and reply threads before you decide.</p>
+                        <p class="slide-text">See verified ratings and thoughtful replies before you decide.</p>
                         <div class="slide-tag">Trusted reviews</div>
                     </div>
                 </div>
@@ -56,17 +56,17 @@
         <div class="why-card">
             <span class="why-icon">V</span>
             <h3>Verified sellers</h3>
-            <p>Identity checks and performance reviews keep the marketplace safe.</p>
+            <p>Identity checks and performance reviews keep the marketplace dependable.</p>
         </div>
         <div class="why-card">
             <span class="why-icon">P</span>
             <h3>Protected payments</h3>
-            <p>Funds are secured and released only when the job is done.</p>
+            <p>Payments are confirmed through clear, consistent steps.</p>
         </div>
         <div class="why-card">
             <span class="why-icon">S</span>
             <h3>Support when needed</h3>
-            <p>Dedicated support helps resolve issues quickly and fairly.</p>
+            <p>Dedicated support helps resolve issues fairly and calmly.</p>
         </div>
         <div class="why-card">
             <span class="why-icon">R</span>
@@ -82,7 +82,7 @@
         <div class="step-card">
             <span class="step-number">1</span>
             <h3>Search your service</h3>
-            <p>Browse providers by category, price, and rating.</p>
+            <p>Browse providers by category, price, and verified rating.</p>
         </div>
         <div class="step-card">
             <span class="step-number">2</span>
@@ -92,13 +92,13 @@
         <div class="step-card">
             <span class="step-number">3</span>
             <h3>Pay securely</h3>
-            <p>Checkout with confidence using protected payments.</p>
+            <p>Checkout with confidence using secure payment confirmation.</p>
         </div>
     </div>
 </section>
 
 <section class="categories-section">
-    <h2>Explore Type</h2>
+    <h2>Explore categories</h2>
     <div class="categories-grid">
         <% categories.forEach(category => { %>
             <a href="/services?category=<%= category.category_id %>" class="category-card">
@@ -110,7 +110,7 @@
 </section>
 
 <section class="popular-services">
-    <h2>Popular Services</h2>
+    <h2>Popular services</h2>
     <div class="services-grid">
         <% services.slice(0, 8).forEach(service => { %>
             <div class="service-card">
@@ -129,7 +129,7 @@
                         <% } %>
                     </span>
                 </div>
-                <a href="/services/<%= service.service_id %>" class="btn-view">View Details</a>
+                <a href="/services/<%= service.service_id %>" class="btn-view">View details</a>
             </div>
         <% }); %>
     </div>
@@ -138,7 +138,7 @@
 <section class="faq-home">
     <div class="faq-home-header">
         <h2>FAQs</h2>
-        <p>Quick answers to keep your booking moving.</p>
+        <p>Clear answers for a confident booking experience.</p>
     </div>
     <div class="faq-home-list">
         <details open>
@@ -146,8 +146,8 @@
             <p>Verified sellers complete identity checks and maintain strong review scores.</p>
         </details>
         <details>
-            <summary>When do payments release?</summary>
-            <p>Payments are protected and released after the service is confirmed.</p>
+            <summary>When is a payment confirmed?</summary>
+            <p>Payments are confirmed once the service is marked complete.</p>
         </details>
         <details>
             <summary>Can I chat before booking?</summary>
@@ -155,7 +155,7 @@
         </details>
         <details>
             <summary>What if there is an issue?</summary>
-            <p>Our support team helps resolve disputes quickly and fairly.</p>
+            <p>Our support team helps resolve disputes fairly and with care.</p>
         </details>
     </div>
     <a href="/faq" class="btn-primary faq-link">View all FAQs</a>

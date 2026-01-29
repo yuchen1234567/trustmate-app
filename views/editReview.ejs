@@ -3,9 +3,9 @@
 <div class="review-page">
     <div class="review-shell">
         <header class="review-header">
-            <p class="review-eyebrow">Edit Review</p>
+            <p class="review-eyebrow">Edit review</p>
             <h1>Update your feedback</h1>
-            <p class="review-meta">Make it as detailed or concise as you like.</p>
+            <p class="review-meta">Keep it clear and balanced, with as much detail as you prefer.</p>
         </header>
 
         <% if (error) { %>
@@ -19,22 +19,22 @@
                     <div class="review-stars" aria-label="Rating from 1 to 5">
                         <% for(let i = 5; i >= 1; i--) { %>
                             <input type="radio" name="rating" value="<%= i %>" id="star<%= i %>" <%= review.rating == i ? 'checked' : '' %> required>
-                            <label for="star<%= i %>" title="<%= i %> star<%= i === 1 ? '' : 's' %>">★</label>
+                            <label for="star<%= i %>" title="<%= i %> star<%= i === 1 ? '' : 's' %>">&#9733;</label>
                         <% } %>
                     </div>
                     <p class="review-feedback" aria-live="polite"></p>
-                    <p class="review-hint">Update the score if your view changed.</p>
+                    <p class="review-hint">Update the score if your view has changed.</p>
                 </div>
             </section>
 
             <section class="review-section">
-                <label class="review-label" for="comment">Follow-up review</label>
-                <textarea id="comment" name="comment" rows="6" maxlength="400" placeholder="Share what changed, or add details you missed the first time."><%= review.comment %></textarea>
+                <label class="review-label" for="comment">Written update</label>
+                <textarea id="comment" name="comment" rows="6" maxlength="400" placeholder="Share what changed or add details you missed the first time."><%= review.comment %></textarea>
                 <small class="char-count">0/400 characters</small>
             </section>
 
             <section class="review-section">
-                <label class="review-label">Give a compliment (optional)</label>
+                <label class="review-label">Compliments (optional)</label>
                 <div class="tags-input">
                     <% const existingTags = review.tags ? review.tags.split(',') : []; %>
                     <label class="tag-pill" data-phrase="Their listing was clear and kept up to date."><input type="checkbox" name="tags" value="Updated listings" <%= existingTags.includes('Updated listings') ? 'checked' : '' %>><span>Updated listings</span></label>
@@ -72,11 +72,11 @@
         updateCount();
 
         const feedbackByRating = {
-            1: 'Thanks for the honesty — what could have been better?',
-            2: 'Thanks! What stood out?',
-            3: 'Glad to hear that — want to share more?',
-            4: 'Great! What made it a strong experience?',
-            5: 'Amazing — what made it exceptional?'
+            1: 'Thank you for the honesty - what could have been better?',
+            2: 'Thank you - what stood out?',
+            3: 'Glad to hear that - anything else to share?',
+            4: 'Thank you - what made it a strong experience?',
+            5: 'Thank you - what made it exceptional?'
         };
 
         const initialStar = form.querySelector('input[name="rating"]:checked');

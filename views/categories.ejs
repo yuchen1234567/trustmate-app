@@ -1,7 +1,7 @@
 <%- include('partials/navbar') %>
 
 <div class="admin-dashboard">
-    <h1>Categories Management</h1>
+    <h1>Category management</h1>
     
     <div class="dashboard-nav">
         <a href="/admin/dashboard">Fraud Detection</a>
@@ -10,7 +10,7 @@
         <a href="/admin/categories" class="active">Categories</a>
     </div>
     
-    <a href="/admin/categories/create" class="btn-primary" style="display: inline-block; margin-bottom: 2rem;">Add New Category</a>
+    <a href="/admin/categories/create" class="btn-primary" style="display: inline-block; margin-bottom: 2rem;">Add category</a>
     
     <div class="categories-list">
         <% if (categories.length === 0) { %>

@@ -1,7 +1,7 @@
 <%- include('partials/navbar') %>
 
 <div class="cart-page">
-    <h1>Shopping Cart</h1>
+    <h1>Your Cart</h1>
     
     <% if (typeof successMessage !== 'undefined' && successMessage) { %>
         <div class="success-message"><%= successMessage %></div>
@@ -54,7 +54,7 @@
         
         <div class="cart-summary">
             <h3>Total: $<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></h3>
-            <a href="/checkout" class="btn-primary">Proceed to Checkout</a>
+            <a href="/checkout" class="btn-primary">Continue to checkout</a>
             <a href="/cart/clear" class="btn-secondary">Clear Cart</a>
         </div>
     <% } %>

@@ -5,7 +5,7 @@
 
     <!-- Header -->
     <div style="margin-bottom:18px;">
-      <h1 style="margin:0; font-size:28px;">Leave a Review</h1>
+      <h1 style="margin:0; font-size:28px;">Share a Review</h1>
       <p style="margin:8px 0 0; color:#666; font-size:14px;">
         Order #<strong><%= order.order_id %></strong>
       </p>
@@ -24,7 +24,7 @@
         <input type="hidden" name="service_id" value="<%= orderItems[0].service_id %>">
 
         <div style="background:#f7f7f7; border:1px solid #eee; padding:14px 16px; border-radius:14px; margin-bottom:18px;">
-          <h3 style="margin:0 0 6px; font-size:16px;">How was your experience?</h3>
+          <h3 style="margin:0 0 6px; font-size:16px;">How was the service?</h3>
           <p style="margin:0; color:#444;">
             Rate the service: <strong><%= orderItems[0].title %></strong>
           </p>
@@ -37,38 +37,38 @@
 
         <div style="display:flex; gap:10px; align-items:center;">
           <input type="radio" name="rating" value="1" id="star1" required>
-          <label for="star1" style="font-size:22px; cursor:pointer;">★</label>
+          <label for="star1" style="font-size:22px; cursor:pointer;">&#9733;</label>
 
           <input type="radio" name="rating" value="2" id="star2">
-          <label for="star2" style="font-size:22px; cursor:pointer;">★</label>
+          <label for="star2" style="font-size:22px; cursor:pointer;">&#9733;</label>
 
           <input type="radio" name="rating" value="3" id="star3">
-          <label for="star3" style="font-size:22px; cursor:pointer;">★</label>
+          <label for="star3" style="font-size:22px; cursor:pointer;">&#9733;</label>
 
           <input type="radio" name="rating" value="4" id="star4">
-          <label for="star4" style="font-size:22px; cursor:pointer;">★</label>
+          <label for="star4" style="font-size:22px; cursor:pointer;">&#9733;</label>
 
           <input type="radio" name="rating" value="5" id="star5">
-          <label for="star5" style="font-size:22px; cursor:pointer;">★</label>
+          <label for="star5" style="font-size:22px; cursor:pointer;">&#9733;</label>
         </div>
 
         <small style="display:block; margin-top:6px; color:#777;">
-          Select 1 (worst) to 5 (best)
+          Select 1 (lowest) to 5 (highest)
         </small>
       </div>
 
       <!-- Comment -->
       <div style="margin-bottom:18px;">
-        <label style="display:block; font-weight:700; margin-bottom:8px;">Write a review (optional)</label>
+        <label style="display:block; font-weight:700; margin-bottom:8px;">Written review (optional)</label>
         <textarea id="comment" name="comment" rows="5" maxlength="400"
-          placeholder="Share your experience interacting with this seller..."
+          placeholder="Share details that would help future buyers..."
           style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none; resize:vertical;"></textarea>
         <small id="charCount" style="display:block; margin-top:6px; color:#777;">0/400 characters</small>
       </div>
 
       <!-- Tags -->
       <div style="margin-bottom:22px;">
-        <label style="display:block; font-weight:700; margin-bottom:10px;">Give a compliment (optional)</label>
+        <label style="display:block; font-weight:700; margin-bottom:10px;">Compliments (optional)</label>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
@@ -101,7 +101,7 @@
       <div style="display:flex; gap:12px; align-items:center;">
         <button type="submit"
           style="padding:12px 18px; border:none; border-radius:12px; background:#222; color:#fff; font-weight:700; cursor:pointer;">
-          Submit Review
+          Save Review
         </button>
 
         <a href="/orders/<%= order.order_id %>"

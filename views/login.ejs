@@ -4,25 +4,25 @@
     <div class="auth-card">
         <div class="auth-logo">
             <div class="support-local-logo">
-                <h2>Support Local</h2>
+                <h2>Trusted Local</h2>
             </div>
         </div>
         
-        <h2>LOGIN</h2>
+        <h2>Sign in</h2>
         
         <% if (error) { %>
             <div class="error-message"><%= error %></div>
         <% } %>
         
         <form action="/login" method="POST" class="auth-form">
-            <input type="email" name="email" placeholder="Phone Number/email" required>
+            <input type="email" name="email" placeholder="Email or phone number" required>
             <input type="password" name="password" placeholder="Password" required>
             
-            <button type="submit" class="btn-primary">NEXT</button>
+            <button type="submit" class="btn-primary">Continue</button>
             
-            <div class="auth-divider">OR WITH</div>
+            <div class="auth-divider">Or continue with</div>
             
-            <p class="auth-link">Don't have an account? <a href="/register">sign up</a></p>
+            <p class="auth-link">Need an account? <a href="/register">Create one</a></p>
         </form>
     </div>
 </div>

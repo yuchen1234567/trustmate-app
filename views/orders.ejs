@@ -4,7 +4,7 @@
     <h1>My Orders</h1>
     
     <% if (orders.length === 0) { %>
-        <p>You have no orders yet. <a href="/services">Start shopping</a></p>
+        <p>You have no orders yet. <a href="/services">Browse services</a></p>
     <% } else { %>
         <table class="orders-table">
             <thead>
@@ -34,7 +34,7 @@
                             </span>
                         </td>
                         <td>
-                            <a href="/orders/<%= order.order_id %>" class="btn-view">View Details</a>
+                            <a href="/orders/<%= order.order_id %>" class="btn-view">View details</a>
                         </td>
                     </tr>
                 <% }); %>

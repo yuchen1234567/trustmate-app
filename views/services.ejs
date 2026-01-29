@@ -2,14 +2,14 @@
 
 <div class="services-page">
     <div class="filter-section">
-        <h2>Product and Filter</h2>
+        <h2>Services and filters</h2>
         
         <form action="/services" method="GET" class="search-form">
             <input type="text" name="q" placeholder="Search services..." value="<%= searchTerm %>">
             <button type="submit">Search</button>
         </form>
         
-        <h3>Explore Type</h3>
+        <h3>Categories</h3>
         <div class="categories-filter">
             <% categories.forEach(category => { %>
                 <a href="/services?category=<%= category.category_id %>" 
@@ -44,7 +44,7 @@
                                 <% } %>
                             </span>
                         </div>
-                        <a href="/services/<%= service.service_id %>" class="btn-view">View Details</a>
+                        <a href="/services/<%= service.service_id %>" class="btn-view">View details</a>
                     </div>
                 <% }); %>
             <% } %>

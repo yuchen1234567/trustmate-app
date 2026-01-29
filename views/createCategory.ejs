@@ -1,7 +1,7 @@
 <%- include('partials/navbar') %>
 
 <div class="form-page">
-    <h1>Create New Category</h1>
+    <h1>Add category</h1>
     
     <% if (error) { %>
         <div class="error-message"><%= error %></div>
@@ -9,21 +9,21 @@
     
     <form action="/admin/categories/create" method="POST" class="service-form">
         <div class="form-group">
-            <label>Category Name:</label>
+            <label>Category name</label>
             <input type="text" name="name" required>
         </div>
         
         <div class="form-group">
-            <label>Description:</label>
+            <label>Description</label>
             <textarea name="description" rows="3"></textarea>
         </div>
         
         <div class="form-group">
-            <label>Icon (optional):</label>
+            <label>Icon (optional)</label>
             <input type="text" name="icon" placeholder="Icon URL or class">
         </div>
         
-        <button type="submit" class="btn-primary">Create Category</button>
+        <button type="submit" class="btn-primary">Save category</button>
         <a href="/admin/categories" class="btn-secondary">Cancel</a>
     </form>
 </div>

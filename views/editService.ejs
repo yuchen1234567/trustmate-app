@@ -4,8 +4,8 @@
   <div style="background:#fff; border-radius:16px; padding:28px; border:1px solid rgba(0,0,0,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
 
     <div style="margin-bottom:18px;">
-      <h1 style="margin:0; font-size:28px;">Add New Service</h1>
-      <p style="margin:8px 0 0; color:#666; font-size:14px;">Fill in the service details below.</p>
+      <h1 style="margin:0; font-size:28px;">Edit service</h1>
+      <p style="margin:8px 0 0; color:#666; font-size:14px;">Review and update the service details below.</p>
     </div>
 
     <% if (error) { %>
@@ -19,16 +19,16 @@
       <div style="margin-bottom:16px;">
         <label style="display:block; font-weight:700; margin-bottom:8px;">Service Title</label>
         <input type="text" name="title" required
-          placeholder="e.g., Home Cleaning (2 Hours)"
+          placeholder="e.g., Home Cleaning (2 hours)"
           style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none;">
       </div>
 
       <div style="margin-bottom:16px;">
         <label style="display:block; font-weight:700; margin-bottom:8px;">Description</label>
         <textarea name="description" rows="5" required
-          placeholder="Describe what you offer, what’s included, and estimated time..."
+          placeholder="Describe what you offer, what is included, and the estimated time..."
           style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none;"></textarea>
-        <small style="display:block; margin-top:6px; color:#777;">Tip: Include deliverables + timeframe.</small>
+        <small style="display:block; margin-top:6px; color:#777;">Note: Include deliverables and timeframe.</small>
       </div>
 
       <!-- Price + Category in one row -->
@@ -62,7 +62,7 @@
       <div style="display:flex; gap:12px; align-items:center;">
         <button type="submit"
           style="padding:12px 18px; border:none; border-radius:12px; background:#222; color:#fff; font-weight:700; cursor:pointer;">
-          Create Service
+          Save changes
         </button>
 
         <a href="/seller/dashboard"
