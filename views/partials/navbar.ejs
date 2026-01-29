@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trustmate - Support Local</title>
+    <title>Trustmate - Trusted Local Services</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
                     <img src="/images/logo.png" alt="Trustmate Logo" class="logo-img">
                     <div class="brand-text">
                         <h1>TRUSTMATE</h1>
-                        <p class="tagline">Support Local</p>
+                        <p class="tagline">Trusted Local Services</p>
                     </div>
                 </a>
             </div>
@@ -32,7 +32,7 @@
                         <a href="/seller/dashboard">Seller Dashboard</a>
                         <a href="/seller/bookings">Bookings</a>
                     <% } else { %>
-                        <a href="/seller/register" class="nav-pill">Become a Seller</a>
+                        <a href="/seller/register" class="nav-pill">Seller Application</a>
                     <% } %>
                     
                     <% if (user.role === 'admin') { %>
@@ -43,9 +43,9 @@
                     <a href="/logout" class="btn-logout">Logout</a>
                 <% } else { %>
                     <a href="/login" class="btn-login">Login</a>
-                    <a href="/seller/login" class="btn-login">Seller Login</a>
-                    <a href="/register" class="btn-signup">Sign Up</a>
-                    <a href="/seller/signup" class="btn-signup">Seller Sign Up</a>
+                    <a href="/seller/login" class="btn-login">Seller Access</a>
+                    <a href="/register" class="btn-signup">Create Account</a>
+                    <a href="/seller/signup" class="btn-signup">Seller Registration</a>
                 <% } %>
             </div>
         </div>

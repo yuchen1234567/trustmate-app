@@ -43,11 +43,17 @@
             <% } else { %>
                 <% reviews.forEach(review => { %>
                     <div class="review-card">
-                        <p class="reviewer"><strong><%= review.username %></strong></p>
-                        <p class="rating">Rating: <%= review.rating %> / 5</p>
-                        <p class="comment"><%= review.comment %></p>
+                        <p class="review-card-eyebrow">Review</p>
+                        <p class="review-card-quote">"<%= review.comment || 'No written comment yet.' %>"</p>
+                        <p class="review-card-user"><%= review.username %></p>
+                        <div class="review-card-stars" aria-label="Rating: <%= review.rating %> out of 5">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <span class="review-card-star <%= i <= review.rating ? 'filled' : '' %>">&#9733;</span>
+                            <% } %>
+                        </div>
+                        <p class="review-card-meta">Rating: <%= review.rating %>/5 &middot; <%= new Date(review.created_at).toLocaleDateString() %></p>
                         <% if (review.tags) { %>
-                            <p class="tags">Tags: <%= review.tags %></p>
+                            <p class="review-card-tags">Tags: <%= review.tags %></p>
                         <% } %>
                         <% if (review.seller_reply) { %>
                             <div class="seller-reply">
@@ -58,7 +64,6 @@
                                 <% } %>
                             </div>
                         <% } %>
-                        <p class="date"><%= new Date(review.created_at).toLocaleDateString() %></p>
                         
                         <% if (user) { %>
                             <div class="review-actions">

@@ -2,6 +2,7 @@ const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const Cart = require('../models/cart');
 const Payment = require('../models/payment');
+const Review = require('../models/review');
 
 // Show checkout page
 exports.showCheckout = async (req, res) => {
@@ -69,12 +70,13 @@ exports.show = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
         const orderItems = await OrderItem.getByOrder(req.params.id);
+        const review = await Review.getByOrder(req.params.id);
         
         if (!order) {
             return res.status(404).send('Order not found');
         }
         
-        res.render('orderDetail', { order, orderItems });
+        res.render('orderDetail', { order, orderItems, review });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error loading order');

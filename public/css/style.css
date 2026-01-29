@@ -784,9 +784,70 @@ body {
     background: #c82333;
 }
 
+.reviews-list {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.order-review {
+    margin-top: 2.5rem;
+}
+
 .review-card {
     position: relative;
-    padding-bottom: 1rem;
+    padding: 2rem 2.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.review-card-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.review-card-quote {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.1rem;
+}
+
+.review-card-user {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.6rem;
+}
+
+.review-card-stars {
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 0.7rem;
+    font-size: 1.1rem;
+}
+
+.review-card-star {
+    color: #c9c2bb;
+}
+
+.review-card-star.filled {
+    color: #f4b942;
+}
+
+.review-card-meta {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.review-card-tags {
+    color: var(--text-muted);
+    font-size: 0.95rem;
 }
 
 .seller-reply {

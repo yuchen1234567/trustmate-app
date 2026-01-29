@@ -4,14 +4,14 @@
   <div style="background:#fff; border-radius:16px; padding:24px; border:1px solid rgba(0,0,0,0.08); box-shadow:0 10px 24px rgba(0,0,0,0.08);">
     <h1 style="margin:0 0 10px; font-size:24px;">Scan to Pay (NETS QR)</h1>
     <p style="margin:0 0 16px; color:#666; font-size:14px;">
-      Order #<%= orderId %> · Total $<%= total %>
+      Order #<%= orderId %> - Total $<%= total %>
     </p>
 
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; align-items:center;">
       <div style="text-align:center;">
         <img src="<%= qrCodeUrl %>" alt="NETS QR Code" style="max-width: 260px; width:100%; border-radius:12px; border:1px solid #eee; background:#fafafa; padding:12px;">
         <div id="nets-status" style="margin-top:14px; font-weight:600; color:#2b6cb0;">
-          Waiting for payment confirmation...
+          Awaiting payment confirmation...
         </div>
         <div id="nets-timer" style="margin-top:6px; color:#777; font-size:13px;">
           Time remaining: 5:00
@@ -21,9 +21,9 @@
       <div>
         <div style="background:#f7f7f7; border:1px solid #eee; padding:16px; border-radius:12px;">
           <ol style="margin:0; padding-left:18px; color:#444; line-height:1.6;">
-            <li>Open your NETS/Banking app.</li>
-            <li>Scan the QR code to approve payment.</li>
-            <li>Keep this page open until payment completes.</li>
+            <li>Open your NETS or banking app.</li>
+            <li>Scan the QR code to confirm payment.</li>
+            <li>Keep this page open while confirmation is processed.</li>
           </ol>
         </div>
 
@@ -61,7 +61,7 @@
     };
 
     eventSource.onerror = () => {
-      statusEl.textContent = 'Connection lost. Retrying...';
+      statusEl.textContent = 'Connection lost. Attempting to reconnect...';
     };
 
     let remainingTime = 300;
