@@ -1,18 +1,18 @@
 <%- include('partials/navbar') %>
 
 <div style="max-width: 850px; margin: 40px auto; padding: 0 16px;">
-  <div style="background:#fff; border-radius:16px; padding:28px; border:1px solid rgba(0,0,0,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
+  <div style="background:var(--surface); border-radius:16px; padding:28px; border:1px solid var(--border-soft); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);">
 
     <!-- Header -->
     <div style="margin-bottom:18px;">
       <h1 style="margin:0; font-size:28px;">Share a Review</h1>
-      <p style="margin:8px 0 0; color:#666; font-size:14px;">
+      <p style="margin:8px 0 0; color:var(--text-muted); font-size:14px;">
         Order #<strong><%= order.order_id %></strong>
       </p>
     </div>
 
     <% if (error) { %>
-      <div style="background:#ffe6e6; color:#9a1b1b; border:1px solid #ffb4b4; padding:12px 14px; border-radius:12px; margin-bottom:16px;">
+      <div style="background:var(--status-error); color:#fff; border:1px solid var(--status-error); padding:12px 14px; border-radius:12px; margin-bottom:16px;">
         <%= error %>
       </div>
     <% } %>
@@ -23,9 +23,9 @@
       <% if (orderItems.length > 0) { %>
         <input type="hidden" name="service_id" value="<%= orderItems[0].service_id %>">
 
-        <div style="background:#f7f7f7; border:1px solid #eee; padding:14px 16px; border-radius:14px; margin-bottom:18px;">
+        <div style="background:var(--surface-muted); border:1px solid var(--border-soft); padding:14px 16px; border-radius:14px; margin-bottom:18px;">
           <h3 style="margin:0 0 6px; font-size:16px;">How was the service?</h3>
-          <p style="margin:0; color:#444;">
+          <p style="margin:0; color:var(--text-muted);">
             Rate the service: <strong><%= orderItems[0].title %></strong>
           </p>
         </div>
@@ -35,24 +35,24 @@
       <div style="margin-bottom:18px;">
         <label style="display:block; font-weight:700; margin-bottom:10px;">Rating</label>
 
-        <div style="display:flex; gap:10px; align-items:center;">
-          <input type="radio" name="rating" value="1" id="star1" required>
-          <label for="star1" style="font-size:22px; cursor:pointer;">&#9733;</label>
-
-          <input type="radio" name="rating" value="2" id="star2">
-          <label for="star2" style="font-size:22px; cursor:pointer;">&#9733;</label>
-
-          <input type="radio" name="rating" value="3" id="star3">
-          <label for="star3" style="font-size:22px; cursor:pointer;">&#9733;</label>
+        <div class="review-stars" aria-label="Rating from 1 to 5">
+          <input type="radio" name="rating" value="5" id="star5" required>
+          <label for="star5" title="5 stars">&#9733;</label>
 
           <input type="radio" name="rating" value="4" id="star4">
-          <label for="star4" style="font-size:22px; cursor:pointer;">&#9733;</label>
+          <label for="star4" title="4 stars">&#9733;</label>
 
-          <input type="radio" name="rating" value="5" id="star5">
-          <label for="star5" style="font-size:22px; cursor:pointer;">&#9733;</label>
+          <input type="radio" name="rating" value="3" id="star3">
+          <label for="star3" title="3 stars">&#9733;</label>
+
+          <input type="radio" name="rating" value="2" id="star2">
+          <label for="star2" title="2 stars">&#9733;</label>
+
+          <input type="radio" name="rating" value="1" id="star1">
+          <label for="star1" title="1 star">&#9733;</label>
         </div>
 
-        <small style="display:block; margin-top:6px; color:#777;">
+        <small style="display:block; margin-top:6px; color:var(--text-muted);">
           Select 1 (lowest) to 5 (highest)
         </small>
       </div>
@@ -62,8 +62,8 @@
         <label style="display:block; font-weight:700; margin-bottom:8px;">Written review (optional)</label>
         <textarea id="comment" name="comment" rows="5" maxlength="400"
           placeholder="Share details that would help future buyers..."
-          style="width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:12px; outline:none; resize:vertical;"></textarea>
-        <small id="charCount" style="display:block; margin-top:6px; color:#777;">0/400 characters</small>
+          style="width:100%; padding:12px 14px; border:1px solid var(--border-strong); border-radius:12px; outline:none; resize:vertical;"></textarea>
+        <small id="charCount" style="display:block; margin-top:6px; color:var(--text-muted);">0/400 characters</small>
       </div>
 
       <!-- Tags -->
@@ -71,28 +71,28 @@
         <label style="display:block; font-weight:700; margin-bottom:10px;">Compliments (optional)</label>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
+          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--border-soft); border-radius:12px; cursor:pointer;">
             <input type="checkbox" name="tags" value="Updated listings">
             Updated listings
           </label>
 
-          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
+          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--border-soft); border-radius:12px; cursor:pointer;">
             <input type="checkbox" name="tags" value="Goes the extra mile">
             Goes the extra mile
           </label>
 
-          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
+          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--border-soft); border-radius:12px; cursor:pointer;">
             <input type="checkbox" name="tags" value="Knows their stuff">
             Knows their stuff
           </label>
 
-          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid #eee; border-radius:12px; cursor:pointer;">
+          <label style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--border-soft); border-radius:12px; cursor:pointer;">
             <input type="checkbox" name="tags" value="Amazing chat">
             Amazing chat
           </label>
         </div>
 
-        <small style="display:block; margin-top:8px; color:#777;">
+        <small style="display:block; margin-top:8px; color:var(--text-muted);">
           You can choose more than one.
         </small>
       </div>
@@ -100,12 +100,12 @@
       <!-- Actions -->
       <div style="display:flex; gap:12px; align-items:center;">
         <button type="submit"
-          style="padding:12px 18px; border:none; border-radius:12px; background:#222; color:#fff; font-weight:700; cursor:pointer;">
+          style="padding:12px 18px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:700; cursor:pointer;">
           Save Review
         </button>
 
         <a href="/orders/<%= order.order_id %>"
-          style="padding:12px 18px; border-radius:12px; border:1px solid #ddd; text-decoration:none; color:#222; font-weight:700;">
+          style="padding:12px 18px; border-radius:12px; border:1px solid var(--border-strong); text-decoration:none; color:var(--text-primary); font-weight:700;">
           Cancel
         </a>
       </div>
