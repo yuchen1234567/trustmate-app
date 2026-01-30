@@ -48,6 +48,7 @@ exports.login = async (req, res) => {
             phoneVerified: false
         };
         req.session.postLoginRedirect = '/seller/dashboard';
+        req.session.successMessage = `Demo code: ${req.session.twoFactor.emailCode}`;
 
         res.redirect('/2fa/email');
     } catch (error) {

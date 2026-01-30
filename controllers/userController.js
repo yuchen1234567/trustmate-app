@@ -119,6 +119,7 @@ exports.login = async (req, res) => {
             phoneVerified: false
         };
         req.session.postLoginRedirect = getPostLoginRedirect(user);
+        req.session.successMessage = `Demo code: ${req.session.twoFactor.emailCode}`;
 
         res.redirect('/2fa/email');
     } catch (error) {
@@ -143,11 +144,9 @@ exports.showEmail2fa = (req, res) => {
         return res.redirect('/login');
     }
 
-    const showOtpHint = process.env.NODE_ENV !== 'production';
     res.render('twoFactorEmail', {
         error: null,
-        maskedEmail: maskEmail(req.session.pendingUser.email),
-        otpHint: showOtpHint ? req.session.twoFactor.emailCode : null
+        maskedEmail: maskEmail(req.session.pendingUser.email)
     });
 };
 
@@ -158,16 +157,15 @@ exports.verifyEmail2fa = (req, res) => {
 
     const code = getOtpFromBody(req.body);
     if (!code || code.length !== 6 || code !== req.session.twoFactor.emailCode) {
-        const showOtpHint = process.env.NODE_ENV !== 'production';
         return res.render('twoFactorEmail', {
             error: 'Invalid code. Please try again.',
-            maskedEmail: maskEmail(req.session.pendingUser.email),
-            otpHint: showOtpHint ? req.session.twoFactor.emailCode : null
+            maskedEmail: maskEmail(req.session.pendingUser.email)
         });
     }
 
     req.session.twoFactor.emailVerified = true;
     req.session.twoFactor.phoneCode = generateOtp();
+    req.session.successMessage = `Demo code: ${req.session.twoFactor.phoneCode}`;
     res.redirect('/2fa/phone');
 };
 
@@ -177,13 +175,8 @@ exports.resendEmail2fa = (req, res) => {
     }
 
     req.session.twoFactor.emailCode = generateOtp();
-    const showOtpHint = process.env.NODE_ENV !== 'production';
-    res.render('twoFactorEmail', {
-        error: null,
-        success: 'A new code has been sent to your email.',
-        maskedEmail: maskEmail(req.session.pendingUser.email),
-        otpHint: showOtpHint ? req.session.twoFactor.emailCode : null
-    });
+    req.session.successMessage = `Demo code: ${req.session.twoFactor.emailCode}`;
+    res.redirect('/2fa/email');
 };
 
 exports.showPhone2fa = (req, res) => {
@@ -195,11 +188,9 @@ exports.showPhone2fa = (req, res) => {
         return res.redirect('/2fa/email');
     }
 
-    const showOtpHint = process.env.NODE_ENV !== 'production';
     res.render('twoFactorPhone', {
         error: null,
-        maskedPhone: maskPhone(req.session.pendingUser.phone),
-        otpHint: showOtpHint ? req.session.twoFactor.phoneCode : null
+        maskedPhone: maskPhone(req.session.pendingUser.phone)
     });
 };
 
@@ -210,11 +201,9 @@ exports.verifyPhone2fa = (req, res) => {
 
     const code = getOtpFromBody(req.body);
     if (!code || code.length !== 6 || code !== req.session.twoFactor.phoneCode) {
-        const showOtpHint = process.env.NODE_ENV !== 'production';
         return res.render('twoFactorPhone', {
             error: 'Invalid code. Please try again.',
-            maskedPhone: maskPhone(req.session.pendingUser.phone),
-            otpHint: showOtpHint ? req.session.twoFactor.phoneCode : null
+            maskedPhone: maskPhone(req.session.pendingUser.phone)
         });
     }
 
@@ -234,13 +223,8 @@ exports.resendPhone2fa = (req, res) => {
     }
 
     req.session.twoFactor.phoneCode = generateOtp();
-    const showOtpHint = process.env.NODE_ENV !== 'production';
-    res.render('twoFactorPhone', {
-        error: null,
-        success: 'A new code has been sent to your phone.',
-        maskedPhone: maskPhone(req.session.pendingUser.phone),
-        otpHint: showOtpHint ? req.session.twoFactor.phoneCode : null
-    });
+    req.session.successMessage = `Demo code: ${req.session.twoFactor.phoneCode}`;
+    res.redirect('/2fa/phone');
 };
 
 // Get user profile

@@ -15,8 +15,8 @@
         <% if (typeof success !== 'undefined' && success) { %>
             <div class="success-message"><%= success %></div>
         <% } %>
-        <% if (otpHint) { %>
-            <p class="twofa-hint">Demo code: <strong><%= otpHint %></strong></p>
+        <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+            <div class="flash-popup-trigger" data-flash-message="<%= successMessage %>"></div>
         <% } %>
 
         <form action="/2fa/phone/verify" method="POST" class="twofa-form" data-otp-form>

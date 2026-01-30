@@ -1,4 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const flashTrigger = document.querySelector('[data-flash-message]');
+    if (flashTrigger) {
+        const message = flashTrigger.dataset.flashMessage;
+        if (message) {
+            const toast = document.createElement('div');
+            toast.className = 'flash-toast';
+            toast.textContent = message;
+
+            const closeButton = document.createElement('button');
+            closeButton.type = 'button';
+            closeButton.className = 'flash-toast-close';
+            closeButton.setAttribute('aria-label', 'Close notification');
+            closeButton.textContent = '×';
+            toast.appendChild(closeButton);
+
+            const removeToast = () => {
+                toast.classList.add('flash-toast-hide');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            };
+
+            closeButton.addEventListener('click', removeToast);
+            setTimeout(removeToast, 5000);
+
+            document.body.appendChild(toast);
+        }
+    }
+
     const form = document.querySelector('[data-otp-form]');
     const inputs = Array.from(document.querySelectorAll('[data-otp-inputs] .otp-input'));
     const hiddenCode = document.querySelector('[data-otp-code]');

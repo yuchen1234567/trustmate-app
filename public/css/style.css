@@ -309,6 +309,58 @@ body {
     margin-bottom: 1rem;
 }
 
+.flash-popup-trigger {
+    display: none;
+}
+
+.flash-toast {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    background: var(--status-success);
+    color: #fff;
+    padding: 0.9rem 3rem 0.9rem 1.25rem;
+    border-radius: 999px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.25);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: flashToastIn 0.25s ease-out;
+}
+
+.flash-toast-close {
+    position: absolute;
+    top: 50%;
+    right: 0.7rem;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.flash-toast-hide {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+@keyframes flashToastIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
 /* Two-factor auth */
 .twofa-container {
     max-width: 720px;
