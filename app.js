@@ -5,6 +5,9 @@ require('dotenv').config();
 
 const app = express();
 
+const stripeConfigured = !!process.env.STRIPE_SECRET_KEY;
+const paypalConfigured = !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -25,6 +28,11 @@ app.set('views', path.join(__dirname, 'views'));
 // Make user available to all views
 const { setUserLocals } = require('./middleware');
 app.use(setUserLocals);
+app.use((req, res, next) => {
+    res.locals.stripeConfigured = stripeConfigured;
+    res.locals.paypalConfigured = paypalConfigured;
+    next();
+});
 
 // Import controllers
 const userController = require('./controllers/userController');
@@ -90,6 +98,15 @@ app.post('/payments/nets/retry/:orderId', isAuthenticated, paymentController.ret
 app.get('/payments/nets/success', isAuthenticated, paymentController.netsSuccess);
 app.get('/payments/nets/fail', isAuthenticated, paymentController.netsFail);
 app.get('/payments/nets/status/:txnRetrievalRef', paymentController.streamNetsStatus);
+
+// Payment routes (Stripe)
+app.post('/payments/stripe/create', isAuthenticated, paymentController.createStripeCheckout);
+app.get('/payments/stripe/success', isAuthenticated, paymentController.stripeSuccess);
+app.get('/payments/stripe/cancel', isAuthenticated, paymentController.stripeCancel);
+
+// Payment routes (PayPal)
+app.post('/payments/paypal/create', isAuthenticated, paymentController.createPayPalOrder);
+app.post('/payments/paypal/capture', isAuthenticated, paymentController.capturePayPalOrder);
 
 // Review routes
 app.get('/reviews/create/:orderId', isAuthenticated, reviewController.showCreate);

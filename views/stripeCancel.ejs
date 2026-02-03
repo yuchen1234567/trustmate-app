@@ -1,0 +1,15 @@
+<%- include('partials/navbar') %>
+
+<div style="max-width: 720px; margin: 40px auto; padding: 0 16px;">
+  <div style="background:var(--surface); border-radius:16px; padding:28px; border:1px solid var(--border-soft); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); text-align:center;">
+    <h1 style="margin:0 0 10px; font-size:26px;">Payment Cancelled</h1>
+    <p style="margin:0 0 18px; color:var(--text-muted);">Your Stripe payment was cancelled. You can try again from checkout.</p>
+
+    <a href="/checkout"
+      style="display:inline-block; padding:12px 18px; border-radius:12px; background:var(--accent); color:#fff; text-decoration:none; font-weight:800;">
+      Back to Checkout
+    </a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

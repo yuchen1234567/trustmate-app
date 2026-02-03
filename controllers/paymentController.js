@@ -4,7 +4,23 @@ const OrderItem = require('../models/orderItem');
 const Payment = require('../models/payment');
 const nets = require('../services/nets');
 
-const createOrderFromCart = async (userId) => {
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+    const stripeModule = require('stripe');
+    stripe = stripeModule(process.env.STRIPE_SECRET_KEY);
+}
+
+const paypal = require('@paypal/checkout-server-sdk');
+let paypalClient = null;
+if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
+    const Environment = process.env.NODE_ENV === 'production'
+        ? paypal.core.LiveEnvironment
+        : paypal.core.SandboxEnvironment;
+    const paypalEnv = new Environment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET);
+    paypalClient = new paypal.core.PayPalHttpClient(paypalEnv);
+}
+
+const createOrderFromCart = async (userId, { provider = 'nets', currency = 'SGD' } = {}) => {
     const cartItems = await Cart.getByUser(userId);
     if (cartItems.length === 0) {
         return null;
@@ -20,8 +36,9 @@ const createOrderFromCart = async (userId) => {
     await Payment.create({
         orderId,
         userId,
-        provider: 'nets',
+        provider,
         amount: total,
+        currency,
         status: 'pending',
         escrowStatus: 'none'
     });
@@ -245,4 +262,186 @@ exports.streamNetsStatus = async (req, res) => {
     req.on('close', () => {
         clearInterval(interval);
     });
+};
+
+exports.createStripeCheckout = async (req, res) => {
+    if (!stripe) {
+        return res.redirect('/checkout?error=stripe_not_configured');
+    }
+
+    let orderId;
+    try {
+        const userId = req.session.user.user_id;
+        const orderData = await createOrderFromCart(userId, { provider: 'stripe' });
+
+        if (!orderData) {
+            return res.redirect('/cart');
+        }
+
+        orderId = orderData.orderId;
+        const amount = Number(orderData.total || 0).toFixed(2);
+
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [
+                {
+                    price_data: {
+                        currency: 'sgd',
+                        product_data: {
+                            name: 'Trustmate Services Order',
+                            description: 'Payment for your Trustmate order'
+                        },
+                        unit_amount: Math.round(Number(amount) * 100)
+                    },
+                    quantity: 1
+                }
+            ],
+            mode: 'payment',
+            success_url: `${req.protocol}://${req.get('host')}/payments/stripe/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${req.protocol}://${req.get('host')}/payments/stripe/cancel?orderId=${orderId}`,
+            metadata: {
+                orderId: String(orderId),
+                userId: String(userId)
+            }
+        });
+
+        await Payment.updateByOrderId(orderId, {
+            payment_reference: session.id
+        });
+
+        return res.redirect(session.url);
+    } catch (error) {
+        console.error('Stripe checkout error:', error);
+        if (orderId) {
+            await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
+        }
+        return res.redirect('/checkout?error=stripe_checkout_failed');
+    }
+};
+
+exports.stripeSuccess = async (req, res) => {
+    if (!stripe) {
+        return res.redirect('/checkout?error=stripe_not_configured');
+    }
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+        if (session.payment_status !== 'paid') {
+            return res.redirect('/payments/stripe/cancel');
+        }
+
+        const orderId = Number(session.metadata?.orderId || 0);
+        if (!orderId) {
+            return res.redirect('/orders');
+        }
+
+        await Payment.updateByOrderId(orderId, {
+            status: 'paid',
+            escrow_status: 'held',
+            provider_txn_id: session.payment_intent,
+            payment_reference: session.id
+        });
+
+        return res.render('stripeSuccess', {
+            orderId,
+            total: (session.amount_total || 0) / 100
+        });
+    } catch (error) {
+        console.error('Stripe success error:', error);
+        return res.redirect('/checkout?error=stripe_capture_failed');
+    }
+};
+
+exports.stripeCancel = async (req, res) => {
+    const orderId = Number(req.query.orderId || 0);
+
+    try {
+        if (orderId) {
+            await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
+        }
+    } catch (error) {
+        console.error('Stripe cancel error:', error);
+    }
+
+    res.render('stripeCancel', { orderId: orderId || null });
+};
+
+exports.createPayPalOrder = async (req, res) => {
+    if (!paypalClient) {
+        return res.status(500).json({ error: 'PayPal not configured' });
+    }
+
+    let orderId;
+    try {
+        const userId = req.session.user.user_id;
+        const orderData = await createOrderFromCart(userId, { provider: 'paypal' });
+
+        if (!orderData) {
+            return res.status(400).json({ error: 'Cart is empty' });
+        }
+
+        orderId = orderData.orderId;
+        const total = Number(orderData.total || 0).toFixed(2);
+
+        const request = new paypal.orders.OrdersCreateRequest();
+        request.prefer('return=representation');
+        request.requestBody({
+            intent: 'CAPTURE',
+            purchase_units: [
+                {
+                    amount: {
+                        currency_code: 'SGD',
+                        value: total
+                    }
+                }
+            ]
+        });
+
+        const order = await paypalClient.execute(request);
+
+        await Payment.updateByOrderId(orderId, {
+            payment_reference: order.result.id
+        });
+
+        req.session.pendingPayPalOrderId = orderId;
+        res.json({ id: order.result.id });
+    } catch (error) {
+        console.error('PayPal order creation error:', error);
+        if (orderId) {
+            await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
+        }
+        res.status(500).json({ error: 'Failed to create PayPal order' });
+    }
+};
+
+exports.capturePayPalOrder = async (req, res) => {
+    if (!paypalClient) {
+        return res.status(500).json({ error: 'PayPal not configured' });
+    }
+
+    const { orderID } = req.body;
+    const orderId = Number(req.session.pendingPayPalOrderId || 0);
+    if (!orderId) {
+        return res.status(400).json({ error: 'Missing pending order' });
+    }
+
+    try {
+        const request = new paypal.orders.OrdersCaptureRequest(orderID);
+        request.requestBody({});
+        const capture = await paypalClient.execute(request);
+
+        await Payment.updateByOrderId(orderId, {
+            status: 'paid',
+            escrow_status: 'held',
+            provider_txn_id: capture.result.id,
+            payment_reference: orderID
+        });
+
+        req.session.pendingPayPalOrderId = null;
+        res.json({ success: true, orderId });
+    } catch (error) {
+        console.error('PayPal capture error:', error);
+        await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
+        res.status(500).json({ error: 'Failed to capture PayPal order' });
+    }
 };

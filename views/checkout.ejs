@@ -52,16 +52,53 @@
 
       <div style="background:var(--surface-muted); border:1px solid var(--border-soft); padding:12px 14px; border-radius:14px; margin-bottom:14px;">
         <p style="margin:0; color:var(--text-muted); font-size:14px;">
-          Pay securely with NETS QR. You will see a confirmation once payment is completed.
+          Choose your preferred payment method. You will see a confirmation once payment is completed.
         </p>
       </div>
 
-      <form action="/payments/nets/start" method="POST" style="margin-bottom:10px;">
-        <button type="submit"
-          style="width:100%; padding:12px 16px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:800; cursor:pointer;">
-          Pay with NETS QR
-        </button>
-      </form>
+      <div style="display:grid; gap:12px; margin-bottom:14px;">
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">NETS QR</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Scan QR code with NETS app for instant payment.</p>
+          <form action="/payments/nets/start" method="POST">
+            <button type="submit"
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:800; cursor:pointer;">
+              Pay with NETS QR
+            </button>
+          </form>
+        </div>
+
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">PayPal</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Pay securely with your PayPal account.</p>
+          <% if (locals.paypalConfigured) { %>
+            <div id="paypal-button-container"></div>
+          <% } else { %>
+            <button type="button" disabled
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:#94a3b8; color:#fff; font-weight:800;">
+              PayPal Not Configured
+            </button>
+          <% } %>
+        </div>
+
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">Stripe</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Pay with credit/debit card via Stripe.</p>
+          <% if (locals.stripeConfigured) { %>
+            <form action="/payments/stripe/create" method="POST">
+              <button type="submit"
+                style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:800; cursor:pointer;">
+                Pay with Stripe
+              </button>
+            </form>
+          <% } else { %>
+            <button type="button" disabled
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:#94a3b8; color:#fff; font-weight:800;">
+              Stripe Not Configured
+            </button>
+          <% } %>
+        </div>
+      </div>
 
       <a href="/cart"
         style="display:block; text-align:center; padding:12px 16px; border-radius:12px; border:1px solid var(--border-strong); text-decoration:none; color:var(--text-primary); font-weight:800;">
@@ -74,5 +111,44 @@
     </div>
   </div>
 </div>
+
+<% if (locals.paypalConfigured) { %>
+  <script src="https://www.paypal.com/sdk/js?client-id=<%= process.env.PAYPAL_CLIENT_ID %>&currency=SGD"></script>
+  <script>
+    paypal.Buttons({
+      createOrder: function() {
+        return fetch('/payments/paypal/create', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(res => res.json())
+        .then(data => data.id);
+      },
+      onApprove: function(data) {
+        return fetch('/payments/paypal/capture', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderID: data.orderID })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = '/orders/' + data.orderId;
+          } else {
+            alert('Payment failed. Please try again.');
+          }
+        })
+        .catch(err => {
+          console.error('PayPal error:', err);
+          alert('PayPal encountered an error. Please try again.');
+        });
+      },
+      onError: function(err) {
+        console.error('PayPal error:', err);
+        alert('PayPal encountered an error. Please try again.');
+      }
+    }).render('#paypal-button-container');
+  </script>
+<% } %>
 
 <%- include('partials/footer') %>
