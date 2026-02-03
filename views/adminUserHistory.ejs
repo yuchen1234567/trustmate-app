@@ -1,55 +1,147 @@
 <%- include('partials/navbar') %>
 
 <div class="admin-dashboard">
-    <h1>User history</h1>
-    
-    <div class="user-info-card">
-        <h2><%= user.username %></h2>
-        <p>Email: <%= user.email %></p>
-        <p>Role: <%= user.role %></p>
-        <p>Status: <%= user.status %></p>
-        <p>Joined: <%= new Date(user.created_at).toLocaleDateString() %></p>
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-breadcrumb">
+                <a href="/admin/dashboard">📊 Admin</a>
+                <span class="breadcrumb-separator">›</span>
+                <a href="/admin/users">👥 Users</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-current">User History</span>
+            </div>
+            <h1 class="page-title">
+                <span class="page-icon">📜</span>
+                User History
+            </h1>
+        </div>
     </div>
     
-    <h2>Order History</h2>
+    <div class="user-profile-card">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <%= user.username.substring(0, 2).toUpperCase() %>
+            </div>
+            <div class="profile-info">
+                <h2 class="profile-name"><%= user.username %></h2>
+                <p class="profile-email">📧 <%= user.email %></p>
+            </div>
+            <div class="profile-badge">
+                <span class="role-badge role-<%= user.role %>">
+                    <% if (user.role === 'admin') { %>👑<% } else if (user.role === 'seller') { %>🏪<% } else { %>👤<% } %>
+                    <%= user.role.toUpperCase() %>
+                </span>
+            </div>
+        </div>
+        
+        <div class="profile-details">
+            <div class="detail-item">
+                <span class="detail-icon">📅</span>
+                <div class="detail-content">
+                    <span class="detail-label">Joined</span>
+                    <span class="detail-value"><%= new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-icon">
+                    <% if (user.status === 'active') { %>✅<% } else { %>❄️<% } %>
+                </span>
+                <div class="detail-content">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value">
+                        <span class="status-badge status-<%= user.status %>"><%= user.status %></span>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-icon">🛒</span>
+                <div class="detail-content">
+                    <span class="detail-label">Total Orders</span>
+                    <span class="detail-value"><%= orders.length %></span>
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-icon">💰</span>
+                <div class="detail-content">
+                    <span class="detail-label">Total Spent</span>
+                    <span class="detail-value">$<%= orders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0).toFixed(2) %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section-header">
+        <h2 class="section-title">
+            <span class="section-icon">📦</span>
+            Order History
+        </h2>
+        <div class="section-meta">
+            <span class="order-count"><%= orders.length %> <%= orders.length === 1 ? 'order' : 'orders' %></span>
+        </div>
+    </div>
     
     <% if (orders.length === 0) { %>
-        <p>No orders found for this user.</p>
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>No Orders Yet</h3>
+            <p>This user hasn't placed any orders.</p>
+        </div>
     <% } else { %>
-        <table class="orders-table">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Date</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% orders.forEach(order => { %>
+        <div class="orders-table-container">
+            <table class="admin-table orders-history-table">
+                <thead>
                     <tr>
-                        <td>#<%= order.order_id %></td>
-                        <td><%= new Date(order.created_at).toLocaleDateString() %></td>
-                        <td>$<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></td>
-                        <td><span class="status-badge status-<%= order.status %>"><%= order.status %></span></td>
-                        <td><a href="/orders/<%= order.order_id %>" class="btn-small">View details</a></td>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
-                <% }); %>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <% orders.forEach(order => { %>
+                        <tr>
+                            <td>
+                                <span class="order-id-badge">#<%= order.order_id %></span>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <span class="date-primary"><%= new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+                                    <span class="date-secondary"><%= new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="items-count">
+                                    <%= order.item_count || 1 %> <%= (order.item_count || 1) === 1 ? 'item' : 'items' %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="amount-value">$<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-<%= order.status %>"><%= order.status %></span>
+                            </td>
+                            <td>
+                                <a href="/orders/<%= order.order_id %>" class="btn-small btn-view-order">
+                                    <span>👁️</span> View
+                                </a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
     <% } %>
     
-    <a href="/admin/users" class="btn-secondary" style="display: inline-block; margin-top: 2rem;">Back to users</a>
+    <div class="page-actions">
+        <a href="/admin/users" class="btn-back">
+            <span>←</span> Back to Users
+        </a>
+    </div>
 </div>
-
-<style>
-.user-info-card {
-    background: var(--surface);
-    padding: 2rem;
-    border-radius: 10px;
-    margin-bottom: 2rem;
-}
-</style>
 
 <%- include('partials/footer') %>

@@ -1,62 +1,140 @@
 <%- include('partials/navbar') %>
 
 <div class="admin-dashboard">
-    <h1>Admin dashboard</h1>
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-breadcrumb">
+                <a href="/admin/dashboard">📊 Admin</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-current">User Management</span>
+            </div>
+            <h1 class="page-title">
+                <span class="page-icon">👥</span>
+                Admin Dashboard
+            </h1>
+        </div>
+    </div>
     
     <div class="dashboard-nav">
-        <a href="/admin/dashboard">Fraud Detection</a>
-        <a href="/admin/users" class="active">User Management</a>
-        <a href="/admin/orders">Order Management</a>
-        <a href="/admin/categories">Categories</a>
+        <a href="/admin/dashboard" class="nav-tab">
+            <span class="tab-icon">🛡️</span>
+            <span class="tab-label">Fraud Detection</span>
+        </a>
+        <a href="/admin/users" class="nav-tab active">
+            <span class="tab-icon">👥</span>
+            <span class="tab-label">User Management</span>
+        </a>
+        <a href="/admin/orders" class="nav-tab">
+            <span class="tab-icon">📦</span>
+            <span class="tab-label">Order Management</span>
+        </a>
+        <a href="/admin/categories" class="nav-tab">
+            <span class="tab-icon">🏷️</span>
+            <span class="tab-label">Categories</span>
+        </a>
     </div>
     
     <div class="user-management">
-        <h2>User account management</h2>
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="section-icon">👤</span>
+                User Account Management
+            </h2>
+            <div class="section-meta">
+                <span class="order-count"><%= users.length %> <%= users.length === 1 ? 'user' : 'users' %></span>
+            </div>
+        </div>
         
-        <form action="/admin/users/search" method="GET" class="search-form">
-            <input type="text" name="search" placeholder="Search by user ID or email">
-            <button type="submit">Search</button>
-        </form>
+        <div class="search-container">
+            <form action="/admin/users/search" method="GET" class="search-form-enhanced">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="search" placeholder="Search by user ID, email, or username..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+                </div>
+                <button type="submit" class="btn-search">Search</button>
+            </form>
+        </div>
         
-        <table class="users-table">
-            <thead>
-                <tr>
-                    <th>User ID</th>
-                    <th>Email</th>
-                    <th>Username</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% const displayUsers = searchResults || users; %>
-                <% if (displayUsers.length === 0) { %>
-                    <tr><td colspan="6">No users found.</td></tr>
-                <% } else { %>
-                    <% displayUsers.forEach(user => { %>
+        <div class="table-wrapper">
+            <table class="users-table admin-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% const displayUsers = searchResults || users; %>
+                    <% if (displayUsers.length === 0) { %>
                         <tr>
-                            <td>User<%= String(user.user_id).padStart(2, '0') %></td>
-                            <td><%= user.email %></td>
-                            <td><%= user.username %></td>
-                            <td><%= user.role %></td>
-                            <td><span class="status-badge status-<%= user.status %>"><%= user.status %></span></td>
-                            <td class="action-buttons">
-                                <a href="/admin/users/history/<%= user.user_id %>" class="btn-small btn-success">History</a>
-                                
-                                <% if (user.status === 'active') { %>
-                                    <a href="/admin/users/freeze/<%= user.user_id %>" class="btn-small btn-danger">Freeze account</a>
-                                <% } else { %>
-                                    <a href="/admin/users/unfreeze/<%= user.user_id %>" class="btn-small btn-success">Unfreeze</a>
-                                <% } %>
-                                
-                                <a href="/admin/users/reset-password/<%= user.user_id %>" class="btn-small btn-warning" onclick="return confirm('Reset password to default?')">Reset password</a>
+                            <td colspan="6">
+                                <div class="empty-state-inline">
+                                    <span class="empty-icon-small">🔍</span>
+                                    <span>No users found</span>
+                                </div>
                             </td>
                         </tr>
-                    <% }); %>
-                <% } %>
-            </tbody>
-        </table>
+                    <% } else { %>
+                        <% displayUsers.forEach(user => { %>
+                            <tr>
+                                <td>
+                                    <span class="user-id-badge">
+                                        <span class="id-icon">👤</span>
+                                        #<%= String(user.user_id).padStart(3, '0') %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="email-cell">
+                                        <span class="email-icon">📧</span>
+                                        <%= user.email %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="username-text"><%= user.username %></span>
+                                </td>
+                                <td>
+                                    <span class="role-badge role-<%= user.role %>">
+                                        <% if (user.role === 'admin') { %>👑<% } else if (user.role === 'seller') { %>🏪<% } else { %>👤<% } %>
+                                        <%= user.role.toUpperCase() %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-<%= user.status %>">
+                                        <% if (user.status === 'active') { %>✅<% } else { %>❄️<% } %>
+                                        <%= user.status %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/admin/users/history/<%= user.user_id %>" class="btn-action btn-info" title="View History">
+                                            <span>📜</span>
+                                        </a>
+                                        
+                                        <% if (user.status === 'active') { %>
+                                            <a href="/admin/users/freeze/<%= user.user_id %>" class="btn-action btn-freeze" title="Freeze Account" onclick="return confirm('Are you sure you want to freeze this account?')">
+                                                <span>❄️</span>
+                                            </a>
+                                        <% } else { %>
+                                            <a href="/admin/users/unfreeze/<%= user.user_id %>" class="btn-action btn-unfreeze" title="Unfreeze Account">
+                                                <span>✅</span>
+                                            </a>
+                                        <% } %>
+                                        
+                                        <a href="/admin/users/reset-password/<%= user.user_id %>" class="btn-action btn-reset" title="Reset Password" onclick="return confirm('Reset password to default?')">
+                                            <span>🔑</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

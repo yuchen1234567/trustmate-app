@@ -4,25 +4,38 @@
     <div class="auth-card">
         <div class="auth-logo">
             <div class="support-local-logo">
-                <h2>Trusted Local</h2>
+                <h2>🔐 Trustmate</h2>
             </div>
         </div>
         
-        <h2>Sign in</h2>
+        <h2 style="text-align: center; margin-bottom: 1.5rem;">Welcome Back</h2>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Sign in to access your account</p>
         
         <% if (error) { %>
             <div class="error-message"><%= error %></div>
         <% } %>
         
         <form action="/login" method="POST" class="auth-form">
-            <input type="email" name="email" placeholder="Email or phone number" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">📧</span>
+                <input type="email" name="email" placeholder="Email or phone number" required style="padding-left: 3rem;">
+            </div>
             
-            <button type="submit" class="btn-primary">Continue</button>
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">🔒</span>
+                <input type="password" name="password" placeholder="Password" required style="padding-left: 3rem;">
+            </div>
             
-            <div class="auth-divider">Or continue with</div>
+            <button type="submit" class="btn-primary">Sign In</button>
             
-            <p class="auth-link">Need an account? <a href="/register">Create one</a></p>
+            <div class="auth-divider" style="margin: 1.5rem 0;">
+                <span style="background: white; padding: 0 1rem; position: relative; z-index: 1;">Or</span>
+                <div style="position: absolute; width: 100%; height: 1px; background: var(--border-soft); top: 50%; left: 0; z-index: 0;"></div>
+            </div>
+            
+            <p class="auth-link" style="font-size: 1rem;">
+                Need an account? <a href="/register" style="color: var(--primary); font-weight: 600; text-decoration: none;">Create one</a>
+            </p>
         </form>
     </div>
 </div>

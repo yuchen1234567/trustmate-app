@@ -91,8 +91,9 @@ exports.signup = async (req, res) => {
 
 // Show become seller form
 exports.showRegister = (req, res) => {
-    if (req.session.user && req.session.user.role === 'admin') {
-        return res.status(403).send('Access denied. Seller only.');
+    // Check if user is already a seller
+    if (req.session.user && req.session.user.role === 'seller') {
+        return res.redirect('/seller/dashboard');
     }
     res.render('becomeSeller', { error: null });
 };
@@ -100,8 +101,9 @@ exports.showRegister = (req, res) => {
 // Register as seller
 exports.register = async (req, res) => {
     try {
+        // Prevent admin from becoming seller
         if (req.session.user && req.session.user.role === 'admin') {
-            return res.status(403).send('Access denied. Seller only.');
+            return res.render('becomeSeller', { error: 'Administrators cannot register as sellers.' });
         }
 
         const userId = req.session.user.user_id;
