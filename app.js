@@ -2,6 +2,8 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 require('dotenv').config();
+const db = require('./db');
+
 
 const app = express();
 
@@ -33,6 +35,7 @@ app.use((req, res, next) => {
     res.locals.paypalConfigured = paypalConfigured;
     next();
 });
+
 
 // Import controllers
 const userController = require('./controllers/userController');
@@ -66,9 +69,11 @@ app.get('/2fa/email/resend', userController.resendEmail2fa);
 app.get('/2fa/phone', userController.showPhone2fa);
 app.post('/2fa/phone/verify', userController.verifyPhone2fa);
 app.get('/2fa/phone/resend', userController.resendPhone2fa);
+
 app.get('/faq', (req, res) => {
     res.render('faq');
 });
+
 
 // Services routes
 app.get('/services', serviceController.search);
@@ -121,6 +126,30 @@ app.get('/chat/:orderId', isAuthenticated, chatController.show);
 app.post('/chat/send', isAuthenticated, chatController.send);
 app.get('/chats', isAuthenticated, chatController.index);
 app.get('/chat/archive/:id', isAuthenticated, chatController.archive);
+
+//feedback route
+app.get('/userfeedback', isAuthenticated, (req, res) => {
+    res.render('userfeedback');
+});
+app.post('/userfeedback', isAuthenticated, (req, res) => {
+    const { message } = req.body;
+
+    if (!message || !message.trim()) {
+        return res.redirect('/userfeedback');
+    }
+
+    const userId = req.session.user.user_id || req.session.user.id;
+
+    const sql = "INSERT INTO feedback (user_id, message) VALUES (?, ?)";
+    db.query(sql, [userId, message.trim()], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
+        res.redirect('/');
+    });
+});
+
 
 // ===== SELLER ROUTES =====
 app.get('/seller/register', isAuthenticated, sellerController.showRegister);

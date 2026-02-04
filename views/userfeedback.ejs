@@ -1,14 +1,32 @@
-<form action="/feedback" method="POST">
-  <div class="mb-3">
-    <label class="form-label">Your Feedback</label>
-    <textarea
-      name="message"
-      class="form-control"
-      rows="4"
-      placeholder="Tell us what you think..."
-      required>
-    </textarea>
-  </div>
+<%- include('partials/navbar') %>
 
-  <button class="btn btn-primary">Submit Feedback</button>
-</form>
+<main class="main-content">
+  <div class="page-container feedback-container">
+    
+    <div class="feedback-card">
+      <h2 class="feedback-title">We’d Love Your Feedback 💬</h2>
+      <p class="feedback-subtitle">
+        Tell us about your experience with Trustmate. Your feedback helps us improve our services.
+      </p>
+
+      <form action="/userfeedback" method="POST">
+        <div class="form-group">
+          <label for="message">Your Feedback</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            placeholder="Share your thoughts, suggestions, or issues here..."
+            required></textarea>
+        </div>
+
+        <div class="feedback-actions">
+          <button type="submit" class="btn-primary">
+            Submit Feedback
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</main>
