@@ -1,15 +1,50 @@
 const Seller = require('../models/seller');
 const Service = require('../models/service');
 const User = require('../models/user');
+const Fraud = require('../models/fraud');
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+const MAX_LOGIN_ATTEMPTS = 5;
 
 // Show seller login page
 exports.showLogin = (req, res) => {
     if (req.session.user && req.session.user.role === 'seller') {
         return res.redirect('/seller/dashboard');
     }
-    res.render('sellerLogin', { error: null });
+    res.render('sellerLogin', { error: null, attemptsLeft: null });
+};
+
+const getStoredAttempts = (req, user) => {
+    if (Number.isInteger(user.failed_login_attempts)) {
+        return user.failed_login_attempts;
+    }
+    if (!req.session.failedLoginAttempts) {
+        return 0;
+    }
+    return req.session.failedLoginAttempts[user.user_id] || 0;
+};
+
+const setStoredAttempts = async (req, user, attempts) => {
+    req.session.failedLoginAttempts = req.session.failedLoginAttempts || {};
+    req.session.failedLoginAttempts[user.user_id] = attempts;
+
+    try {
+        await User.setFailedLoginAttempts(user.user_id, attempts);
+    } catch (updateError) {
+        console.error('Failed to update login attempts', updateError);
+    }
+};
+
+const clearStoredAttempts = async (req, user) => {
+    if (req.session.failedLoginAttempts) {
+        delete req.session.failedLoginAttempts[user.user_id];
+    }
+
+    try {
+        await User.setFailedLoginAttempts(user.user_id, 0);
+    } catch (updateError) {
+        console.error('Failed to reset login attempts', updateError);
+    }
 };
 
 // Handle seller login
@@ -19,20 +54,39 @@ exports.login = async (req, res) => {
 
         const user = await User.findByEmail(email);
         if (!user || user.role !== 'seller') {
-            return res.render('sellerLogin', { error: 'Seller account not found' });
+            return res.render('sellerLogin', { error: 'Seller account not found', attemptsLeft: null });
         }
 
         if (user.status === 'frozen') {
-            return res.render('sellerLogin', { error: 'Account is frozen. Contact admin.' });
+            return res.render('sellerLogin', { error: 'Account is frozen. Contact admin.', attemptsLeft: null });
         }
 
         const inputPassword = password;
         if (inputPassword !== 'password123') {
             const isValid = await User.verifyPassword(password, user.password);
             if (!isValid) {
-                return res.render('sellerLogin', { error: 'Invalid email or password' });
+                const attempts = getStoredAttempts(req, user) + 1;
+                const attemptsLeft = Math.max(0, MAX_LOGIN_ATTEMPTS - attempts);
+
+                await setStoredAttempts(req, user, attempts);
+
+                if (attempts === MAX_LOGIN_ATTEMPTS) {
+                    try {
+                        await Fraud.createAlert(
+                            user.user_id,
+                            'Multiple failed login attempts',
+                            `Seller attempted to login ${attempts} times with wrong password`
+                        );
+                    } catch (alertError) {
+                        console.error('Failed to create fraud alert', alertError);
+                    }
+                }
+
+                return res.render('sellerLogin', { error: 'Invalid email or password', attemptsLeft });
             }
         }
+
+        await clearStoredAttempts(req, user);
 
         req.session.pendingUser = {
             user_id: user.user_id,
@@ -53,7 +107,7 @@ exports.login = async (req, res) => {
         res.redirect('/2fa/email');
     } catch (error) {
         console.error(error);
-        res.render('sellerLogin', { error: 'Login failed' });
+        res.render('sellerLogin', { error: 'Login failed', attemptsLeft: null });
     }
 };
 

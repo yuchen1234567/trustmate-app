@@ -2,6 +2,29 @@ const db = require('../db');
 const bcrypt = require('bcryptjs');
 
 class User {
+    static failedLoginColumnAvailable = null;
+
+    static async hasFailedLoginAttemptsColumn() {
+        if (User.failedLoginColumnAvailable !== null) {
+            return User.failedLoginColumnAvailable;
+        }
+
+        try {
+            const [rows] = await db.query(
+                `SELECT COUNT(*) AS count
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                 AND TABLE_NAME = 'users'
+                 AND COLUMN_NAME = 'failed_login_attempts'`
+            );
+            User.failedLoginColumnAvailable = rows[0].count > 0;
+        } catch (error) {
+            User.failedLoginColumnAvailable = false;
+        }
+
+        return User.failedLoginColumnAvailable;
+    }
+
     static async create(username, email, phone, password, role = 'buyer') {
         const hashedPassword = await bcrypt.hash(password, 10);
         const [result] = await db.query(
@@ -37,6 +60,14 @@ class User {
     static async updatePassword(userId, newPassword) {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await db.query('UPDATE users SET password = ? WHERE user_id = ?', [hashedPassword, userId]);
+    }
+
+    static async setFailedLoginAttempts(userId, attempts) {
+        const hasColumn = await User.hasFailedLoginAttemptsColumn();
+        if (!hasColumn) {
+            return;
+        }
+        await db.query('UPDATE users SET failed_login_attempts = ? WHERE user_id = ?', [attempts, userId]);
     }
 
     static async getAll() {

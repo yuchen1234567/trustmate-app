@@ -2,7 +2,27 @@ const Cart = require('../models/cart');
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const Payment = require('../models/payment');
+const Fraud = require('../models/fraud');
 const nets = require('../services/nets');
+
+const HIGH_VALUE_THRESHOLD = 2000;
+
+const flagHighValueOrder = async (userId, orderId, total) => {
+    const amount = Number(total || 0);
+    if (amount <= HIGH_VALUE_THRESHOLD) {
+        return;
+    }
+
+    try {
+        await Fraud.createAlert(
+            userId,
+            'High-value transaction',
+            `Order #${orderId} total ${amount.toFixed(2)} exceeds ${HIGH_VALUE_THRESHOLD}`
+        );
+    } catch (error) {
+        console.error('Failed to create high-value alert', error);
+    }
+};
 
 let stripe = null;
 if (process.env.STRIPE_SECRET_KEY) {
@@ -42,6 +62,8 @@ const createOrderFromCart = async (userId, { provider = 'nets', currency = 'SGD'
         status: 'pending',
         escrowStatus: 'none'
     });
+
+    await flagHighValueOrder(userId, orderId, total);
 
     await Cart.clearUserCart(userId);
     return { orderId, total };

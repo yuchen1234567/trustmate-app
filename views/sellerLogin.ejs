@@ -13,6 +13,15 @@
         <% if (error) { %>
             <div class="error-message"><%= error %></div>
         <% } %>
+
+        <% if (typeof attemptsLeft === 'number') { %>
+            <div class="login-attempts">
+                Attempts left: <strong><%= attemptsLeft %></strong>
+                <% if (attemptsLeft === 0) { %>
+                    <span class="login-attempts-alert">Admin has been alerted.</span>
+                <% } %>
+            </div>
+        <% } %>
         
         <form action="/seller/login" method="POST" class="auth-form">
             <input type="email" name="email" placeholder="Email" required>

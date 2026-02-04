@@ -93,6 +93,70 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Toggle user status without redirect
+    document.querySelectorAll('.js-user-toggle').forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+
+            if (this.dataset.loading === 'true') {
+                return;
+            }
+            this.dataset.loading = 'true';
+
+            const currentAction = this.dataset.action;
+            const targetUrl = this.getAttribute('href');
+
+            try {
+                await fetch(targetUrl, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                const newStatus = currentAction === 'disable' ? 'frozen' : 'active';
+                const nextAction = newStatus === 'active' ? 'disable' : 'enable';
+                const userId = this.dataset.userId;
+
+                const updateButton = (btn) => {
+                    btn.dataset.action = nextAction;
+                    btn.textContent = nextAction === 'disable' ? 'Disable' : 'Enable';
+                    btn.setAttribute(
+                        'href',
+                        nextAction === 'disable' ? btn.dataset.disableHref : btn.dataset.enableHref
+                    );
+                    btn.classList.remove('btn-warning', 'btn-success');
+                    btn.classList.add(nextAction === 'disable' ? 'btn-warning' : 'btn-success');
+                };
+
+                const updateStatus = (badge) => {
+                    badge.classList.remove('status-active', 'status-frozen');
+                    badge.classList.add(newStatus === 'frozen' ? 'status-frozen' : 'status-active');
+                    badge.textContent = newStatus;
+                };
+
+                if (userId) {
+                    document
+                        .querySelectorAll(`.js-user-toggle[data-user-id="${userId}"]`)
+                        .forEach(updateButton);
+                    document
+                        .querySelectorAll(`.js-user-status[data-user-id="${userId}"]`)
+                        .forEach(updateStatus);
+                } else {
+                    updateButton(this);
+                    const row = this.closest('tr');
+                    const statusBadge = row ? row.querySelector('.js-user-status, .status-badge') : null;
+                    if (statusBadge) {
+                        updateStatus(statusBadge);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to toggle user status', error);
+            } finally {
+                this.dataset.loading = 'false';
+            }
+        });
+    });
+
     // Navbar scroll effect
     let lastScroll = 0;
     const navbar = document.querySelector('.navbar');
