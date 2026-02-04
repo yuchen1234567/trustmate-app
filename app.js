@@ -146,7 +146,7 @@ app.post('/userfeedback', isAuthenticated, (req, res) => {
             console.error(err);
             return res.status(500).send('Database error');
         }
-        res.redirect('/');
+        res.redirect('/feedback/success');
     });
 });
 
