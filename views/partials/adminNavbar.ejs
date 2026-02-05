@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trustmate - Trusted Local Services</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/pages.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/">
+                    <img src="/images/logo.png" alt="Trustmate Logo" class="logo-img">
+                    <div class="brand-text">
+                        <h1>TRUSTMATE</h1>
+                        <p class="tagline">Trusted Local Services</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="nav-links">
+                <a href="/">Home</a>
+
+                <% if (user) { %>
+
+                    <% if (user.role === 'seller') { %>
+                        <a href="/seller/dashboard">Seller Dashboard</a>
+                        <a href="/seller/bookings">Bookings</a>
+                    <% } %>
+
+                    <% if (user.role === 'admin') { %>
+                        <a href="/admin/dashboard">Admin</a>
+                    <% } %>
+
+                    <span class="user-info">Hello, <%= user.username %></span>
+                    <a href="/logout" class="btn-logout">Logout</a>
+
+                <% } else { %>
+                    <a href="/login" class="btn-login">Login</a>
+                    <a href="/seller/login" class="btn-login">Seller Access</a>
+                    <a href="/register" class="btn-signup">Create Account</a>
+                    <a href="/seller/signup" class="btn-signup">Seller Registration</a>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="main-content">

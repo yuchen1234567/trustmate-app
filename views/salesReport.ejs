@@ -1,0 +1,336 @@
+<%- include('partials/adminNavbar') %>
+
+<style>
+  :root{
+    --bg:#0b1220;
+    --card:#0f172a;
+    --muted:#94a3b8;
+    --text:#e5e7eb;
+    --line:rgba(148,163,184,.15);
+    --accent:#6366f1;
+    --accent2:#22c55e;
+    --danger:#ef4444;
+    --shadow: 0 10px 35px rgba(0,0,0,.25);
+    --radius: 18px;
+  }
+
+  .report-wrap{max-width:1100px;margin:28px auto;padding:0 14px;}
+  .report-hero{
+    background: linear-gradient(135deg, rgba(99,102,241,.22), rgba(34,197,94,.14));
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding:18px 18px;
+    box-shadow: var(--shadow);
+    display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .report-title{display:flex;gap:12px;align-items:flex-start}
+  .badge{
+    width:44px;height:44px;border-radius:14px;
+    background: rgba(99,102,241,.18);
+    border: 1px solid rgba(99,102,241,.25);
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;
+  }
+  .report-hero h1{margin:0;font-size:1.35rem;color:var(--text);letter-spacing:.2px}
+  .report-hero p{margin:6px 0 0;color:var(--muted);font-size:.92rem;max-width:720px}
+
+  .filters{
+    margin-top:14px;
+    background: rgba(15,23,42,.65);
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding:14px;
+    box-shadow: var(--shadow);
+  }
+  .filters-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap:12px;
+    align-items:end;
+  }
+  @media (max-width: 820px){
+    .filters-grid{grid-template-columns:1fr 1fr; }
+    .filters-grid .actions{grid-column:1/-1; display:flex; gap:10px; flex-wrap:wrap;}
+  }
+
+  .field label{display:block;color:var(--muted);font-size:.85rem;font-weight:700;margin-bottom:6px;}
+  .field input[type="date"]{
+    width:100%;
+    padding:10px 12px;
+    background: rgba(2,6,23,.55);
+    border:1px solid var(--line);
+    border-radius:14px;
+    color:var(--text);
+    outline:none;
+  }
+  .btn{
+    border:1px solid transparent;
+    background: rgba(99,102,241,.92);
+    color:white;
+    padding:10px 14px;
+    border-radius:14px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.15s ease;
+    box-shadow: 0 8px 22px rgba(99,102,241,.22);
+  }
+  .btn:hover{transform:translateY(-1px); filter:brightness(1.03);}
+  .btn.secondary{
+    background: rgba(148,163,184,.12);
+    border-color: var(--line);
+    color: var(--text);
+    box-shadow:none;
+  }
+
+  .quick-range{
+    margin-top:10px;
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background: rgba(2,6,23,.45);
+    color: var(--text);
+    font-weight:700;
+    font-size:.85rem;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  .pill:hover{border-color: rgba(99,102,241,.35);}
+
+  .section{
+    margin-top:18px;
+    background: rgba(15,23,42,.65);
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding:16px;
+    box-shadow: var(--shadow);
+  }
+  .section-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    margin-bottom: 12px;
+  }
+  .section h2{margin:0; font-size:1.05rem; color:var(--text);}
+  .subtle{color:var(--muted); font-size:.88rem;}
+
+  .kpi-grid{
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap:12px;
+  }
+  @media (max-width: 820px){ .kpi-grid{grid-template-columns:1fr;} }
+  .kpi{
+    border:1px solid var(--line);
+    border-radius: 16px;
+    padding:14px;
+    background: rgba(2,6,23,.45);
+  }
+  .kpi .label{color:var(--muted); font-weight:800; font-size:.86rem;}
+  .kpi .value{margin-top:6px; font-size:1.7rem; font-weight:900; color:var(--text); letter-spacing:.2px;}
+  .kpi .hint{margin-top:6px; color:var(--muted); font-size:.82rem;}
+
+  .table-wrap{
+    overflow:auto;
+    border:1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(2,6,23,.35);
+  }
+  table{width:100%; border-collapse:collapse; min-width: 760px;}
+  thead th{
+    text-align:left;
+    font-size:.82rem;
+    letter-spacing:.3px;
+    text-transform:uppercase;
+    color: var(--muted);
+    padding:12px;
+    border-bottom:1px solid var(--line);
+    background: rgba(2,6,23,.55);
+  }
+  tbody td{
+    padding:12px;
+    border-bottom:1px solid rgba(148,163,184,.08);
+    color: var(--text);
+  }
+  tbody tr:hover td{background: rgba(99,102,241,.06);}
+  .right{text-align:right;}
+  .money{font-variant-numeric: tabular-nums;}
+  .empty{
+    padding:18px;
+    border:1px dashed rgba(148,163,184,.25);
+    border-radius: 16px;
+    background: rgba(2,6,23,.35);
+    color: var(--muted);
+  }
+  .tag{
+    display:inline-flex; align-items:center;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid rgba(34,197,94,.25);
+    background: rgba(34,197,94,.10);
+    color: #bbf7d0;
+    font-weight:800;
+    font-size:.78rem;
+  }
+</style>
+
+<div class="report-wrap">
+  <div class="report-hero">
+    <div class="report-title">
+      <div class="badge">📈</div>
+      <div>
+        <h1>Sales Performance Report</h1>
+        <p>
+          Summary of <b>completed</b> orders within a selected date range — total orders, revenue, and average order value.
+        </p>
+      </div>
+    </div>
+
+    <div class="tag">Admin Report</div>
+  </div>
+
+  <div class="filters">
+    <form method="GET" action="/admin/reports/sales">
+      <div class="filters-grid">
+        <div class="field">
+          <label>Start Date</label>
+          <input type="date" name="start" value="<%= (filters && filters.start) ? filters.start : '' %>">
+        </div>
+        <div class="field">
+          <label>End Date</label>
+          <input type="date" name="end" value="<%= (filters && filters.end) ? filters.end : '' %>">
+        </div>
+        <div class="actions" style="display:flex; gap:10px; justify-content:flex-end;">
+          <button class="btn" type="submit">Generate</button>
+          <a class="btn secondary" href="/admin/reports/sales" style="text-decoration:none; display:inline-flex; align-items:center;">Reset</a>
+        </div>
+      </div>
+
+      <div class="quick-range">
+        <button type="button" class="pill" onclick="setRange(7)">Last 7 days</button>
+        <button type="button" class="pill" onclick="setRange(30)">Last 30 days</button>
+        <button type="button" class="pill" onclick="setRange(90)">Last 90 days</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Overall Summary</h2>
+      <div class="subtle">All amounts in SGD ($)</div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="label">Total Orders</div>
+        <div class="value"><%= Number((stats && stats.totalOrders) || 0) %></div>
+        <div class="hint">Completed orders</div>
+      </div>
+
+      <div class="kpi">
+        <div class="label">Total Revenue</div>
+        <div class="value money">$<%= Number((stats && stats.totalRevenue) || 0).toFixed(2) %></div>
+        <div class="hint">Sum of completed orders</div>
+      </div>
+
+      <div class="kpi">
+        <div class="label">Avg Order Value</div>
+        <div class="value money">$<%= Number((stats && stats.avgOrderValue) || 0).toFixed(2) %></div>
+        <div class="hint">Revenue ÷ Orders</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Seller Performance</h2>
+      <div class="subtle">Ranked by revenue</div>
+    </div>
+
+    <% if (!sellerRows || sellerRows.length === 0) { %>
+      <div class="empty">No sales data in selected period.</div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Seller</th>
+              <th class="right">Orders</th>
+              <th class="right">Services Sold</th>
+              <th class="right">Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sellerRows.forEach(r => { %>
+              <tr>
+                <td><%= r.business_name || ("Seller #" + r.seller_id) %></td>
+                <td class="right"><%= Number(r.ordersCount || 0) %></td>
+                <td class="right"><%= Number(r.servicesSold || 0) %></td>
+                <td class="right money">$<%= Number(r.revenue || 0).toFixed(2) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Top Services (Top 10)</h2>
+      <div class="subtle">Best-selling services by revenue</div>
+    </div>
+
+    <% if (!serviceRows || serviceRows.length === 0) { %>
+      <div class="empty">No service sales data.</div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th class="right">Qty Sold</th>
+              <th class="right">Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% serviceRows.forEach(r => { %>
+              <tr>
+                <td><%= r.title || ("Service #" + r.service_id) %></td>
+                <td class="right"><%= Number(r.qtySold || 0) %></td>
+                <td class="right money">$<%= Number(r.revenue || 0).toFixed(2) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  // Quick range helper: sets start/end date inputs then submits
+  function setRange(days) {
+    const form = document.querySelector('form[action="/admin/reports/sales"]');
+    const startInput = form.querySelector('input[name="start"]');
+    const endInput = form.querySelector('input[name="end"]');
+
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - (days - 1));
+
+    const toYMD = (d) => {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    };
+
+    startInput.value = toYMD(start);
+    endInput.value = toYMD(end);
+    form.submit();
+  }
+</script>
+
+<%- include('partials/footer') %>

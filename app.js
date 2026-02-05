@@ -48,6 +48,9 @@ const sellerController = require('./controllers/sellerController');
 const fraudController = require('./controllers/fraudController');
 const chatController = require('./controllers/chatController');
 const paymentController = require('./controllers/paymentController');
+// app.js
+const adminReportsRoutes = require("./models/adminReports");
+app.use("/admin", adminReportsRoutes);
 
 // Import middleware
 const { isAuthenticated, isAdmin, isSeller } = require('./middleware');

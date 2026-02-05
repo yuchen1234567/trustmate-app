@@ -6,10 +6,9 @@ exports.index = async (req, res) => {
         const userId = req.session.user.user_id;
         const cartItems = await Cart.getByUser(userId);
         let total = await Cart.getTotal(userId);
-        
-        // Ensure total is a number
-        total = total || 0;
-        
+
+        total = Number(total) || 0;
+
         res.render('cart', { cartItems, total });
     } catch (error) {
         console.error(error);
