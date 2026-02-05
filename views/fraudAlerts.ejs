@@ -1,0 +1,73 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-dashboard">
+    <h1>Flagged alerts</h1>
+    
+    <a href="/admin/dashboard" class="btn-secondary" style="display: inline-block; margin-bottom: 1rem;">Back to dashboard</a>
+    
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Alert ID</th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (alerts.length === 0) { %>
+                <tr><td colspan="7">No alerts found.</td></tr>
+            <% } else { %>
+                <% alerts.forEach(alert => { %>
+                    <tr>
+                        <td>#<%= alert.alert_id %></td>
+                        <td><%= alert.username || 'N/A' %> (<%= alert.email || 'N/A' %>)</td>
+                        <td><%= alert.alert_type %></td>
+                        <td><%= alert.description %></td>
+                        <td>
+                            <% if (alert.user_id) { %>
+                                <% const userStatusClass = alert.user_status === 'frozen' ? 'status-frozen' : 'status-active'; %>
+                                <span class="status-badge <%= userStatusClass %> js-user-status" data-user-id="<%= alert.user_id %>"><%= alert.user_status || 'active' %></span>
+                            <% } else { %>
+                                <span class="status-badge status-<%= alert.status %>"><%= alert.status %></span>
+                            <% } %>
+                        </td>
+                        <td><%= new Date(alert.created_at).toLocaleDateString() %></td>
+                        <td>
+                            <% if (alert.status === 'pending') { %>
+                                <a href="/admin/fraud/review/<%= alert.alert_id %>" class="btn-small">Review</a>
+                            <% } %>
+                            <% if (alert.user_id) { %>
+                                <% if (alert.user_status === 'frozen') { %>
+                                    <a
+                                        href="/admin/users/unfreeze/<%= alert.user_id %>"
+                                        class="btn-small btn-success js-user-toggle"
+                                        data-user-id="<%= alert.user_id %>"
+                                        data-action="enable"
+                                        data-enable-href="/admin/users/unfreeze/<%= alert.user_id %>"
+                                        data-disable-href="/admin/users/freeze/<%= alert.user_id %>"
+                                    >Enable</a>
+                                <% } else { %>
+                                    <a
+                                        href="/admin/users/freeze/<%= alert.user_id %>"
+                                        class="btn-small btn-warning js-user-toggle"
+                                        data-user-id="<%= alert.user_id %>"
+                                        data-action="disable"
+                                        data-enable-href="/admin/users/unfreeze/<%= alert.user_id %>"
+                                        data-disable-href="/admin/users/freeze/<%= alert.user_id %>"
+                                    >Disable</a>
+                                <% } %>
+                            <% } %>
+                            <a href="/admin/fraud/delete/<%= alert.alert_id %>" class="btn-small btn-danger" onclick="return confirm('Delete this alert?')">Delete</a>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<%- include('partials/footer') %>

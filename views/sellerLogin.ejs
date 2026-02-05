@@ -1,0 +1,39 @@
+<%- include('partials/navbar') %>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="support-local-logo">
+                <h2>Trusted Local</h2>
+            </div>
+        </div>
+        
+        <h2>Seller access</h2>
+        
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+
+        <% if (typeof attemptsLeft === 'number') { %>
+            <div class="login-attempts">
+                Attempts left: <strong><%= attemptsLeft %></strong>
+                <% if (attemptsLeft === 0) { %>
+                    <span class="login-attempts-alert">Admin has been alerted.</span>
+                <% } %>
+            </div>
+        <% } %>
+        
+        <form action="/seller/login" method="POST" class="auth-form">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            
+            <button type="submit" class="btn-primary">Continue</button>
+            
+            <div class="auth-divider">Or continue with</div>
+            
+            <p class="auth-link">Need a seller account? <a href="/seller/signup">Create one</a></p>
+        </form>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

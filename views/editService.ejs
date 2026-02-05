@@ -1,0 +1,79 @@
+<%- include('partials/navbar') %>
+
+<div style="max-width: 850px; margin: 40px auto; padding: 0 16px;">
+  <div style="background:var(--surface); border-radius:16px; padding:28px; border:1px solid var(--border-soft); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);">
+
+    <div style="margin-bottom:18px;">
+      <h1 style="margin:0; font-size:28px;">Edit service</h1>
+      <p style="margin:8px 0 0; color:var(--text-muted); font-size:14px;">Review and update the service details below.</p>
+    </div>
+
+    <% if (error) { %>
+      <div style="background:var(--status-error); color:#fff; border:1px solid var(--status-error); padding:12px 14px; border-radius:12px; margin-bottom:16px;">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/seller/services/create" method="POST">
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-weight:700; margin-bottom:8px;">Service Title</label>
+        <input type="text" name="title" required
+          placeholder="e.g., Home Cleaning (2 hours)"
+          style="width:100%; padding:12px 14px; border:1px solid var(--border-strong); border-radius:12px; outline:none;">
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-weight:700; margin-bottom:8px;">Description</label>
+        <textarea name="description" rows="5" required
+          placeholder="Describe what you offer, what is included, and the estimated time..."
+          style="width:100%; padding:12px 14px; border:1px solid var(--border-strong); border-radius:12px; outline:none;"></textarea>
+        <small style="display:block; margin-top:6px; color:var(--text-muted);">Note: Include deliverables and timeframe.</small>
+      </div>
+
+      <!-- Price + Category in one row -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+        <div>
+          <label style="display:block; font-weight:700; margin-bottom:8px;">Price ($)</label>
+          <input type="number" name="price" step="0.01" min="0" required
+            placeholder="e.g., 49.90"
+            style="width:100%; padding:12px 14px; border:1px solid var(--border-strong); border-radius:12px; outline:none;">
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:700; margin-bottom:8px;">Category</label>
+          <select name="category_id" required
+            style="width:100%; padding:12px 14px; border:1px solid var(--border-strong); border-radius:12px; outline:none; background:var(--surface);">
+            <option value="">Select a category</option>
+            <% categories.forEach(category => { %>
+              <option value="<%= category.category_id %>"><%= category.name %></option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <label style="display:block; font-weight:700; margin-bottom:8px;">Image URL (optional)</label>
+        <input type="text" name="image" placeholder="/images/service.png"
+          style="width:100%; padding:12px 14px; border:1px solid var(--border-strong); border-radius:12px; outline:none;">
+        <small style="display:block; margin-top:6px; color:var(--text-muted);">Leave blank to use a default image.</small>
+      </div>
+
+      <div style="display:flex; gap:12px; align-items:center;">
+        <button type="submit"
+          style="padding:12px 18px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:700; cursor:pointer;">
+          Save changes
+        </button>
+
+        <a href="/seller/dashboard"
+          style="padding:12px 18px; border-radius:12px; border:1px solid var(--border-strong); text-decoration:none; color:var(--text-primary); font-weight:700;">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>

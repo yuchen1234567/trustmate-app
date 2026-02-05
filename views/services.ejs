@@ -1,0 +1,55 @@
+<%- include('partials/navbar') %>
+
+<div class="services-page">
+    <div class="filter-section">
+        <h2>Services and filters</h2>
+        
+        <form action="/services" method="GET" class="search-form">
+            <input type="text" name="q" placeholder="Search services..." value="<%= searchTerm %>">
+            <button type="submit">Search</button>
+        </form>
+        
+        <h3>Categories</h3>
+        <div class="categories-filter">
+            <% categories.forEach(category => { %>
+                <a href="/services?category=<%= category.category_id %>" 
+                   class="category-btn <%= selectedCategory == category.category_id ? 'active' : '' %>">
+                    <%= category.name %>
+                </a>
+            <% }); %>
+            <a href="/services" class="category-btn <%= !selectedCategory ? 'active' : '' %>">All</a>
+        </div>
+    </div>
+    
+    <div class="services-list">
+        <h2>Services</h2>
+        <div class="services-grid">
+            <% if (services.length === 0) { %>
+                <p>No services found.</p>
+            <% } else { %>
+                <% services.forEach(service => { %>
+                    <div class="service-card">
+                        <h3><%= service.title %></h3>
+                        <p><%= service.description ? service.description.substring(0, 100) : '' %>...</p>
+                        <div class="service-meta">
+                            <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
+                            <p class="category"><%= service.category_name %></p>
+                        </div>
+                        <div class="service-trust">
+                            <span class="trust-badge"><%= service.verified ? 'Verified seller' : 'Trusted seller' %></span>
+                            <span class="trust-rating">
+                                <%= service.avg_rating ? parseFloat(service.avg_rating).toFixed(1) : 'No ratings yet' %>
+                                <% if (service.review_count) { %>
+                                    (<%= service.review_count %>)
+                                <% } %>
+                            </span>
+                        </div>
+                        <a href="/services/<%= service.service_id %>" class="btn-view">View details</a>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

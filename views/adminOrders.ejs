@@ -1,0 +1,189 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-dashboard admin-container">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-breadcrumb">
+                <a href="/admin/dashboard">📊 Admin</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-current">Order Management</span>
+            </div>
+            <h1 class="page-title">
+                <span class="page-icon">📦</span>
+                Order Management
+            </h1>
+        </div>
+    </div>
+    
+    <div class="admin-actions-bar">
+        <a href="/admin/dashboard" class="btn-back">
+            <span>←</span> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-container">
+        <div class="search-section">
+            <form action="/admin/orders" method="GET" class="search-form-enhanced">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="search" placeholder="Search by username or email..." value="<%= searchTerm %>">
+                </div>
+                <button type="submit" class="btn-search">Search</button>
+                <% if (searchTerm) { %>
+                    <a href="/admin/orders" class="btn-clear">✕ Clear</a>
+                <% } %>
+            </form>
+        </div>
+
+        <div class="filter-section">
+            <form action="/admin/orders" method="GET" class="filter-form-enhanced">
+                <label class="filter-label">
+                    <span class="filter-icon">🏷️</span>
+                    Filter by Status:
+                </label>
+                <select name="status" onchange="this.form.submit()" class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="pending" <%= selectedStatus === 'pending' ? 'selected' : '' %>>⏳ Pending</option>
+                    <option value="accepted" <%= selectedStatus === 'accepted' ? 'selected' : '' %>>✅ Accepted</option>
+                    <option value="completed" <%= selectedStatus === 'completed' ? 'selected' : '' %>>🎉 Completed</option>
+                    <option value="cancelled" <%= selectedStatus === 'cancelled' ? 'selected' : '' %>>❌ Cancelled</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="orders-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="section-icon">📋</span>
+                Orders List
+            </h2>
+            <div class="section-meta">
+                <span class="order-count"><%= orders.length %> <%= orders.length === 1 ? 'order' : 'orders' %></span>
+            </div>
+        </div>
+        
+        <% if (orders.length === 0) { %>
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>No Orders Found</h3>
+                <p>There are no orders matching your criteria.</p>
+            </div>
+        <% } else { %>
+            <div class="table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Total Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td>
+                                    <span class="order-id-badge">#<%= order.order_id %></span>
+                                </td>
+                                <td>
+                                    <div class="customer-cell">
+                                        <span class="customer-icon">👤</span>
+                                        <span class="customer-name"><%= order.username %></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="email-cell">
+                                        <span class="email-icon">📧</span>
+                                        <%= order.email %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="amount-value">$<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-<%= order.payment_status || 'pending' %>">
+                                        <% if ((order.payment_status || 'pending') === 'paid') { %>💳<% } else { %>⏳<% } %>
+                                        <%= order.payment_status || 'pending' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-<%= order.status %>">
+                                        <% if (order.status === 'completed') { %>🎉<% } else if (order.status === 'accepted') { %>✅<% } else if (order.status === 'cancelled') { %>❌<% } else { %>⏳<% } %>
+                                        <%= order.status %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="date-cell">
+                                        <span class="date-primary"><%= new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+                                        <span class="date-secondary"><%= new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="/admin/orders/<%= order.order_id %>" class="btn-action btn-info" title="View Details">
+                                        <span>👁️</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Statistics -->
+    <div class="order-stats">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="section-icon">📊</span>
+                Order Statistics
+            </h2>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card stat-total">
+                <div class="stat-icon">📦</div>
+                <div class="stat-content">
+                    <h3>Total Orders</h3>
+                    <p class="stat-number"><%= orders.length %></p>
+                </div>
+            </div>
+            <div class="stat-card stat-pending">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content">
+                    <h3>Pending</h3>
+                    <p class="stat-number"><%= orders.filter(o => o.status === 'pending').length %></p>
+                </div>
+            </div>
+            <div class="stat-card stat-accepted">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <h3>Accepted</h3>
+                    <p class="stat-number"><%= orders.filter(o => o.status === 'accepted').length %></p>
+                </div>
+            </div>
+            <div class="stat-card stat-completed">
+                <div class="stat-icon">🎉</div>
+                <div class="stat-content">
+                    <h3>Completed</h3>
+                    <p class="stat-number"><%= orders.filter(o => o.status === 'completed').length %></p>
+                </div>
+            </div>
+            <div class="stat-card stat-cancelled">
+                <div class="stat-icon">❌</div>
+                <div class="stat-content">
+                    <h3>Cancelled</h3>
+                    <p class="stat-number"><%= orders.filter(o => o.status === 'cancelled').length %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

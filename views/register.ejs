@@ -1,0 +1,63 @@
+<%- include('partials/navbar') %>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="support-local-logo">
+                <h2>🚀 Trustmate</h2>
+            </div>
+        </div>
+        
+        <h2 style="text-align: center; margin-bottom: 1.5rem;">Create Your Account</h2>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Join our trusted community today</p>
+        
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+        
+        <form action="/register" method="POST" class="auth-form">
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">👤</span>
+                <input type="text" name="username" placeholder="Username" required style="padding-left: 3rem;">
+            </div>
+            
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">📧</span>
+                <input type="email" name="email" placeholder="Email address" required style="padding-left: 3rem;">
+            </div>
+            
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">📱</span>
+                <input type="tel" name="phone" placeholder="Phone number (optional)" style="padding-left: 3rem;">
+            </div>
+            
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">🔒</span>
+                <input type="password" name="password" placeholder="Password" required style="padding-left: 3rem;">
+            </div>
+            
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">🔐</span>
+                <input type="password" name="confirmPassword" placeholder="Confirm password" required style="padding-left: 3rem;">
+            </div>
+            
+            <div class="terms" style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 1rem;">
+                <input type="checkbox" required style="margin-top: 0.3rem; width: auto;">
+                <label style="font-size: 0.9rem; color: var(--text-muted);">By creating an account, you agree to the Trustmate terms, conditions, and policies.</label>
+            </div>
+            
+            <button type="submit" class="btn-primary">Create Account</button>
+            
+            <div class="auth-divider" style="margin: 1.5rem 0; position: relative; text-align: center;">
+                <span style="background: white; padding: 0 1rem; position: relative; z-index: 1;">Or</span>
+                <div style="position: absolute; width: 100%; height: 1px; background: var(--border-soft); top: 50%; left: 0; z-index: 0;"></div>
+            </div>
+            
+            <p class="auth-link" style="font-size: 1rem;">
+                Already have an account? <a href="/login" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign in</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

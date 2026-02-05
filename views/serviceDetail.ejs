@@ -1,0 +1,213 @@
+<%- include('partials/navbar') %>
+
+<div class="service-detail-page">
+    <div class="service-detail-container">
+        <div class="service-main-section">
+            <div class="service-header-card">
+                <div class="service-badge">
+                    <span class="badge-icon">⭐</span>
+                    <span class="badge-text">Featured Service</span>
+                </div>
+                
+                <h1 class="service-title"><%= service.title %></h1>
+                
+                <div class="service-meta-info">
+                    <div class="meta-item">
+                        <span class="meta-icon">🏪</span>
+                        <span class="meta-text"><%= service.business_name || service.seller_name %></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">🏷️</span>
+                        <span class="meta-text"><%= service.category_name %></span>
+                    </div>
+                    <% if (avgRating && avgRating.review_count > 0) { %>
+                        <div class="meta-item">
+                            <span class="meta-icon">⭐</span>
+                            <span class="meta-text"><%= avgRating.avg_rating ? parseFloat(avgRating.avg_rating).toFixed(1) : 'N/A' %> (<%= avgRating.review_count %> reviews)</span>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <div class="service-price-tag">
+                    <span class="price-label">Price</span>
+                    <span class="price-amount">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></span>
+                </div>
+                
+                <div class="service-description-box">
+                    <h3 class="description-title">
+                        <span class="title-icon">📝</span>
+                        Description
+                    </h3>
+                    <p class="description-text"><%= service.description %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="service-sidebar">
+            <div class="order-card">
+                <h3 class="order-card-title">
+                    <span class="card-icon">🛒</span>
+                    Order This Service
+                </h3>
+                
+                <div class="price-display">
+                    <span class="price-display-label">Total Price</span>
+                    <span class="price-display-amount">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></span>
+                </div>
+                
+                <% if (user) { %>
+                    <form action="/cart/add" method="POST" class="order-form">
+                        <input type="hidden" name="service_id" value="<%= service.service_id %>">
+                        
+                        <div class="form-group">
+                            <label for="quantity" class="form-label">
+                                <span class="label-icon">🔢</span>
+                                Quantity
+                            </label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" class="quantity-input-large">
+                        </div>
+                        
+                        <button type="submit" class="btn-add-to-cart">
+                            <span class="btn-icon">🛒</span>
+                            Add to Cart
+                        </button>
+                    </form>
+                    
+                    <div class="service-features">
+                        <div class="feature-item">
+                            <span class="feature-icon">✅</span>
+                            <span class="feature-text">Verified Seller</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🔒</span>
+                            <span class="feature-text">Secure Payment</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">💬</span>
+                            <span class="feature-text">Chat Support</span>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="login-prompt-card">
+                        <div class="prompt-icon">🔐</div>
+                        <h4>Login Required</h4>
+                        <p>Please log in to order this service</p>
+                        <a href="/login" class="btn-login-prompt">
+                            <span>🔑</span>
+                            Login to Continue
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <div class="reviews-section-full">
+        <div class="section-header-reviews">
+            <h2 class="section-title">
+                <span class="section-icon">⭐</span>
+                Customer Reviews
+            </h2>
+            <% if (avgRating && avgRating.review_count > 0) { %>
+                <div class="rating-summary-badge">
+                    <span class="rating-number"><%= avgRating.avg_rating ? parseFloat(avgRating.avg_rating).toFixed(1) : 'N/A' %></span>
+                    <span class="rating-stars">★★★★★</span>
+                    <span class="rating-count"><%= avgRating.review_count %> <%= avgRating.review_count === 1 ? 'review' : 'reviews' %></span>
+                </div>
+            <% } %>
+        </div>
+        
+        <div class="reviews-list">
+            <% if (reviews.length === 0) { %>
+                <div class="empty-state">
+                    <div class="empty-icon">💬</div>
+                    <h3>No Reviews Yet</h3>
+                    <p>Be the first to review this service!</p>
+                </div>
+            <% } else { %>
+                <% reviews.forEach(review => { %>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">
+                                    <%= review.username.substring(0, 2).toUpperCase() %>
+                                </div>
+                                <div class="reviewer-details">
+                                    <p class="reviewer-name"><%= review.username %></p>
+                                    <p class="review-date">
+                                        <span class="date-icon">📅</span>
+                                        <%= new Date(review.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                <div class="review-card-stars" aria-label="Rating: <%= review.rating %> out of 5">
+                                    <% for (let i = 1; i <= 5; i++) { %>
+                                        <span class="review-card-star <%= i <= review.rating ? 'filled' : '' %>">★</span>
+                                    <% } %>
+                                </div>
+                                <span class="rating-text"><%= review.rating %>/5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="review-content">
+                            <p class="review-comment">"<%= review.comment || 'No written comment yet.' %>"</p>
+                            <% if (review.tags) { %>
+                                <div class="review-tags">
+                                    <% review.tags.split(',').forEach(tag => { %>
+                                        <span class="review-tag"><%= tag.trim() %></span>
+                                    <% }); %>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <% if (review.seller_reply) { %>
+                            <div class="seller-reply">
+                                <div class="reply-header">
+                                    <span class="reply-icon">💬</span>
+                                    <span class="reply-label">Seller Response</span>
+                                    <% if (review.seller_reply_at) { %>
+                                        <span class="reply-date"><%= new Date(review.seller_reply_at).toLocaleDateString() %></span>
+                                    <% } %>
+                                </div>
+                                <p class="reply-text"><%= review.seller_reply %></p>
+                            </div>
+                        <% } %>
+                        
+                        <% if (user) { %>
+                            <div class="review-actions">
+                                <% if (user.user_id === review.user_id) { %>
+                                    <a href="/reviews/edit/<%= review.review_id %>" class="btn-action btn-edit">
+                                        <span>✏️</span> Edit
+                                    </a>
+                                    <a href="/reviews/delete/<%= review.review_id %>" class="btn-action btn-delete-review" onclick="return confirm('Are you sure you want to delete this review?')">
+                                        <span>🗑️</span> Delete
+                                    </a>
+                                <% } else if (user.role === 'admin') { %>
+                                    <a href="/reviews/delete/<%= review.review_id %>" class="btn-action btn-delete-review" onclick="return confirm('Are you sure you want to delete this review?')">
+                                        <span>🗑️</span> Delete (Admin)
+                                    </a>
+                                <% } %>
+                            </div>
+                        <% } %>
+
+                        <% if (canReply && !review.seller_reply) { %>
+                            <form action="/reviews/<%= review.review_id %>/reply" method="POST" class="seller-reply-form">
+                                <label for="reply-<%= review.review_id %>" class="reply-form-label">
+                                    <span class="label-icon">💬</span>
+                                    Reply to this review
+                                </label>
+                                <textarea id="reply-<%= review.review_id %>" name="reply" rows="3" maxlength="400" placeholder="Thank them, address concerns, or share next steps..." class="reply-textarea"></textarea>
+                                <button type="submit" class="btn-post-reply">
+                                    <span>📤</span> Post Reply
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,41 @@
+<%- include('partials/navbar') %>
+
+<div class="twofa-container">
+    <div class="twofa-card">
+        <p class="twofa-eyebrow">Account verification</p>
+        <h2>Verify your phone number</h2>
+        <p class="twofa-subtext">
+            To keep your account secure, please enter the one-time code sent to
+            <span class="twofa-highlight"><%= maskedPhone %></span>.
+        </p>
+
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="success-message"><%= success %></div>
+        <% } %>
+        <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+            <div class="flash-popup-trigger" data-flash-message="<%= successMessage %>"></div>
+        <% } %>
+
+        <form action="/2fa/phone/verify" method="POST" class="twofa-form" data-otp-form>
+            <div class="otp-inputs" data-otp-inputs>
+                <input type="text" name="code1" inputmode="numeric" maxlength="1" class="otp-input" autocomplete="one-time-code" required>
+                <input type="text" name="code2" inputmode="numeric" maxlength="1" class="otp-input" required>
+                <input type="text" name="code3" inputmode="numeric" maxlength="1" class="otp-input" required>
+                <input type="text" name="code4" inputmode="numeric" maxlength="1" class="otp-input" required>
+                <input type="text" name="code5" inputmode="numeric" maxlength="1" class="otp-input" required>
+                <input type="text" name="code6" inputmode="numeric" maxlength="1" class="otp-input" required>
+            </div>
+            <input type="hidden" name="code" data-otp-code>
+
+            <button type="submit" class="btn-primary">Verify</button>
+        </form>
+
+        <a class="twofa-resend" href="/2fa/phone/resend">Resend code</a>
+    </div>
+</div>
+
+<script src="/js/otp.js"></script>
+<%- include('partials/footer') %>

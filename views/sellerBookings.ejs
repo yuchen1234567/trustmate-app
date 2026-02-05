@@ -1,0 +1,74 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-container">
+    <h1>Seller Bookings</h1>
+    <p>Review bookings, confirm acceptance, and view payment status.</p>
+
+    <div class="admin-actions">
+        <a href="/seller/dashboard" class="btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="orders-section">
+        <% if (bookings.length === 0) { %>
+            <p>No bookings yet.</p>
+        <% } else { %>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Buyer</th>
+                        <th>Services</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% bookings.forEach(order => { %>
+                        <tr>
+                            <td>#<%= order.order_id %></td>
+                            <td>
+                                <div><strong><%= order.buyer_username %></strong></div>
+                                <div><%= order.buyer_email %></div>
+                            </td>
+                            <td>
+                                <% order.items.forEach(item => { %>
+                                    <div>
+                                        <strong><%= item.title %></strong>
+                                        (x<%= item.quantity %>) - $<%= typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price || 0).toFixed(2) %>
+                                    </div>
+                                <% }); %>
+                            </td>
+                            <td>
+                                <div><strong>$<%= typeof order.total_amount === 'number' ? order.total_amount.toFixed(2) : parseFloat(order.total_amount || 0).toFixed(2) %></strong></div>
+                                <div>
+                                    <span class="status-badge status-<%= order.payment_status || 'pending' %>">
+                                        <%= order.payment_status || 'pending' %>
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-<%= order.status %>"><%= order.status %></span>
+                            </td>
+                            <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+                            <td>
+                                <% if (order.status === 'pending' && order.payment_status === 'paid') { %>
+                                    <form action="/seller/bookings/<%= order.order_id %>/accept" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn-small">Accept</button>
+                                    </form>
+                                <% } else if (order.status === 'pending') { %>
+                                    <span class="review-meta">Awaiting payment</span>
+                                <% } else { %>
+                                    <span class="review-meta">No action</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
