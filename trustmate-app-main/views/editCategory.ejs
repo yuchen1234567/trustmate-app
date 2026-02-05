@@ -1,0 +1,129 @@
+<%- include('partials/navbar') %>
+
+<div class="form-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-breadcrumb">
+                <a href="/admin/dashboard">📊 Admin</a>
+                <span class="breadcrumb-separator">›</span>
+                <a href="/admin/categories">🏷️ Categories</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-current">Edit Category</span>
+            </div>
+            <h1 class="page-title">
+                <span class="page-icon">✏️</span>
+                Edit Category
+            </h1>
+            <p class="page-subtitle">Update category information and settings</p>
+        </div>
+    </div>
+    
+    <% if (error) { %>
+        <div class="error-message"><%= error %></div>
+    <% } %>
+    
+    <div class="form-container">
+        <form action="/admin/categories/update/<%= category.category_id %>" method="POST" class="modern-form">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h2 class="form-card-title">
+                        <span class="title-icon">📝</span>
+                        Category Details
+                    </h2>
+                </div>
+                
+                <div class="form-card-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="label-icon">🏷️</span>
+                            <span class="label-text">Category Name</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            name="name" 
+                            value="<%= category.name %>" 
+                            required 
+                            class="form-input"
+                            placeholder="e.g., Programming, Design, Marketing">
+                        <small class="form-hint">Choose a clear and descriptive name for this category</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="label-icon">📄</span>
+                            <span class="label-text">Description</span>
+                        </label>
+                        <textarea 
+                            name="description" 
+                            rows="4" 
+                            class="form-textarea"
+                            placeholder="Describe what services belong to this category..."><%= category.description || '' %></textarea>
+                        <small class="form-hint">Help users understand what types of services are in this category</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="label-icon">🎨</span>
+                            <span class="label-text">Icon</span>
+                        </label>
+                        <div class="icon-input-group">
+                            <input 
+                                type="text" 
+                                name="icon" 
+                                value="<%= category.icon || '' %>" 
+                                placeholder="Icon URL or emoji (e.g., 💻 🎨 📱)"
+                                class="form-input icon-input">
+                            <div class="icon-preview">
+                                <% if (category.icon) { %>
+                                    <span class="preview-icon"><%= category.icon %></span>
+                                <% } else { %>
+                                    <span class="preview-placeholder">Preview</span>
+                                <% } %>
+                            </div>
+                        </div>
+                        <small class="form-hint">Use an emoji or icon class to represent this category</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-save">
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">Save Changes</span>
+                </button>
+                <a href="/admin/categories" class="btn-cancel">
+                    <span class="btn-icon">✕</span>
+                    <span class="btn-text">Cancel</span>
+                </a>
+            </div>
+        </form>
+        
+        <div class="help-card">
+            <div class="help-header">
+                <span class="help-icon">💡</span>
+                <h3 class="help-title">Tips for Categories</h3>
+            </div>
+            <ul class="help-list">
+                <li>
+                    <span class="tip-icon">✓</span>
+                    <span class="tip-text">Use clear, concise names that users will easily understand</span>
+                </li>
+                <li>
+                    <span class="tip-icon">✓</span>
+                    <span class="tip-text">Write descriptions that help users find the right services</span>
+                </li>
+                <li>
+                    <span class="tip-icon">✓</span>
+                    <span class="tip-text">Choose icons that visually represent the category</span>
+                </li>
+                <li>
+                    <span class="tip-icon">✓</span>
+                    <span class="tip-text">Keep category names consistent across your platform</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

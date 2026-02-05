@@ -19,16 +19,21 @@ CREATE TABLE `users`  (
   `role` enum('buyer','seller','admin') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'buyer',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `status` enum('active','frozen') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'active',
+  `failed_login_attempts` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`) USING BTREE,
   UNIQUE INDEX `username`(`username` ASC) USING BTREE,
   UNIQUE INDEX `email`(`email` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- Records of users
-INSERT INTO `users` VALUES (1, 'admin', 'admin@trustmate.com', NULL, '$2b$10$OaZQA/ggtzGJJkBg06sUKOcrdcq4gtiOsXeDIAyoSK3Xfw8D32UJG', 'admin', '2026-01-20 23:56:28', 'active');
-INSERT INTO `users` VALUES (2, 'john_doe', 'john@example.com', '1234567890', '$2b$10$OaZQA/ggtzGJJkBg06sUKOcrdcq4gtiOsXeDIAyoSK3Xfw8D32UJG', 'buyer', '2026-01-20 23:57:08', 'active');
-INSERT INTO `users` VALUES (3, 'jane_smith', 'jane@example.com', '0987654321', '$2b$10$OaZQA/ggtzGJJkBg06sUKOcrdcq4gtiOsXeDIAyoSK3Xfw8D32UJG', 'seller', '2026-01-20 23:57:08', 'active');
-INSERT INTO `users` VALUES (4, 'bob_wilson', 'bob@example.com', '5551234567', '$2b$10$OaZQA/ggtzGJJkBg06sUKOcrdcq4gtiOsXeDIAyoSK3Xfw8D32UJG', 'seller', '2026-01-20 23:57:08', 'active');
+INSERT INTO `users` (`user_id`, `username`, `email`, `phone`, `password`, `role`, `created_at`, `status`, `failed_login_attempts`)
+VALUES (1, 'admin', 'admin@trustmate.com', NULL, '$2b$10$OaZQA/ggtzGJJkBg06sUKOcrdcq4gtiOsXeDIAyoSK3Xfw8D32UJG', 'admin', '2026-01-20 23:56:28', 'active', 0);
+INSERT INTO `users` (`user_id`, `username`, `email`, `phone`, `password`, `role`, `created_at`, `status`, `failed_login_attempts`)
+VALUES (2, 'john_doe', 'john@example.com', '1234567890', '$2b$10$OaZQA/ggtzGJJkBg06sUKOcrdcq4gtiOsXeDIAyoSK3Xfw8D32UJG', 'buyer', '2026-01-20 23:57:08', 'active', 0);
+INSERT INTO `users` (`user_id`, `username`, `email`, `phone`, `password`, `role`, `created_at`, `status`, `failed_login_attempts`)
+VALUES (3, 'jane_smith', 'jane@example.com', '0987654321', '$2b$10$OaZQA/ggtzGJJkBg06sUKOcrdcq4gtiOsXeDIAyoSK3Xfw8D32UJG', 'seller', '2026-01-20 23:57:08', 'active', 0);
+INSERT INTO `users` (`user_id`, `username`, `email`, `phone`, `password`, `role`, `created_at`, `status`, `failed_login_attempts`)
+VALUES (4, 'bob_wilson', 'bob@example.com', '5551234567', '$2b$10$OaZQA/ggtzGJJkBg06sUKOcrdcq4gtiOsXeDIAyoSK3Xfw8D32UJG', 'seller', '2026-01-20 23:57:08', 'active', 0);
 
 -- ----------------------------
 -- Table structure for categories (SECOND - no dependencies)

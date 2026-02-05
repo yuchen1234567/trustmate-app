@@ -3,6 +3,26 @@ const OrderItem = require('../models/orderItem');
 const Cart = require('../models/cart');
 const Payment = require('../models/payment');
 const Review = require('../models/review');
+const Fraud = require('../models/fraud');
+
+const HIGH_VALUE_THRESHOLD = 2000;
+
+const flagHighValueOrder = async (userId, orderId, total) => {
+    const amount = Number(total || 0);
+    if (amount <= HIGH_VALUE_THRESHOLD) {
+        return;
+    }
+
+    try {
+        await Fraud.createAlert(
+            userId,
+            'High-value transaction',
+            `Order #${orderId} total ${amount.toFixed(2)} exceeds ${HIGH_VALUE_THRESHOLD}`
+        );
+    } catch (error) {
+        console.error('Failed to create high-value alert', error);
+    }
+};
 
 // Show checkout page
 exports.showCheckout = async (req, res) => {
@@ -37,11 +57,13 @@ exports.create = async (req, res) => {
         
         const total = await Cart.getTotal(userId);
         const orderId = await Order.create(userId, total);
-        
+
         // Create order items
         for (const item of cartItems) {
             await OrderItem.create(orderId, item.service_id, item.quantity, item.price);
         }
+
+        await flagHighValueOrder(userId, orderId, total);
         
         // Clear cart
         await Cart.clearUserCart(userId);

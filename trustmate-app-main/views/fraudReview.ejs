@@ -1,0 +1,54 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-dashboard fraud-review">
+
+    <a href="/admin/dashboard" class="btn-secondary" style="display: inline-block; margin: 0 0 1.5rem;">Back to Admin Dashboard</a>
+
+    <div class="fraud-review-grid">
+        <div class="fraud-review-left">
+            <section class="fraud-card">
+                <div class="user-card">
+                    <div class="avatar-circle avatar-large"></div>
+                    <div>
+                        <h2><%= alert.username || 'Unknown user' %></h2>
+                        <p class="user-role">Account</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="fraud-card">
+                <div class="fraud-card-header">
+                    <h2>Suspicious Activity History</h2>
+                </div>
+                <div class="history-table">
+                    <% if (!history || history.length === 0) { %>
+                        <div class="history-row history-row-empty">No suspicious activity recorded.</div>
+                    <% } else { %>
+                        <% history.forEach(item => { %>
+                            <div class="history-row">
+                                <div class="history-date">
+                                    <% if (item.created_at) { %>
+                                        <% const dt = new Date(item.created_at); %>
+                                        <span><%= dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' ', '') %> <%= dt.toLocaleDateString('en-GB') %></span>
+                                    <% } else { %>
+                                        <span>--</span>
+                                    <% } %>
+                                </div>
+                                <div class="history-reason"><%= item.description || item.alert_type %></div>
+                            </div>
+                        <% }); %>
+                    <% } %>
+                </div>
+            </section>
+        </div>
+
+        <section class="fraud-card fraud-reason">
+            <div class="fraud-card-header">
+                <h2>Flagged Reason</h2>
+            </div>
+            <p class="flagged-reason-text"><%= alert.description || alert.alert_type %></p>
+        </section>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

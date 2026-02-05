@@ -1,0 +1,46 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-dashboard">
+    <h1>Category management</h1>
+    
+    <div class="dashboard-nav">
+        <a href="/admin/dashboard">Fraud Detection</a>
+        <a href="/admin/users">User Management</a>
+        <a href="/admin/orders">Order Management</a>
+        <a href="/admin/categories" class="active">Categories</a>
+    </div>
+    
+    <a href="/admin/categories/create" class="btn-primary" style="display: inline-block; margin-bottom: 2rem;">Add category</a>
+    
+    <div class="categories-list">
+        <% if (categories.length === 0) { %>
+            <p>No categories found.</p>
+        <% } else { %>
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% categories.forEach(category => { %>
+                        <tr>
+                            <td><%= category.category_id %></td>
+                            <td><%= category.name %></td>
+                            <td><%= category.description || 'N/A' %></td>
+                            <td>
+                                <a href="/admin/categories/edit/<%= category.category_id %>" class="btn-small">Edit</a>
+                                <a href="/admin/categories/delete/<%= category.category_id %>" class="btn-small btn-danger" onclick="return confirm('Delete this category?')">Delete</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

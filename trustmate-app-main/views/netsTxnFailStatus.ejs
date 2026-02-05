@@ -1,0 +1,22 @@
+<%- include('partials/navbar') %>
+
+<div style="max-width: 720px; margin: 50px auto; padding: 0 16px;">
+  <div style="background:var(--surface); border-radius:16px; padding:26px; border:1px solid var(--border-soft); box-shadow:0 12px 24px rgba(15, 23, 42, 0.08); text-align:center;">
+    <h1 style="margin:0 0 10px; font-size:24px;"><%= message %></h1>
+    <p style="color:var(--text-muted); margin:0 0 18px;">
+      The payment did not complete. If you'd like, you can retry NETS payment or review the order.
+    </p>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <% if (typeof orderId !== 'undefined' && orderId) { %>
+        <form action="/payments/nets/retry/<%= orderId %>" method="POST" style="display:inline;">
+          <button type="submit" class="btn-primary" style="width:auto; padding:0.8rem 1.4rem;">Retry NETS Payment</button>
+        </form>
+        <a href="/orders/<%= orderId %>" class="btn-secondary" style="margin-left:0;">View Order</a>
+      <% } else { %>
+        <a href="/orders" class="btn-secondary" style="margin-left:0;">View Orders</a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
