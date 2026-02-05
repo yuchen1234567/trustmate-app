@@ -1,0 +1,154 @@
+<%- include('partials/navbar') %>
+
+<div style="max-width: 980px; margin: 40px auto; padding: 0 16px;">
+  <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px;">
+    <div>
+      <h1 style="margin:0; font-size:28px;">Checkout</h1>
+      <p style="margin:8px 0 0; color:var(--text-muted); font-size:14px;">Review your items and confirm the order details.</p>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1.4fr 1fr; gap:18px;">
+    <!-- Order Summary -->
+    <div style="background:var(--surface); border-radius:16px; padding:22px; border:1px solid var(--border-soft); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);">
+      <h2 style="margin:0 0 14px; font-size:18px;">Order Summary</h2>
+
+      <div style="border:1px solid var(--border-soft); border-radius:14px; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+          <tbody>
+            <% cartItems.forEach(item => { %>
+              <tr>
+                <td style="padding:12px 14px; border-bottom:1px solid var(--border-soft);">
+                  <div style="font-weight:700; color:var(--text-primary);"><%= item.title %></div>
+                  <div style="color:var(--text-muted); font-size:12px;">Qty: <%= item.quantity %></div>
+                </td>
+                <td style="padding:12px 14px; text-align:right; border-bottom:1px solid var(--border-soft); white-space:nowrap; font-weight:700;">
+                  $<%= typeof item.price === 'number'
+                    ? (item.price * item.quantity).toFixed(2)
+                    : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %>
+                </td>
+              </tr>
+            <% }); %>
+
+            <tr>
+              <td style="padding:14px; font-weight:800; font-size:14px;">Total</td>
+              <td style="padding:14px; text-align:right; font-weight:900; font-size:16px; white-space:nowrap;">
+                $<%= Number(total || 0).toFixed(2) %>
+
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:12px; color:var(--text-muted); font-size:12px;">
+        Prices shown include quantity calculation.
+      </div>
+    </div>
+
+    <!-- Confirm Order -->
+    <div style="background:var(--surface); border-radius:16px; padding:22px; border:1px solid var(--border-soft); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);">
+      <h2 style="margin:0 0 10px; font-size:18px;">Confirm Order</h2>
+
+      <div style="background:var(--surface-muted); border:1px solid var(--border-soft); padding:12px 14px; border-radius:14px; margin-bottom:14px;">
+        <p style="margin:0; color:var(--text-muted); font-size:14px;">
+          Choose your preferred payment method. You will see a confirmation once payment is completed.
+        </p>
+      </div>
+
+      <div style="display:grid; gap:12px; margin-bottom:14px;">
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">NETS QR</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Scan QR code with NETS app for instant payment.</p>
+          <form action="/payments/nets/start" method="POST">
+            <button type="submit"
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:800; cursor:pointer;">
+              Pay with NETS QR
+            </button>
+          </form>
+        </div>
+
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">PayPal</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Pay securely with your PayPal account.</p>
+          <% if (locals.paypalConfigured) { %>
+            <div id="paypal-button-container"></div>
+          <% } else { %>
+            <button type="button" disabled
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:#94a3b8; color:#fff; font-weight:800;">
+              PayPal Not Configured
+            </button>
+          <% } %>
+        </div>
+
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">Stripe</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Pay with credit/debit card via Stripe.</p>
+          <% if (locals.stripeConfigured) { %>
+            <form action="/payments/stripe/create" method="POST">
+              <button type="submit"
+                style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:800; cursor:pointer;">
+                Pay with Stripe
+              </button>
+            </form>
+          <% } else { %>
+            <button type="button" disabled
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:#94a3b8; color:#fff; font-weight:800;">
+              Stripe Not Configured
+            </button>
+          <% } %>
+        </div>
+      </div>
+
+      <a href="/cart"
+        style="display:block; text-align:center; padding:12px 16px; border-radius:12px; border:1px solid var(--border-strong); text-decoration:none; color:var(--text-primary); font-weight:800;">
+        Back to Cart
+      </a>
+
+      <div style="margin-top:12px; color:var(--text-muted); font-size:12px; line-height:1.5;">
+        By confirming your order, you acknowledge the details shown above.
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (locals.paypalConfigured) { %>
+  <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>&currency=SGD"></script>
+  <script>
+    paypal.Buttons({
+      createOrder: function() {
+        return fetch('/payments/paypal/create', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(res => res.json())
+        .then(data => data.id);
+      },
+      onApprove: function(data) {
+        return fetch('/payments/paypal/capture', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderID: data.orderID })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = '/orders/' + data.orderId;
+          } else {
+            alert('Payment failed. Please try again.');
+          }
+        })
+        .catch(err => {
+          console.error('PayPal error:', err);
+          alert('PayPal encountered an error. Please try again.');
+        });
+      },
+      onError: function(err) {
+        console.error('PayPal error:', err);
+        alert('PayPal encountered an error. Please try again.');
+      }
+    }).render('#paypal-button-container');
+  </script>
+<% } %>
+
+<%- include('partials/footer') %>

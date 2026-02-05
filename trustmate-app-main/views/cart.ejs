@@ -1,0 +1,147 @@
+<%- include('partials/navbar') %>
+
+<div class="cart-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <h1 class="page-title">
+                <span class="page-icon">🛒</span>
+                Your Shopping Cart
+            </h1>
+            <p class="page-subtitle">Review your items before checkout</p>
+        </div>
+    </div>
+    
+    <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div class="success-message"><%= successMessage %></div>
+    <% } %>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="error-message"><%= error %></div>
+    <% } %>
+    
+    <% if (cartItems.length === 0) { %>
+        <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <h3>Your Cart is Empty</h3>
+            <p>Start shopping and add items to your cart!</p>
+            <a href="/services" class="btn-primary">Browse Services</a>
+        </div>
+    <% } else { %>
+        <div class="cart-container">
+            <div class="cart-items-section">
+                <div class="section-header-small">
+                    <h2>Cart Items (<%= cartItems.length %>)</h2>
+                </div>
+                
+                <div class="cart-items-list">
+                    <% cartItems.forEach(item => { %>
+                        <div class="cart-item-card">
+                            <div class="item-main-info">
+                                <div class="item-icon">🎯</div>
+                                <div class="item-details">
+                                    <h3 class="item-title"><%= item.title %></h3>
+                                    <p class="item-seller">
+                                        <span class="seller-icon">🏪</span>
+                                        <%= item.business_name %>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="item-pricing">
+                                <div class="price-info">
+                                    <span class="price-label">Unit Price</span>
+                                    <span class="price-value">$<%= typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price || 0).toFixed(2) %></span>
+                                </div>
+                                
+                                <div class="quantity-control">
+                                    <form action="/cart/update" method="POST" class="quantity-form-inline">
+                                        <input type="hidden" name="cart_id" value="<%= item.cart_id %>">
+                                        <label class="quantity-label">Quantity</label>
+                                        <div class="quantity-input-group">
+                                            <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="10" class="quantity-input">
+                                            <button type="submit" class="btn-update">
+                                                <span>✓</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <div class="subtotal-info">
+                                    <span class="subtotal-label">Subtotal</span>
+                                    <span class="subtotal-value">$<%= typeof item.price === 'number' ? (item.price * item.quantity).toFixed(2) : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %></span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-actions">
+                                <a href="/cart/remove/<%= item.cart_id %>" class="btn-remove" onclick="return confirm('Remove this item from cart?')">
+                                    <span>🗑️</span>
+                                    Remove
+                                </a>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+            
+            <div class="cart-summary-section">
+                <div class="summary-card">
+                    <h2 class="summary-title">
+                        <span class="summary-icon">💰</span>
+                        Order Summary
+                    </h2>
+                    
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span class="summary-label">Items (<%= cartItems.length %>)</span>
+                            <span class="summary-value">$<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">Service Fee</span>
+                            <span class="summary-value">$0.00</span>
+                        </div>
+                        
+                        <div class="summary-divider"></div>
+                        
+                        <div class="summary-row summary-total">
+                            <span class="summary-label">Total</span>
+                            <span class="summary-value">$<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></span>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-actions">
+                        <a href="/checkout" class="btn-checkout">
+                            <span>🔒</span>
+                            Proceed to Checkout
+                        </a>
+                        <a href="/services" class="btn-continue-shopping">
+                            <span>←</span>
+                            Continue Shopping
+                        </a>
+                        <a href="/cart/clear" class="btn-clear-cart" onclick="return confirm('Clear all items from cart?')">
+                            <span>🗑️</span>
+                            Clear Cart
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="trust-badges">
+                    <div class="trust-badge-item">
+                        <span class="badge-icon">🔒</span>
+                        <span class="badge-text">Secure Payment</span>
+                    </div>
+                    <div class="trust-badge-item">
+                        <span class="badge-icon">✅</span>
+                        <span class="badge-text">Verified Sellers</span>
+                    </div>
+                    <div class="trust-badge-item">
+                        <span class="badge-icon">💬</span>
+                        <span class="badge-text">24/7 Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,185 @@
+<%- include('partials/navbar') %>
+
+<div class="admin-dashboard">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-breadcrumb">
+                <a href="/admin/dashboard">&#x1F4CA; Admin</a>
+                <span class="breadcrumb-separator">&rsaquo;</span>
+                <span class="breadcrumb-current">Fraud Detection</span>
+            </div>
+            <h1 class="page-title">
+                <span class="page-icon">&#x1F6E1;&#xFE0F;</span>
+                Admin Dashboard
+            </h1>
+        </div>
+    </div>
+
+    <div class="dashboard-nav">
+        <a href="/admin/dashboard" class="nav-tab active">
+            <span class="tab-icon">&#x1F6E1;&#xFE0F;</span>
+            <span class="tab-label">Fraud Detection</span>
+        </a>
+        <a href="/admin/users" class="nav-tab">
+            <span class="tab-icon">&#x1F465;</span>
+            <span class="tab-label">User Management</span>
+        </a>
+        <a href="/admin/orders" class="nav-tab">
+            <span class="tab-icon">&#x1F4E6;</span>
+            <span class="tab-label">Order Management</span>
+        </a>
+        <a href="/admin/categories" class="nav-tab">
+            <span class="tab-icon">&#x1F3F7;&#xFE0F;</span>
+            <span class="tab-label">Categories</span>
+        </a>
+    </div>
+
+    <% if (typeof error !== 'undefined') { %>
+        <p class="error-message"><%= error %></p>
+    <% } %>
+
+    <div class="section-header">
+        <h2 class="section-title">
+            <span class="section-icon">&#x1F514;</span>
+            Notifications
+        </h2>
+        <div class="section-meta">
+            <span class="order-count"><%= alerts.length %> recent</span>
+            <a href="/admin/fraud" class="btn-secondary">View All</a>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="users-table admin-table">
+            <thead>
+                <tr>
+                    <th>Timestamp &amp; Date</th>
+                    <th>User</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (alerts.length === 0) { %>
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state-inline">
+                                <span class="empty-icon-small">&#x1F4ED;</span>
+                                <span>No alerts yet</span>
+                            </div>
+                        </td>
+                    </tr>
+                <% } else { %>
+                    <% alerts.forEach(alert => { %>
+                        <% const statusClass = alert.status === 'resolved' ? 'status-active' : (alert.status === 'reviewed' ? 'status-held' : 'status-pending'); %>
+                        <tr>
+                            <td>
+                                <div class="date-cell">
+                                    <% if (alert.created_at) { %>
+                                        <% const dt = new Date(alert.created_at); %>
+                                        <span class="date-primary"><%= dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' ', '') %></span>
+                                        <span class="date-secondary"><%= dt.toLocaleDateString('en-GB') %></span>
+                                    <% } else { %>
+                                        <span class="date-primary">--</span>
+                                    <% } %>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="email-cell">
+                                    <span class="email-icon">&#x1F465;</span>
+                                    <span><%= alert.username || 'Unknown user' %></span>
+                                </div>
+                                <% if (alert.email) { %>
+                                    <div class="text-muted" style="font-size: 0.85rem;"><%= alert.email %></div>
+                                <% } %>
+                            </td>
+                            <td><%= alert.description || alert.alert_type %></td>
+                            <td>
+                                <span class="status-badge <%= statusClass %>"><%= alert.status %></span>
+                            </td>
+                            <td>
+                                <a href="/admin/fraud/review/<%= alert.alert_id %>" class="btn-small">View</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-header" style="margin-top: 2rem;">
+        <h2 class="section-title">
+            <span class="section-icon">&#x1F465;</span>
+            Flagged Users
+        </h2>
+        <div class="section-meta">
+            <span class="order-count"><%= flaggedUsers ? flaggedUsers.length : 0 %> users</span>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="users-table admin-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (!flaggedUsers || flaggedUsers.length === 0) { %>
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty-state-inline">
+                                <span class="empty-icon-small">&#x1F465;</span>
+                                <span>No flagged users yet</span>
+                            </div>
+                        </td>
+                    </tr>
+                <% } else { %>
+                    <% flaggedUsers.forEach(user => { %>
+                        <tr>
+                            <td>
+                                <div class="email-cell">
+                                    <span class="email-icon">&#x1F465;</span>
+                                    <span><%= user.username || 'Unknown user' %></span>
+                                </div>
+                                <% if (user.email) { %>
+                                    <div class="text-muted" style="font-size: 0.85rem;"><%= user.email %></div>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% const userStatusClass = user.status === 'frozen' ? 'status-frozen' : 'status-active'; %>
+                                <span class="status-badge <%= userStatusClass %> js-user-status" data-user-id="<%= user.user_id %>"><%= user.status || 'active' %></span>
+                            </td>
+                            <td>
+                                <% if (user.status === 'frozen') { %>
+                                    <a
+                                        href="/admin/users/unfreeze/<%= user.user_id %>"
+                                        class="btn-small btn-success js-user-toggle"
+                                        data-user-id="<%= user.user_id %>"
+                                        data-action="enable"
+                                        data-enable-href="/admin/users/unfreeze/<%= user.user_id %>"
+                                        data-disable-href="/admin/users/freeze/<%= user.user_id %>"
+                                    >Enable</a>
+                                <% } else { %>
+                                    <a
+                                        href="/admin/users/freeze/<%= user.user_id %>"
+                                        class="btn-small btn-warning js-user-toggle"
+                                        data-user-id="<%= user.user_id %>"
+                                        data-action="disable"
+                                        data-enable-href="/admin/users/unfreeze/<%= user.user_id %>"
+                                        data-disable-href="/admin/users/freeze/<%= user.user_id %>"
+                                    >Disable</a>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

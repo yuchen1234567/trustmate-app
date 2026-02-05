@@ -1,0 +1,164 @@
+<%- include('partials/navbar') %>
+
+<div class="hero-section">
+    <div class="hero-content hero-grid">
+        <div class="hero-text">
+            <p class="hero-eyebrow">TrustMate Marketplace</p>
+            <h1>Trusted local services</h1>
+            <h1>with clear, verified reviews</h1>
+            <p class="hero-subtitle">A calm, dependable marketplace for verified sellers and completed work.</p>
+            <div class="hero-trust">
+                <span class="trust-pill">Verified identities</span>
+                <span class="trust-pill">Secure payments</span>
+                <span class="trust-pill">Dispute support</span>
+            </div>
+            <div class="search-bar">
+                <form action="/services" method="GET">
+                    <input type="text" name="q" placeholder="Find trusted services by category">
+                    <button type="submit">Browse services</button>
+                </form>
+            </div>
+        </div>
+        <div class="hero-slider" aria-label="TrustMate highlights">
+            <div class="slider-track">
+                <div class="hero-slide">
+                    <div class="slide-card">
+                        <img class="slide-image" src="/images/sellers.png" alt="Illustration of verified sellers">
+                        <p class="slide-title">Why TrustMate</p>
+                        <p class="slide-text">Every seller is verified and reviewed with consistent standards.</p>
+                        <div class="slide-tag">Verified sellers</div>
+                    </div>
+                </div>
+                <div class="hero-slide">
+                    <div class="slide-card">
+                        <img class="slide-image" src="/images/payment.png" alt="Illustration of secure payments">
+                        <p class="slide-title">How to book</p>
+                        <p class="slide-text">Search, compare, and book with clear payment confirmation.</p>
+                        <div class="slide-tag">Secure payments</div>
+                    </div>
+                </div>
+                <div class="hero-slide">
+                    <div class="slide-card">
+                        <img class="slide-image" src="/images/reviews.png" alt="Illustration of trusted reviews">
+                        <p class="slide-title">Service confidence</p>
+                        <p class="slide-text">See verified ratings and thoughtful replies before you decide.</p>
+                        <div class="slide-tag">Trusted reviews</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="why-trustmate">
+    <h2>Why TrustMate</h2>
+    <div class="why-grid">
+        <div class="why-card">
+            <span class="why-icon">V</span>
+            <h3>Verified sellers</h3>
+            <p>Identity checks and performance reviews keep the marketplace dependable.</p>
+        </div>
+        <div class="why-card">
+            <span class="why-icon">P</span>
+            <h3>Protected payments</h3>
+            <p>Payments are confirmed through clear, consistent steps.</p>
+        </div>
+        <div class="why-card">
+            <span class="why-icon">S</span>
+            <h3>Support when needed</h3>
+            <p>Dedicated support helps resolve issues fairly and calmly.</p>
+        </div>
+        <div class="why-card">
+            <span class="why-icon">R</span>
+            <h3>Real reviews</h3>
+            <p>Every review comes from a completed order, not anonymous users.</p>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2>How to book</h2>
+    <div class="steps-grid">
+        <div class="step-card">
+            <span class="step-number">1</span>
+            <h3>Search your service</h3>
+            <p>Browse providers by category, price, and verified rating.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">2</span>
+            <h3>Choose a time</h3>
+            <p>Pick a seller and confirm availability in chat.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">3</span>
+            <h3>Pay securely</h3>
+            <p>Checkout with confidence using secure payment confirmation.</p>
+        </div>
+    </div>
+</section>
+
+<section class="categories-section">
+    <h2>Explore categories</h2>
+    <div class="categories-grid">
+        <% categories.forEach(category => { %>
+            <a href="/services?category=<%= category.category_id %>" class="category-card">
+                <span class="category-icon"><%= category.name.substring(0, 1).toUpperCase() %></span>
+                <span class="category-label"><%= category.name %></span>
+            </a>
+        <% }); %>
+    </div>
+</section>
+
+<section class="popular-services">
+    <h2>Popular services</h2>
+    <div class="services-grid">
+        <% services.slice(0, 8).forEach(service => { %>
+            <div class="service-card">
+                <h3><%= service.title %></h3>
+                <p><%= service.description ? service.description.substring(0, 100) : '' %>...</p>
+                <div class="service-meta">
+                    <p class="price">$<%= typeof service.price === 'number' ? service.price.toFixed(2) : parseFloat(service.price || 0).toFixed(2) %></p>
+                    <p class="seller">by <%= service.business_name || 'Seller' %></p>
+                </div>
+                <div class="service-trust">
+                    <span class="trust-badge"><%= service.verified ? 'Verified seller' : 'Trusted seller' %></span>
+                    <span class="trust-rating">
+                        <%= service.avg_rating ? parseFloat(service.avg_rating).toFixed(1) : 'No ratings yet' %>
+                        <% if (service.review_count) { %>
+                            (<%= service.review_count %>)
+                        <% } %>
+                    </span>
+                </div>
+                <a href="/services/<%= service.service_id %>" class="btn-view">View details</a>
+            </div>
+        <% }); %>
+    </div>
+</section>
+
+<section class="faq-home">
+    <div class="faq-home-header">
+        <h2>FAQs</h2>
+        <p>Clear answers for a confident booking experience.</p>
+    </div>
+    <div class="faq-home-list">
+        <details open>
+            <summary>How do I know a seller is verified?</summary>
+            <p>Verified sellers complete identity checks and maintain strong review scores.</p>
+        </details>
+        <details>
+            <summary>When is a payment confirmed?</summary>
+            <p>Payments are confirmed once the service is marked complete.</p>
+        </details>
+        <details>
+            <summary>Can I chat before booking?</summary>
+            <p>Yes. Use chat to confirm timing, scope, and any special requests.</p>
+        </details>
+        <details>
+            <summary>What if there is an issue?</summary>
+            <p>Our support team helps resolve disputes fairly and with care.</p>
+        </details>
+    </div>
+    <a href="/faq" class="btn-primary faq-link">View all FAQs</a>
+</section>
+
+<%- include('partials/footer') %>
