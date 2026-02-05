@@ -34,8 +34,10 @@
                 </div>
                 
                 <div class="cart-items-list">
-                    <% cartItems.forEach(item => { %>
-                        <div class="cart-item-card">
+                    <% cartItems.forEach((item, index) => { 
+                        const unitPrice = typeof item.price === 'number' ? item.price : parseFloat(item.price || 0);
+                    %>
+                        <div class="cart-item-card" data-item-index="<%= index %>" data-unit-price="<%= unitPrice %>">
                             <div class="item-main-info">
                                 <div class="item-icon">🎯</div>
                                 <div class="item-details">
@@ -50,7 +52,7 @@
                             <div class="item-pricing">
                                 <div class="price-info">
                                     <span class="price-label">Unit Price</span>
-                                    <span class="price-value">$<%= typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price || 0).toFixed(2) %></span>
+                                    <span class="price-value">$<%= unitPrice.toFixed(2) %></span>
                                 </div>
                                 
                                 <div class="quantity-control">
@@ -58,7 +60,7 @@
                                         <input type="hidden" name="cart_id" value="<%= item.cart_id %>">
                                         <label class="quantity-label">Quantity</label>
                                         <div class="quantity-input-group">
-                                            <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="10" class="quantity-input">
+                                            <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="10" class="quantity-input" data-item-index="<%= index %>" onchange="updateOrderSummary()">
                                             <button type="submit" class="btn-update">
                                                 <span>✓</span>
                                             </button>
@@ -68,7 +70,7 @@
                                 
                                 <div class="subtotal-info">
                                     <span class="subtotal-label">Subtotal</span>
-                                    <span class="subtotal-value">$<%= typeof item.price === 'number' ? (item.price * item.quantity).toFixed(2) : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %></span>
+                                    <span class="subtotal-value" id="subtotal-<%= index %>">$<%= (unitPrice * item.quantity).toFixed(2) %></span>
                                 </div>
                             </div>
                             
@@ -92,8 +94,8 @@
                     
                     <div class="summary-details">
                         <div class="summary-row">
-                            <span class="summary-label">Items (<%= cartItems.length %>)</span>
-                            <span class="summary-value">$<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></span>
+                            <span class="summary-label">Items (<span id="item-count"><%= cartItems.length %></span>)</span>
+                            <span class="summary-value" id="items-total">$<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></span>
                         </div>
                         
                         <div class="summary-row">
@@ -105,7 +107,7 @@
                         
                         <div class="summary-row summary-total">
                             <span class="summary-label">Total</span>
-                            <span class="summary-value">$<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></span>
+                            <span class="summary-value" id="order-total">$<%= typeof total === 'number' ? total.toFixed(2) : '0.00' %></span>
                         </div>
                     </div>
                     
@@ -143,5 +145,48 @@
         </div>
     <% } %>
 </div>
+
+<script>
+function updateOrderSummary() {
+    const cartItems = document.querySelectorAll('.cart-item-card');
+    let total = 0;
+    
+    cartItems.forEach((item) => {
+        const index = item.dataset.itemIndex;
+        const unitPrice = parseFloat(item.dataset.unitPrice) || 0;
+        const quantityInput = item.querySelector('.quantity-input');
+        const quantity = parseInt(quantityInput.value) || 1;
+        
+        // Calculate subtotal for this item
+        const subtotal = unitPrice * quantity;
+        total += subtotal;
+        
+        // Update item subtotal display
+        const subtotalEl = document.getElementById('subtotal-' + index);
+        if (subtotalEl) {
+            subtotalEl.textContent = '$' + subtotal.toFixed(2);
+        }
+    });
+    
+    // Update order summary totals
+    const itemsTotalEl = document.getElementById('items-total');
+    const orderTotalEl = document.getElementById('order-total');
+    
+    if (itemsTotalEl) {
+        itemsTotalEl.textContent = '$' + total.toFixed(2);
+    }
+    if (orderTotalEl) {
+        orderTotalEl.textContent = '$' + total.toFixed(2);
+    }
+}
+
+// Also update on input (not just change) for immediate feedback
+document.querySelectorAll('.quantity-input').forEach(input => {
+    input.addEventListener('input', updateOrderSummary);
+});
+
+// Run on page load to calculate initial totals
+updateOrderSummary();
+</script>
 
 <%- include('partials/footer') %>
