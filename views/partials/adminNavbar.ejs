@@ -32,6 +32,7 @@
 
                     <% if (user.role === 'admin') { %>
                         <a href="/admin/dashboard">Admin</a>
+                        <a href="/admin/feedback">Admin Feedback</a>
                     <% } %>
 
                     <span class="user-info">Hello, <%= user.username %></span>
@@ -42,6 +43,7 @@
                     <a href="/seller/login" class="btn-login">Seller Access</a>
                     <a href="/register" class="btn-signup">Create Account</a>
                     <a href="/seller/signup" class="btn-signup">Seller Registration</a>
+                    
                 <% } %>
             </div>
         </div>

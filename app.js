@@ -48,9 +48,14 @@ const sellerController = require('./controllers/sellerController');
 const fraudController = require('./controllers/fraudController');
 const chatController = require('./controllers/chatController');
 const paymentController = require('./controllers/paymentController');
-// app.js
+const feedbackController = require('./controllers/feedbackController');
+const adminFeedbackController = require("./controllers/adminFeedbackController");
+
 const adminReportsRoutes = require("./models/adminReports");
 app.use("/admin", adminReportsRoutes);
+const feedbackRoutes = require("./models/feedback");
+app.use("/", feedbackRoutes);
+
 
 // Import middleware
 const { isAuthenticated, isAdmin, isSeller } = require('./middleware');
@@ -130,28 +135,10 @@ app.post('/chat/send', isAuthenticated, chatController.send);
 app.get('/chats', isAuthenticated, chatController.index);
 app.get('/chat/archive/:id', isAuthenticated, chatController.archive);
 
-//feedback route
-app.get('/userfeedback', isAuthenticated, (req, res) => {
-    res.render('userfeedback');
-});
-app.post('/userfeedback', isAuthenticated, (req, res) => {
-    const { message } = req.body;
+//feedback routes
+app.post('/userfeedback', isAuthenticated, feedbackController.submit);
+app.get("/admin/feedback", isAdmin, adminFeedbackController.list);
 
-    if (!message || !message.trim()) {
-        return res.redirect('/userfeedback');
-    }
-
-    const userId = req.session.user.user_id || req.session.user.id;
-
-    const sql = "INSERT INTO feedback (user_id, message) VALUES (?, ?)";
-    db.query(sql, [userId, message.trim()], (err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Database error');
-        }
-        res.redirect('/feedback/success');
-    });
-});
 
 
 // ===== SELLER ROUTES =====
