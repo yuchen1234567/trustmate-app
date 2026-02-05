@@ -198,9 +198,9 @@ exports.dashboard = async (req, res) => {
         }
         
         req.session.sellerId = seller.seller_id;
-        const services = await Service.getBySeller(seller.seller_id);
+        const services = await Service.getBySellerCombined(seller.seller_id);
         
-        res.render('sellerDashboard', { seller, services });
+        res.render("sellerDashboard", { seller, services });
     } catch (error) {
         console.error(error);
         res.redirect('/');

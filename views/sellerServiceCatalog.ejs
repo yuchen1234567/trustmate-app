@@ -1,0 +1,72 @@
+<%- include('partials/navbar') %>
+
+<div style="margin-bottom:12px;">
+  <a href="/seller/dashboard"
+     style="
+       display:inline-flex;
+       align-items:center;
+       gap:6px;
+       padding:8px 12px;
+       border-radius:10px;
+       text-decoration:none;
+       font-weight:800;
+       border:1px solid #e5e7eb;
+       background:#fff;
+       color:#111;
+     ">
+    ← Back to Dashboard
+  </a>
+</div>
+<main class="main-content">
+  <div class="page-container" style="max-width:1100px;margin:28px auto;padding:0 14px;">
+
+    <h1>🔍 Service Catalog</h1>
+    <p style="opacity:.75;">Search existing services and add them to your seller profile.</p>
+
+    <form method="GET" action="/seller/services/catalog" style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;">
+      <input
+        type="text"
+        name="q"
+        value="<%= q || '' %>"
+        placeholder="Search by service title..."
+        style="flex:1;min-width:240px;padding:12px 14px;border:1px solid #ddd;border-radius:12px;"
+      />
+      <button type="submit" style="padding:12px 16px;border:0;border-radius:12px;font-weight:800;cursor:pointer;">
+        Search
+      </button>
+    </form>
+
+    <% if (!services || services.length === 0) { %>
+      <div style="padding:14px;border:1px dashed #ccc;border-radius:14px;">No services found.</div>
+    <% } else { %>
+      <div style="display:grid;gap:12px;">
+        <% services.forEach(s => { %>
+          <div style="padding:14px;border:1px solid #eee;border-radius:16px;background:#fff;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="min-width:240px;">
+              <div style="font-weight:900;font-size:1.05rem;"><%= s.title %></div>
+              <div style="opacity:.75;margin-top:6px;"><%= s.description ? s.description.slice(0,120) : '' %></div>
+              <div style="margin-top:8px;font-weight:800;">$<%= Number(s.price || 0).toFixed(2) %></div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;">
+              <% if (s.alreadyAdded) { %>
+                <span style="padding:8px 12px;border-radius:999px;background:#ecfeff;border:1px solid #a5f3fc;font-weight:900;">
+                  Added
+                </span>
+              <% } else { %>
+                <form method="POST" action="/seller/services/catalog/add">
+                  <input type="hidden" name="service_id" value="<%= s.service_id %>">
+                  <button type="submit" style="padding:10px 14px;border:0;border-radius:12px;font-weight:900;cursor:pointer;">
+                    ➕ Add to My Services
+                  </button>
+                </form>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

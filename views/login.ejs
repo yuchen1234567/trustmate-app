@@ -1,52 +1,168 @@
 <%- include('partials/navbar') %>
 
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-logo">
-            <div class="support-local-logo">
-                <h2>🔐 Trustmate</h2>
-            </div>
-        </div>
-        
-        <h2 style="text-align: center; margin-bottom: 1.5rem;">Welcome Back</h2>
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Sign in to access your account</p>
-        
-        <% if (error) { %>
-            <div class="error-message"><%= error %></div>
-        <% } %>
+<div style="
+  min-height: calc(100vh - 64px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(1200px 600px at 10% 10%, #e0f2fe 0%, transparent 60%),
+    radial-gradient(900px 500px at 90% 20%, #cdd6f3 0%, transparent 55%),
+    linear-gradient(180deg, #f8fbff 0%, #bbc9df 100%);
+">
 
-        <% if (typeof attemptsLeft === 'number') { %>
-            <div class="login-attempts">
-                Attempts left: <strong><%= attemptsLeft %></strong>
-                <% if (attemptsLeft === 0) { %>
-                    <span class="login-attempts-alert">Admin has been alerted.</span>
-                <% } %>
-            </div>
-        <% } %>
-        
-        <form action="/login" method="POST" class="auth-form">
-            <div style="position: relative;">
-                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">📧</span>
-                <input type="email" name="email" placeholder="Email or phone number" required style="padding-left: 3rem;">
-            </div>
-            
-            <div style="position: relative;">
-                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;">🔒</span>
-                <input type="password" name="password" placeholder="Password" required style="padding-left: 3rem;">
-            </div>
-            
-            <button type="submit" class="btn-primary">Sign In</button>
-            
-            <div class="auth-divider" style="margin: 1.5rem 0;">
-                <span style="background: white; padding: 0 1rem; position: relative; z-index: 1;">Or</span>
-                <div style="position: absolute; width: 100%; height: 1px; background: var(--border-soft); top: 50%; left: 0; z-index: 0;"></div>
-            </div>
-            
-            <p class="auth-link" style="font-size: 1rem;">
-                Need an account? <a href="/register" style="color: var(--primary); font-weight: 600; text-decoration: none;">Create one</a>
-            </p>
-        </form>
+  <div style="
+    width:100%;
+    max-width:420px;
+    border-radius:26px;
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 30px 70px rgba(0,0,0,.15);
+    overflow:hidden;
+  ">
+
+    <!-- TOP VISUAL -->
+    <div style="padding:26px 18px 14px; text-align:center;">
+      <div style="
+        font-weight:900;
+        letter-spacing:.18em;
+        font-size:1.9rem;
+        color:#0f172a;
+      ">TRUSTMATE</div>
+
+   
+      <svg viewBox="0 0 400 200" width="100%" style="max-width:300px;margin:14px auto 0;display:block;">
+        <defs>
+          <linearGradient id="scriptGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ec4899"/>
+            <stop offset="100%" stop-color="#7c3aed"/>
+          </linearGradient>
+        </defs>
+        <text
+          x="50%"
+          y="55%"
+          text-anchor="middle"
+          fill="url(#scriptGrad)"
+          style="
+            font-family: 'Brush Script MT', 'Segoe Script', cursive;
+            font-size: 86px;
+            font-weight: 600;
+          "
+        >
+          Support
+        </text>
+        <text
+          x="50%"
+          y="85%"
+          text-anchor="middle"
+          fill="url(#scriptGrad)"
+          style="
+            font-family: 'Brush Script MT', 'Segoe Script', cursive;
+            font-size: 96px;
+            font-weight: 700;
+          "
+        >
+          Local
+        </text>
+      </svg>
     </div>
+
+    <!-- FORM -->
+    <div style="padding:18px 18px 22px;">
+      <h2 style="
+        margin:0 0 12px;
+        text-align:center;
+        font-weight:900;
+        letter-spacing:.14em;
+        color:#0f172a;
+      ">WELCOME BACK</h2>
+
+      <% if (error) { %>
+        <div style="
+          background: rgba(239,68,68,.12);
+          color:#991b1b;
+          padding:10px 12px;
+          border-radius:12px;
+          font-weight:800;
+          margin-bottom:10px;
+        "><%= error %></div>
+      <% } %>
+
+      <% if (typeof attemptsLeft === 'number') { %>
+        <div style="
+          background: rgba(59,130,246,.12);
+          color:#1e3a8a;
+          padding:10px 12px;
+          border-radius:12px;
+          font-weight:800;
+          margin-bottom:10px;
+        ">
+          Attempts left: <strong><%= attemptsLeft %></strong>
+        </div>
+      <% } %>
+
+      <form action="/login" method="POST" style="display:grid;gap:12px;">
+        <input
+          type="email"
+          name="email"
+          placeholder="Phone Number / Email"
+          required
+          style="
+            padding:14px;
+            border-radius:14px;
+            border:1px solid rgba(15,23,42,.18);
+            font-size:1rem;
+          "
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+          style="
+            padding:14px;
+            border-radius:14px;
+            border:1px solid rgba(15,23,42,.18);
+            font-size:1rem;
+          "
+        />
+
+        <button type="submit" style="
+          margin-top:4px;
+          padding:14px;
+          border-radius:14px;
+          border:0;
+          background: linear-gradient(180deg,#1e3a8a 0%,#0f172a 100%);
+          color:#fff;
+          font-weight:900;
+          letter-spacing:.16em;
+        ">
+          NEXT
+        </button>
+
+        <div style="
+          display:grid;
+          grid-template-columns:1fr auto 1fr;
+          align-items:center;
+          gap:12px;
+          opacity:.7;
+          font-weight:800;
+          font-size:.82rem;
+        ">
+          <div style="height:1px;background:rgba(15,23,42,.25);"></div>
+          <span>OR WITH</span>
+          <div style="height:1px;background:rgba(15,23,42,.25);"></div>
+        </div>
+
+        <p style="text-align:center;font-weight:800;margin:6px 0 0;">
+          Have an account? <a href="/register" style="color:#1e3a8a;">login</a>
+        </p>
+      </form>
+    </div>
+
+  </div>
 </div>
 
 <%- include('partials/footer') %>

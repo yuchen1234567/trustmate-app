@@ -56,6 +56,12 @@ app.use("/admin", adminReportsRoutes);
 const feedbackRoutes = require("./models/feedback");
 app.use("/", feedbackRoutes);
 
+// ===== Seller Service Catalog Routes (no routes folder) =====
+const sellerCatalogController = require("./controllers/sellerCatalogController");
+app.get("/seller/services/catalog", sellerCatalogController.catalog);
+app.post("/seller/services/catalog/add", sellerCatalogController.addFromCatalog);
+
+
 
 // Import middleware
 const { isAuthenticated, isAdmin, isSeller } = require('./middleware');

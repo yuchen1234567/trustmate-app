@@ -27,6 +27,26 @@ class Service {
         );
         return rows[0];
     }
+    //add
+    static async getBySellerCombined(sellerId) {
+      const [rows] = await db.query(`
+        SELECT s.*,
+               CASE 
+                WHEN ss.seller_id IS NOT NULL THEN 'catalog'
+                ELSE 'created'
+               END AS source
+        FROM services s
+        LEFT JOIN seller_services ss
+          ON ss.service_id = s.service_id
+         AND ss.seller_id = ?
+        WHERE s.seller_id = ?
+           OR ss.seller_id = ?
+        ORDER BY s.service_id DESC
+      `, [sellerId, sellerId, sellerId]);
+
+      return rows;
+    }
+
 
     static async getAll() {
         const [rows] = await db.query(
