@@ -15,8 +15,8 @@ exports.showCreate = async (req, res) => {
             return res.status(403).send('Access denied');
         }
         
-        // Check if order is completed
-        if (order.status !== 'completed') {
+        // Allow reviews only for completed or paid orders
+        if (order.status !== 'completed' && order.payment_status !== 'paid') {
             return res.redirect(`/orders/${orderId}`);
         }
         
@@ -33,6 +33,15 @@ exports.create = async (req, res) => {
         const { order_id, service_id, rating, comment, tags } = req.body;
         const userId = req.session.user.user_id;
         
+        const order = await Order.findById(order_id);
+        if (!order || order.user_id !== userId) {
+            return res.status(403).send('Access denied');
+        }
+
+        if (order.status !== 'completed' && order.payment_status !== 'paid') {
+            return res.redirect(`/orders/${order_id}`);
+        }
+
         // Check if review already exists
         const existingReview = await Review.getByOrder(order_id);
         if (existingReview) {

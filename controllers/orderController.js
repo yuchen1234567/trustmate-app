@@ -57,6 +57,7 @@ exports.create = async (req, res) => {
         
         const total = await Cart.getTotal(userId);
         const orderId = await Order.create(userId, total);
+        await Order.updateStatus(orderId, 'pending_payment');
 
         // Create order items
         for (const item of cartItems) {

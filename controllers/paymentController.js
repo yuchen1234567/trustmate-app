@@ -4,6 +4,7 @@ const OrderItem = require('../models/orderItem');
 const Payment = require('../models/payment');
 const Fraud = require('../models/fraud');
 const nets = require('../services/nets');
+const paymentService = require('../services/paymentService');
 
 const HIGH_VALUE_THRESHOLD = 2000;
 
@@ -46,8 +47,10 @@ const createOrderFromCart = async (userId, { provider = 'nets', currency = 'SGD'
         return null;
     }
 
+    const resolvedCurrency = paymentService.resolveCurrency(currency);
     const total = await Cart.getTotal(userId);
     const orderId = await Order.create(userId, total);
+    await Order.updateStatus(orderId, 'pending_payment');
 
     for (const item of cartItems) {
         await OrderItem.create(orderId, item.service_id, item.quantity, item.price);
@@ -58,7 +61,7 @@ const createOrderFromCart = async (userId, { provider = 'nets', currency = 'SGD'
         userId,
         provider,
         amount: total,
-        currency,
+        currency: resolvedCurrency,
         status: 'pending',
         escrowStatus: 'none'
     });
@@ -66,7 +69,7 @@ const createOrderFromCart = async (userId, { provider = 'nets', currency = 'SGD'
     await flagHighValueOrder(userId, orderId, total);
 
     await Cart.clearUserCart(userId);
-    return { orderId, total };
+    return { orderId, total, currency: resolvedCurrency };
 };
 
 const isNetsSuccess = (result) => {
@@ -102,6 +105,7 @@ exports.startNetsPayment = async (req, res) => {
 
         if (!isNetsSuccess({ data: qrData })) {
             await Payment.updateByOrderId(orderId, { status: 'failed' });
+            await Order.updateStatus(orderId, 'cancelled');
             return res.render('netsTxnFailStatus', {
                 message: 'Transaction Failed. Please try again.',
                 orderId
@@ -126,6 +130,7 @@ exports.startNetsPayment = async (req, res) => {
         if (orderId) {
             try {
                 await Payment.updateByOrderId(orderId, { status: 'failed' });
+                await Order.updateStatus(orderId, 'cancelled');
             } catch (updateError) {
                 console.error('Failed to mark payment as failed:', updateError);
             }
@@ -152,6 +157,8 @@ exports.retryNetsPayment = async (req, res) => {
             return res.redirect(`/orders/${orderId}`);
         }
 
+        await Order.updateStatus(orderId, 'pending_payment');
+
         const existingPayment = await Payment.findByOrderId(orderId);
         if (!existingPayment) {
             await Payment.create({
@@ -170,6 +177,7 @@ exports.retryNetsPayment = async (req, res) => {
 
         if (!isNetsSuccess({ data: qrData })) {
             await Payment.updateByOrderId(orderId, { status: 'failed' });
+            await Order.updateStatus(orderId, 'cancelled');
             return res.render('netsTxnFailStatus', {
                 message: 'Transaction Failed. Please try again.',
                 orderId
@@ -194,6 +202,7 @@ exports.retryNetsPayment = async (req, res) => {
         if (orderId) {
             try {
                 await Payment.updateByOrderId(orderId, { status: 'failed' });
+                await Order.updateStatus(orderId, 'cancelled');
             } catch (updateError) {
                 console.error('Failed to mark payment as failed:', updateError);
             }
@@ -206,16 +215,32 @@ exports.retryNetsPayment = async (req, res) => {
 };
 
 exports.netsSuccess = async (req, res) => {
+    const orderId = Number(req.query.orderId || 0);
+    if (orderId) {
+        try {
+            await Order.updateStatus(orderId, 'pending');
+        } catch (error) {
+            console.error('Failed to update order status after NETS success:', error);
+        }
+    }
     res.render('netsTxnSuccessStatus', {
         message: 'Payment Successful! Funds are now held in escrow.',
-        orderId: req.query.orderId || null
+        orderId: orderId || null
     });
 };
 
 exports.netsFail = async (req, res) => {
+    const orderId = Number(req.query.orderId || 0);
+    if (orderId) {
+        try {
+            await Order.updateStatus(orderId, 'cancelled');
+        } catch (error) {
+            console.error('Failed to update order status after NETS failure:', error);
+        }
+    }
     res.render('netsTxnFailStatus', {
         message: 'Transaction Failed. Please try again.',
-        orderId: req.query.orderId || null
+        orderId: orderId || null
     });
 };
 
@@ -294,7 +319,10 @@ exports.createStripeCheckout = async (req, res) => {
     let orderId;
     try {
         const userId = req.session.user.user_id;
-        const orderData = await createOrderFromCart(userId, { provider: 'stripe' });
+        const orderData = await createOrderFromCart(userId, {
+            provider: 'stripe',
+            currency: req.body.currency || req.query.currency
+        });
 
         if (!orderData) {
             return res.redirect('/cart');
@@ -302,13 +330,14 @@ exports.createStripeCheckout = async (req, res) => {
 
         orderId = orderData.orderId;
         const amount = Number(orderData.total || 0).toFixed(2);
+        const currency = orderData.currency;
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [
                 {
                     price_data: {
-                        currency: 'sgd',
+                        currency: paymentService.toStripeCurrency(currency),
                         product_data: {
                             name: 'Trustmate Services Order',
                             description: 'Payment for your Trustmate order'
@@ -336,6 +365,7 @@ exports.createStripeCheckout = async (req, res) => {
         console.error('Stripe checkout error:', error);
         if (orderId) {
             await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
+            await Order.updateStatus(orderId, 'cancelled');
         }
         return res.redirect('/checkout?error=stripe_checkout_failed');
     }
@@ -363,6 +393,7 @@ exports.stripeSuccess = async (req, res) => {
             provider_txn_id: session.payment_intent,
             payment_reference: session.id
         });
+        await Order.updateStatus(orderId, 'pending');
 
         return res.render('stripeSuccess', {
             orderId,
@@ -380,6 +411,7 @@ exports.stripeCancel = async (req, res) => {
     try {
         if (orderId) {
             await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
+            await Order.updateStatus(orderId, 'cancelled');
         }
     } catch (error) {
         console.error('Stripe cancel error:', error);
@@ -396,7 +428,10 @@ exports.createPayPalOrder = async (req, res) => {
     let orderId;
     try {
         const userId = req.session.user.user_id;
-        const orderData = await createOrderFromCart(userId, { provider: 'paypal' });
+        const orderData = await createOrderFromCart(userId, {
+            provider: 'paypal',
+            currency: req.body.currency || req.query.currency
+        });
 
         if (!orderData) {
             return res.status(400).json({ error: 'Cart is empty' });
@@ -404,6 +439,7 @@ exports.createPayPalOrder = async (req, res) => {
 
         orderId = orderData.orderId;
         const total = Number(orderData.total || 0).toFixed(2);
+        const currency = orderData.currency;
 
         const request = new paypal.orders.OrdersCreateRequest();
         request.prefer('return=representation');
@@ -412,7 +448,7 @@ exports.createPayPalOrder = async (req, res) => {
             purchase_units: [
                 {
                     amount: {
-                        currency_code: 'SGD',
+                        currency_code: currency,
                         value: total
                     }
                 }
@@ -431,6 +467,7 @@ exports.createPayPalOrder = async (req, res) => {
         console.error('PayPal order creation error:', error);
         if (orderId) {
             await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
+            await Order.updateStatus(orderId, 'cancelled');
         }
         res.status(500).json({ error: 'Failed to create PayPal order' });
     }
@@ -458,12 +495,14 @@ exports.capturePayPalOrder = async (req, res) => {
             provider_txn_id: capture.result.id,
             payment_reference: orderID
         });
+        await Order.updateStatus(orderId, 'pending');
 
         req.session.pendingPayPalOrderId = null;
         res.json({ success: true, orderId });
     } catch (error) {
         console.error('PayPal capture error:', error);
         await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
+        await Order.updateStatus(orderId, 'cancelled');
         res.status(500).json({ error: 'Failed to capture PayPal order' });
     }
 };
