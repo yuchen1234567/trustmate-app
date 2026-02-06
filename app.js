@@ -50,6 +50,7 @@ const chatController = require('./controllers/chatController');
 const paymentController = require('./controllers/paymentController');
 const feedbackController = require('./controllers/feedbackController');
 const adminFeedbackController = require("./controllers/adminFeedbackController");
+const customerSupportController = require('./controllers/customerSupportController');
 const sellerRoutes = require('./routes/sellerRoutes');
 
 const adminReportsRoutes = require("./models/adminReports");
@@ -66,7 +67,7 @@ app.post("/seller/services/catalog/add", sellerCatalogController.addFromCatalog)
 
 
 // Import middleware
-const { isAuthenticated, isAdmin, isSeller } = require('./middleware');
+const { isAuthenticated, isAdmin, isSeller, isCustomerService, isCSOrAdmin } = require('./middleware');
 
 // ===== PUBLIC ROUTES =====
 app.get('/', serviceController.index);
@@ -147,6 +148,25 @@ app.get('/chat/archive/:id', isAuthenticated, chatController.archive);
 app.post('/userfeedback', isAuthenticated, feedbackController.submit);
 app.get("/admin/feedback", isAdmin, adminFeedbackController.list);
 
+// ===== CUSTOMER SUPPORT ROUTES =====
+// Buyer routes - create and view tickets
+app.get('/support/tickets/create', isAuthenticated, customerSupportController.showCreateTicket);
+app.post('/support/tickets/create', isAuthenticated, customerSupportController.createTicket);
+app.get('/support/tickets', isAuthenticated, customerSupportController.myTickets);
+app.get('/support/tickets/:id', isAuthenticated, customerSupportController.viewTicket);
+app.post('/support/tickets/send', isAuthenticated, customerSupportController.sendMessage);
+
+// Customer Service routes
+app.get('/cs/dashboard', isAuthenticated, isCustomerService, customerSupportController.csDashboard);
+app.get('/cs/tickets', isAuthenticated, isCSOrAdmin, customerSupportController.csAllTickets);
+app.get('/cs/tickets/:id', isAuthenticated, isCSOrAdmin, customerSupportController.viewTicket);
+app.post('/cs/tickets/:id/assign', isAuthenticated, isCSOrAdmin, customerSupportController.assignToMe);
+app.post('/cs/tickets/:id/status', isAuthenticated, isCSOrAdmin, customerSupportController.updateStatus);
+app.post('/cs/tickets/:id/priority', isAuthenticated, isCSOrAdmin, customerSupportController.updatePriority);
+
+// Admin support management
+app.get('/admin/support/statistics', isAuthenticated, isAdmin, customerSupportController.adminStatistics);
+app.post('/admin/support/tickets/:id/delete', isAuthenticated, isAdmin, customerSupportController.adminDeleteTicket);
 
 
 // ===== SELLER ROUTES =====

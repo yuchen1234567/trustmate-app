@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trustmate - Customer Service</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/pages.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/cs/dashboard">
+                    <img src="/images/logo.png" alt="Trustmate Logo" class="logo-img">
+                    <div class="brand-text">
+                        <h1>TRUSTMATE</h1>
+                        <p class="tagline">Customer Service Portal</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="nav-links">
+                <a href="/cs/dashboard">Dashboard</a>
+                <a href="/cs/tickets">All Tickets</a>
+                <a href="/cs/tickets?status=pending">Pending</a>
+                <a href="/cs/tickets?status=in_progress">In Progress</a>
+                
+                <% if (user) { %>
+                    <span class="user-info">👤 <%= user.username %> (CS)</span>
+                    <a href="/logout" class="btn-logout">Logout</a>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+    
+    <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div class="alert alert-success"><%= successMessage %></div>
+    <% } %>
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="alert alert-error"><%= errorMessage %></div>
+    <% } %>
+    
+    <main class="main-content">

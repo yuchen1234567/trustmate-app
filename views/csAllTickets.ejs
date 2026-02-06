@@ -1,0 +1,226 @@
+<%- include('partials/csNavbar') %>
+
+<div class="container">
+    <div class="all-tickets-page">
+        <div class="page-header">
+            <h1>All Support Tickets</h1>
+            
+            <!-- Filters -->
+            <form method="GET" action="/cs/tickets" class="filters-form">
+                <select name="status" onchange="this.form.submit()">
+                    <option value="">All Status</option>
+                    <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="in_progress" <%= filters.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
+                    <option value="resolved" <%= filters.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
+                    <option value="closed" <%= filters.status === 'closed' ? 'selected' : '' %>>Closed</option>
+                </select>
+                
+                <select name="category" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    <option value="order_issue" <%= filters.category === 'order_issue' ? 'selected' : '' %>>Order Issue</option>
+                    <option value="payment_issue" <%= filters.category === 'payment_issue' ? 'selected' : '' %>>Payment Issue</option>
+                    <option value="service_inquiry" <%= filters.category === 'service_inquiry' ? 'selected' : '' %>>Service Inquiry</option>
+                    <option value="technical_support" <%= filters.category === 'technical_support' ? 'selected' : '' %>>Technical Support</option>
+                    <option value="complaint" <%= filters.category === 'complaint' ? 'selected' : '' %>>Complaint</option>
+                    <option value="other" <%= filters.category === 'other' ? 'selected' : '' %>>Other</option>
+                </select>
+                
+                <% if (filters.status || filters.category) { %>
+                    <a href="/cs/tickets" class="btn-clear-filters">Clear Filters</a>
+                <% } %>
+            </form>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-error"><%= error %></div>
+        <% } %>
+
+        <% if (tickets.length === 0) { %>
+            <div class="empty-state">
+                <p>No tickets found matching your criteria</p>
+            </div>
+        <% } else { %>
+            <div class="tickets-table-container">
+                <table class="tickets-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Subject</th>
+                            <th>User</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Messages</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% tickets.forEach(ticket => { %>
+                            <tr class="<%= ticket.priority === 'urgent' ? 'row-urgent' : '' %>">
+                                <td>#<%= ticket.ticket_id %></td>
+                                <td class="ticket-subject">
+                                    <%= ticket.subject %>
+                                    <% if (ticket.last_message) { %>
+                                        <div class="last-message">
+                                            <%= ticket.last_message.substring(0, 50) %><%= ticket.last_message.length > 50 ? '...' : '' %>
+                                        </div>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <%= ticket.user_name %><br>
+                                    <small><%= ticket.user_email %></small>
+                                </td>
+                                <td>
+                                    <span class="category-badge">
+                                        <%= ticket.category === 'order_issue' ? 'Order' :
+                                            ticket.category === 'payment_issue' ? 'Payment' :
+                                            ticket.category === 'service_inquiry' ? 'Inquiry' :
+                                            ticket.category === 'technical_support' ? 'Technical' :
+                                            ticket.category === 'complaint' ? 'Complaint' : 'Other' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="priority-badge priority-<%= ticket.priority %>">
+                                        <%= ticket.priority === 'urgent' ? '🔴' :
+                                            ticket.priority === 'high' ? '🟠' :
+                                            ticket.priority === 'medium' ? '🟡' : '🟢' %>
+                                        <%= ticket.priority %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-<%= ticket.status %>">
+                                        <%= ticket.status === 'pending' ? 'Pending' : 
+                                            ticket.status === 'in_progress' ? 'In Progress' : 
+                                            ticket.status === 'resolved' ? 'Resolved' : 'Closed' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <% if (ticket.assigned_name) { %>
+                                        <%= ticket.assigned_name %>
+                                    <% } else { %>
+                                        <span class="unassigned">Unassigned</span>
+                                    <% } %>
+                                </td>
+                                <td><%= ticket.message_count || 0 %></td>
+                                <td><%= new Date(ticket.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></td>
+                                <td>
+                                    <a href="/cs/tickets/<%= ticket.ticket_id %>" class="btn-small btn-view">View</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<style>
+.all-tickets-page {
+    padding: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.filters-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.filters-form select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-clear-filters {
+    padding: 8px 16px;
+    background: #f44336;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.tickets-table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.tickets-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tickets-table th,
+.tickets-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.tickets-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #333;
+    position: sticky;
+    top: 0;
+}
+
+.tickets-table tr:hover {
+    background: #fafafa;
+}
+
+.row-urgent {
+    background: #ffebee !important;
+}
+
+.ticket-subject {
+    max-width: 300px;
+}
+
+.last-message {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.unassigned {
+    color: #ff9800;
+    font-style: italic;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 13px;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.btn-view {
+    background: #2196f3;
+    color: white;
+}
+</style>
+
+<%- include('partials/footer') %>

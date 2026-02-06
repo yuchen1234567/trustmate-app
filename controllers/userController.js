@@ -83,6 +83,9 @@ const getPostLoginRedirect = (user) => {
     if (user.role === 'seller') {
         return '/seller/dashboard';
     }
+    if (user.role === 'customer_service') {
+        return '/cs/dashboard';
+    }
     return '/';
 };
 

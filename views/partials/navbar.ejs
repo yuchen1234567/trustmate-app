@@ -29,16 +29,21 @@
                 <% if (user) { %>
                     <a href="/cart">Cart</a>
                     <a href="/orders">My Orders</a>
+                    <a href="/support/tickets">Support</a>
                     
                     <% if (user.role === 'seller') { %>
                         <a href="/seller/dashboard">Seller Dashboard</a>
                         <a href="/seller/bookings">Bookings</a>
-                    <% } else { %>
+                    <% } else if (user.role === 'buyer') { %>
                         <a href="/seller/register" class="nav-pill">Seller Application</a>
                     <% } %>
                     
                     <% if (user.role === 'admin') { %>
                         <a href="/admin/dashboard">Admin</a>
+                    <% } %>
+                    
+                    <% if (user.role === 'customer_service') { %>
+                        <a href="/cs/dashboard">CS Dashboard</a>
                     <% } %>
                     
                     <span class="user-info">Hello, <%= user.username %></span>
