@@ -209,13 +209,14 @@ exports.adminIndex = async (req, res) => {
 exports.adminShow = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
-        const items = await OrderItem.getByOrder(req.params.id);
+        const orderItems = await OrderItem.getByOrder(req.params.id);
+        const review = await Review.getByOrder(req.params.id);
 
         if (!order) {
             return res.status(404).send('Order not found');
         }
 
-        res.render('orderDetail', { order, items });
+        res.render('orderDetail', { order, orderItems, review });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error loading order');
