@@ -1,7 +1,47 @@
 const db = require('../db');
 
 class OrderItem {
+    static bookingDateColumnAvailable = null;
+
+    static async hasBookingDateColumn() {
+        if (OrderItem.bookingDateColumnAvailable !== null) {
+            return OrderItem.bookingDateColumnAvailable;
+        }
+
+        try {
+            const [rows] = await db.query(
+                `SELECT COUNT(*) AS count
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = 'order_items'
+                   AND COLUMN_NAME = 'booking_date'`
+            );
+            OrderItem.bookingDateColumnAvailable = rows[0].count > 0;
+        } catch (error) {
+            OrderItem.bookingDateColumnAvailable = false;
+        }
+
+        return OrderItem.bookingDateColumnAvailable;
+    }
+
+    static async ensureBookingDateColumn() {
+        const hasColumn = await OrderItem.hasBookingDateColumn();
+        if (hasColumn) {
+            return true;
+        }
+
+        try {
+            await db.query('ALTER TABLE order_items ADD COLUMN booking_date DATE NULL');
+            OrderItem.bookingDateColumnAvailable = true;
+            return true;
+        } catch (error) {
+            OrderItem.bookingDateColumnAvailable = false;
+            return false;
+        }
+    }
+
     static async create(orderId, serviceId, quantity, price, bookingDate) {
+        await OrderItem.ensureBookingDateColumn();
         const [result] = await db.query(
             'INSERT INTO order_items (order_id, service_id, quantity, price, booking_date) VALUES (?, ?, ?, ?, ?)',
             [orderId, serviceId, quantity, price, bookingDate]
@@ -22,6 +62,7 @@ class OrderItem {
     }
 
     static async hasPaidBooking(serviceId, bookingDate) {
+        await OrderItem.ensureBookingDateColumn();
         const [rows] = await db.query(
             `SELECT 1
              FROM order_items oi

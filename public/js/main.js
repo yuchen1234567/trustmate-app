@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const addToCartForm = document.querySelector('.order-form');
         const availableDates = new Set(window.__serviceAvailability.availableDates || []);
         const unavailableDates = new Set(window.__serviceAvailability.unavailableDates || []);
-        const allowAllFuture = availableDates.size === 0 && unavailableDates.size === 0;
+        const hasExplicitAvailable = availableDates.size > 0;
 
         if (bookingInput && addToCartForm) {
             const today = new Date();
@@ -246,7 +246,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     setFormState(false, 'Please select a booking date.');
                     return;
                 }
-                if (!allowAllFuture && !availableDates.has(selected)) {
+                if (hasExplicitAvailable && !availableDates.has(selected)) {
+                    setFormState(false, 'Selected date is unavailable. Choose another date.');
+                    return;
+                }
+                if (!hasExplicitAvailable && unavailableDates.has(selected)) {
                     setFormState(false, 'Selected date is unavailable. Choose another date.');
                     return;
                 }

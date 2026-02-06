@@ -55,7 +55,11 @@ exports.add = async (req, res) => {
         res.redirect('/cart');
     } catch (error) {
         console.error(error);
-        req.session.errorMessage = 'Failed to add service to cart';
+        req.session.errorMessage = 'Failed to add service to cart. Please try again.';
+        const serviceId = req.body?.service_id;
+        if (serviceId) {
+            return res.redirect(`/services/${serviceId}`);
+        }
         res.redirect('/services');
     }
 };

@@ -22,25 +22,33 @@ class SellerAvailability {
     }
 
     static async isAvailable(sellerId, date) {
-        const [anyRows] = await db.query(
+        const [availableRows] = await db.query(
             `SELECT 1
              FROM seller_availability
-             WHERE seller_id = ?
+             WHERE seller_id = ? AND status = 'available'
              LIMIT 1`,
             [sellerId]
         );
-        if (anyRows.length === 0) {
-            return true;
+
+        if (availableRows.length > 0) {
+            const [rows] = await db.query(
+                `SELECT 1
+                 FROM seller_availability
+                 WHERE seller_id = ? AND availability_date = ? AND status = 'available'
+                 LIMIT 1`,
+                [sellerId, date]
+            );
+            return rows.length > 0;
         }
 
-        const [rows] = await db.query(
+        const [unavailableRows] = await db.query(
             `SELECT 1
              FROM seller_availability
-             WHERE seller_id = ? AND availability_date = ? AND status = 'available'
+             WHERE seller_id = ? AND availability_date = ? AND status = 'unavailable'
              LIMIT 1`,
             [sellerId, date]
         );
-        return rows.length > 0;
+        return unavailableRows.length === 0;
     }
 }
 

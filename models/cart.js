@@ -1,7 +1,47 @@
 const db = require('../db');
 
 class Cart {
+    static bookingDateColumnAvailable = null;
+
+    static async hasBookingDateColumn() {
+        if (Cart.bookingDateColumnAvailable !== null) {
+            return Cart.bookingDateColumnAvailable;
+        }
+
+        try {
+            const [rows] = await db.query(
+                `SELECT COUNT(*) AS count
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = 'cart'
+                   AND COLUMN_NAME = 'booking_date'`
+            );
+            Cart.bookingDateColumnAvailable = rows[0].count > 0;
+        } catch (error) {
+            Cart.bookingDateColumnAvailable = false;
+        }
+
+        return Cart.bookingDateColumnAvailable;
+    }
+
+    static async ensureBookingDateColumn() {
+        const hasColumn = await Cart.hasBookingDateColumn();
+        if (hasColumn) {
+            return true;
+        }
+
+        try {
+            await db.query('ALTER TABLE cart ADD COLUMN booking_date DATE NULL');
+            Cart.bookingDateColumnAvailable = true;
+            return true;
+        } catch (error) {
+            Cart.bookingDateColumnAvailable = false;
+            return false;
+        }
+    }
+
     static async add(userId, serviceId, bookingDate, quantity = 1) {
+        await Cart.ensureBookingDateColumn();
         // Check if item already exists in cart
         const [existing] = await db.query(
             'SELECT * FROM cart WHERE user_id = ? AND service_id = ? AND booking_date = ?',
