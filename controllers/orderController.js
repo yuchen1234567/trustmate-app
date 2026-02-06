@@ -7,18 +7,28 @@ const Review = require('../models/review');
 const Fraud = require('../models/fraud');
 
 const HIGH_VALUE_THRESHOLD = 2000;
+const HIGH_VALUE_WINDOW_MINUTES = 5;
+const HIGH_VALUE_MIN_COUNT = 3;
 
 const flagHighValueOrder = async (userId, orderId, total) => {
     const amount = Number(total || 0);
-    if (amount <= HIGH_VALUE_THRESHOLD) {
+    if (amount < HIGH_VALUE_THRESHOLD) {
         return;
     }
 
     try {
+        const recentHighValueCount = await Order.countHighValueByUserWithin(
+            userId,
+            HIGH_VALUE_THRESHOLD,
+            HIGH_VALUE_WINDOW_MINUTES
+        );
+        if (recentHighValueCount < HIGH_VALUE_MIN_COUNT) {
+            return;
+        }
         await Fraud.createAlert(
             userId,
-            'High-value transaction',
-            `Order #${orderId} total ${amount.toFixed(2)} exceeds ${HIGH_VALUE_THRESHOLD}`
+            'High-value transactions in short time',
+            `User made ${recentHighValueCount} transactions of ${HIGH_VALUE_THRESHOLD} or more within ${HIGH_VALUE_WINDOW_MINUTES} minutes. Latest order #${orderId} total ${amount.toFixed(2)}.`
         );
     } catch (error) {
         console.error('Failed to create high-value alert', error);
@@ -82,7 +92,7 @@ exports.create = async (req, res) => {
         }
 
         await flagHighValueOrder(userId, orderId, total);
-        
+
         // Clear cart
         await Cart.clearUserCart(userId);
         

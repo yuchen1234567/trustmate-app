@@ -52,20 +52,13 @@ exports.show = async (req, res) => {
             .map(item => toDateKey(item.availability_date))
             .filter(Boolean);
 
-        const errorMessage = req.session.errorMessage || null;
-        const successMessage = req.session.successMessage || null;
-        delete req.session.errorMessage;
-        delete req.session.successMessage;
-
         res.render('serviceDetail', {
             service,
             reviews,
             avgRating,
             canReply,
             availableDates,
-            unavailableDates,
-            errorMessage,
-            successMessage
+            unavailableDates
         });
     } catch (error) {
         console.error(error);

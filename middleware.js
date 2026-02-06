@@ -1,3 +1,8 @@
+const Fraud = require('./models/fraud');
+
+const COOLDOWN_ALERT_TYPE = 'High-value transactions in short time';
+const COOLDOWN_MINUTES = 1;
+
 // Authentication middleware
 const isAuthenticated = (req, res, next) => {
     if (req.session && req.session.user) {
@@ -40,7 +45,7 @@ const isCSOrAdmin = (req, res, next) => {
 };
 
 // Make user available to all views
-const setUserLocals = (req, res, next) => {
+const setUserLocals = async (req, res, next) => {
     res.locals.user = req.session.user || null;
     res.locals.successMessage = req.session.successMessage || null;
     res.locals.errorMessage = req.session.errorMessage || null;
@@ -48,6 +53,28 @@ const setUserLocals = (req, res, next) => {
     // Clear messages after displaying
     delete req.session.successMessage;
     delete req.session.errorMessage;
+
+    res.locals.cooldownRemainingSeconds = 0;
+    res.locals.cooldownEndsAt = null;
+    req.cooldownRemainingSeconds = 0;
+
+    if (res.locals.user) {
+        try {
+            const remainingSeconds = await Fraud.getCooldownRemainingSeconds(
+                res.locals.user.user_id,
+                COOLDOWN_ALERT_TYPE,
+                COOLDOWN_MINUTES
+            );
+            if (remainingSeconds > 0) {
+                const expiresAt = Date.now() + remainingSeconds * 1000;
+                res.locals.cooldownRemainingSeconds = remainingSeconds;
+                res.locals.cooldownEndsAt = expiresAt;
+                req.cooldownRemainingSeconds = remainingSeconds;
+            }
+        } catch (error) {
+            console.error('Failed to compute cooldown status', error);
+        }
+    }
     
     next();
 };

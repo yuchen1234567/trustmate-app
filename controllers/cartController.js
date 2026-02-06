@@ -25,6 +25,13 @@ exports.add = async (req, res) => {
         const userId = req.session.user.user_id;
         const { service_id, quantity, booking_date } = req.body;
 
+        if (req.cooldownRemainingSeconds && req.cooldownRemainingSeconds > 0) {
+            const minutes = Math.floor(req.cooldownRemainingSeconds / 60);
+            const seconds = String(req.cooldownRemainingSeconds % 60).padStart(2, '0');
+            req.session.errorMessage = `Purchasing is temporarily paused. Try again in ${minutes}:${seconds}.`;
+            return res.redirect(`/services/${service_id}`);
+        }
+
         if (!booking_date) {
             req.session.errorMessage = 'Please select a booking date before adding to cart.';
             return res.redirect(`/services/${service_id}`);

@@ -228,19 +228,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const dd = String(today.getDate()).padStart(2, '0');
             bookingInput.min = `${yyyy}-${mm}-${dd}`;
 
+            const isCooldownActive = () => addToCartForm.dataset.cooldownActive === 'true';
+
             const setFormState = (isValid, message) => {
                 if (feedback) {
                     feedback.textContent = message || '';
                 }
                 const submit = addToCartForm.querySelector('button[type="submit"]');
                 if (submit) {
-                    submit.disabled = !isValid;
+                    submit.disabled = isCooldownActive() || !isValid;
                 }
             };
 
-            setFormState(false, 'Please select a booking date.');
-
-            bookingInput.addEventListener('change', () => {
+            const refreshFormState = () => {
+                if (isCooldownActive()) {
+                    setFormState(false, 'Purchasing is temporarily paused.');
+                    return;
+                }
                 const selected = bookingInput.value;
                 if (!selected) {
                     setFormState(false, 'Please select a booking date.');
@@ -255,10 +259,73 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 setFormState(true, '');
-            });
+            };
+
+            window.__refreshAddToCartState = refreshFormState;
+            refreshFormState();
+            bookingInput.addEventListener('change', refreshFormState);
         }
     }
 });
+
+const cooldownElements = Array.from(document.querySelectorAll('.cooldown-timer, .cooldown-inline'));
+if (cooldownElements.length > 0) {
+    const cooldownForms = Array.from(document.querySelectorAll('form[data-cooldown-ends]'));
+    let intervalId = null;
+    const updateCooldown = () => {
+        const now = Date.now();
+        let anyActive = false;
+
+        cooldownElements.forEach((el) => {
+            if (!el.isConnected) {
+                return;
+            }
+            const endsAt = Number(el.dataset.cooldownEnds || 0);
+            if (!endsAt) {
+                return;
+            }
+            const remaining = Math.ceil((endsAt - now) / 1000);
+            if (remaining <= 0) {
+                if (el.classList.contains('cooldown-timer')) {
+                    el.remove();
+                } else {
+                    const note = el.closest('.cooldown-note');
+                    if (note) {
+                        note.remove();
+                    } else {
+                        el.remove();
+                    }
+                }
+                return;
+            }
+
+            anyActive = true;
+            const minutes = Math.floor(remaining / 60);
+            const seconds = String(remaining % 60).padStart(2, '0');
+            el.textContent = `${minutes}:${seconds}`;
+        });
+
+        if (!anyActive) {
+            cooldownForms.forEach((form) => {
+                form.dataset.cooldownActive = 'false';
+                const submit = form.querySelector('button[type="submit"]');
+                if (submit) {
+                    submit.disabled = false;
+                    submit.classList.remove('is-disabled');
+                }
+            });
+            if (typeof window.__refreshAddToCartState === 'function') {
+                window.__refreshAddToCartState();
+            }
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        }
+    };
+
+    updateCooldown();
+    intervalId = setInterval(updateCooldown, 1000);
+}
 
     const chatbotToggle = document.getElementById('chatbot-toggle');
     const chatbotPanel = document.getElementById('chatbot-panel');

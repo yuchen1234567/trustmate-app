@@ -62,7 +62,8 @@
                 </div>
                 
                 <% if (user) { %>
-                    <form action="/cart/add" method="POST" class="order-form">
+                    <% const cooldownActive = cooldownRemainingSeconds && cooldownRemainingSeconds > 0; %>
+                    <form action="/cart/add" method="POST" class="order-form" <%= cooldownActive ? `data-cooldown-active="true" data-cooldown-ends="${cooldownEndsAt}"` : '' %>>
                         <input type="hidden" name="service_id" value="<%= service.service_id %>">
 
                         <div class="form-group">
@@ -82,10 +83,18 @@
                             <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" class="quantity-input-large">
                         </div>
                         
-                        <button type="submit" class="btn-add-to-cart">
+                        <button type="submit" class="btn-add-to-cart <%= cooldownActive ? 'is-disabled' : '' %>" <%= cooldownActive ? 'disabled' : '' %>>
                             <span class="btn-icon">🛒</span>
                             Add to Cart
                         </button>
+                        <% if (cooldownActive) { %>
+                            <% const cooldownMinutes = Math.floor(cooldownRemainingSeconds / 60); %>
+                            <% const cooldownSeconds = String(cooldownRemainingSeconds % 60).padStart(2, '0'); %>
+                            <div class="cooldown-note">
+                                Purchasing paused. Try again in
+                                <span class="cooldown-inline" data-cooldown-ends="<%= cooldownEndsAt %>"><%= `${cooldownMinutes}:${cooldownSeconds}` %></span>.
+                            </div>
+                        <% } %>
                     </form>
                     
                     <div class="service-features">

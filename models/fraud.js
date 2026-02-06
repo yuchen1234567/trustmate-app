@@ -9,6 +9,31 @@ class Fraud {
         return result.insertId;
     }
 
+    static async getLatestAlertByUserAndType(userId, alertType) {
+        const [rows] = await db.query(
+            `SELECT *
+             FROM fraud_alerts
+             WHERE user_id = ? AND alert_type = ?
+             ORDER BY created_at DESC
+             LIMIT 1`,
+            [userId, alertType]
+        );
+        return rows[0] || null;
+    }
+
+    static async getCooldownRemainingSeconds(userId, alertType, minutes) {
+        const [rows] = await db.query(
+            `SELECT TIMESTAMPDIFF(SECOND, NOW(), DATE_ADD(created_at, INTERVAL ? MINUTE)) AS remaining
+             FROM fraud_alerts
+             WHERE user_id = ? AND alert_type = ?
+             ORDER BY created_at DESC
+             LIMIT 1`,
+            [minutes, userId, alertType]
+        );
+        const remaining = Number(rows[0]?.remaining || 0);
+        return remaining > 0 ? remaining : 0;
+    }
+
     static async getAll() {
         const [rows] = await db.query(
             `SELECT f.*, u.username, u.email, u.status AS user_status

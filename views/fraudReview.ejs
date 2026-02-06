@@ -48,6 +48,81 @@
             </div>
             <p class="flagged-reason-text"><%= alert.description || alert.alert_type %></p>
         </section>
+
+        <section class="fraud-card">
+            <div class="fraud-card-header">
+                <h2>Flagged Transactions</h2>
+            </div>
+            <% if (transactions && transactions.length > 0) { %>
+                <% transactions.forEach((transaction, index) => { %>
+                    <div style="margin-top: <%= index === 0 ? '0' : '1.5rem' %>;">
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">
+                            Transaction <%= index + 1 %>: Order #<%= transaction.order.order_id %>
+                        </div>
+                        <div class="history-table">
+                            <div class="history-row">
+                                <div class="history-date">Placed</div>
+                                <div class="history-reason">
+                                    <%= transaction.order.created_at ? new Date(transaction.order.created_at).toLocaleString('en-GB') : '--' %>
+                                </div>
+                            </div>
+                            <div class="history-row">
+                                <div class="history-date">Total</div>
+                                <div class="history-reason">
+                                    $<%= typeof transaction.order.total_amount === 'number' ? transaction.order.total_amount.toFixed(2) : parseFloat(transaction.order.total_amount || 0).toFixed(2) %>
+                                </div>
+                            </div>
+                            <div class="history-row">
+                                <div class="history-date">Order Status</div>
+                                <div class="history-reason"><%= transaction.order.status || 'unknown' %></div>
+                            </div>
+                            <div class="history-row">
+                                <div class="history-date">Payment</div>
+                                <div class="history-reason">
+                                    <%= (transaction.payment && transaction.payment.status) ? transaction.payment.status : (transaction.order.payment_status || 'unpaid') %>
+                                    <% if (transaction.payment && transaction.payment.provider) { %>
+                                        &middot; <%= transaction.payment.provider %>
+                                    <% } else if (transaction.order.payment_provider) { %>
+                                        &middot; <%= transaction.order.payment_provider %>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <% if (transaction.payment && transaction.payment.amount) { %>
+                                <div class="history-row">
+                                    <div class="history-date">Payment Amount</div>
+                                    <div class="history-reason">
+                                        <%= transaction.payment.currency || 'SGD' %>
+                                        <%= typeof transaction.payment.amount === 'number' ? transaction.payment.amount.toFixed(2) : parseFloat(transaction.payment.amount || 0).toFixed(2) %>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <% if (transaction.orderItems && transaction.orderItems.length > 0) { %>
+                            <div style="margin-top: 0.75rem;">
+                                <strong>Items</strong>
+                                <div class="history-table" style="margin-top: 0.5rem;">
+                                    <% transaction.orderItems.forEach(item => { %>
+                                        <div class="history-row">
+                                            <div class="history-date"><%= item.title %></div>
+                                            <div class="history-reason">
+                                                $<%= typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price || 0).toFixed(2) %>
+                                                × <%= item.quantity %>
+                                                <% if (item.booking_date) { %>
+                                                    &middot; <%= new Date(item.booking_date).toLocaleDateString('en-GB') %>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p class="flagged-reason-text">No transaction details available for this alert.</p>
+            <% } %>
+        </section>
     </div>
 </div>
 

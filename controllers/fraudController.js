@@ -1,5 +1,10 @@
 const Fraud = require('../models/fraud');
-const User = require('../models/user');
+const Order = require('../models/order');
+const OrderItem = require('../models/orderItem');
+const Payment = require('../models/payment');
+
+const HIGH_VALUE_THRESHOLD = 2000;
+const HIGH_VALUE_WINDOW_MINUTES = 5;
 
 // Show fraud dashboard
 exports.dashboard = async (req, res) => {
@@ -69,7 +74,31 @@ exports.review = async (req, res) => {
         }
         await Fraud.updateStatus(req.params.id, 'reviewed');
         const history = alert.user_id ? await Fraud.getByUser(alert.user_id, 5) : [];
-        res.render('fraudReview', { alert, history });
+        let transactions = [];
+        const sourceText = `${alert.description || ''} ${alert.alert_type || ''}`;
+        const isTransactionAlert = /transaction|order/i.test(sourceText);
+
+        if (alert.user_id && isTransactionAlert) {
+            const windowEnd = alert.created_at ? new Date(alert.created_at) : new Date();
+            const orders = await Order.getHighValueByUserWithin(
+                alert.user_id,
+                HIGH_VALUE_THRESHOLD,
+                HIGH_VALUE_WINDOW_MINUTES,
+                windowEnd
+            );
+
+            transactions = await Promise.all(
+                orders.map(async (order) => {
+                    const [orderItems, payment] = await Promise.all([
+                        OrderItem.getByOrder(order.order_id),
+                        Payment.findByOrderId(order.order_id)
+                    ]);
+                    return { order, orderItems, payment };
+                })
+            );
+        }
+
+        res.render('fraudReview', { alert, history, transactions });
     } catch (error) {
         console.error(error);
         res.redirect('/admin/fraud');

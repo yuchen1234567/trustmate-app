@@ -47,6 +47,11 @@
                     <% } %>
                     
                     <span class="user-info">Hello, <%= user.username %></span>
+                    <% if (cooldownRemainingSeconds && cooldownRemainingSeconds > 0) { %>
+                        <% const cooldownMinutes = Math.floor(cooldownRemainingSeconds / 60); %>
+                        <% const cooldownSeconds = String(cooldownRemainingSeconds % 60).padStart(2, '0'); %>
+                        <span class="cooldown-timer" data-cooldown-ends="<%= cooldownEndsAt %>"><%= `${cooldownMinutes}:${cooldownSeconds}` %></span>
+                    <% } %>
                     <a href="/logout" class="btn-logout">Logout</a>
                 <% } else { %>
                     <a href="/login" class="btn-login">Login</a>

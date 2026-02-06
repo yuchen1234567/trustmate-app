@@ -644,6 +644,38 @@
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
 }
 
+.btn-add-to-cart.is-disabled,
+.btn-add-to-cart:disabled {
+    background: #c6cbd4;
+    color: #ffffff;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    opacity: 0.8;
+}
+
+.cooldown-note {
+    margin-top: 0.6rem;
+    font-size: 0.9rem;
+    color: #8b1c1c;
+    font-weight: 600;
+}
+
+.cooldown-inline {
+    font-weight: 700;
+}
+
+.cooldown-timer {
+    margin-left: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: #f7d36b;
+    color: #1f1f1f;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
 .btn-icon {
     font-size: 1.2rem;
 }
