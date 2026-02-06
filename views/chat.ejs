@@ -20,7 +20,7 @@
         
         <form action="/chat/send" method="POST" class="chat-form">
             <input type="hidden" name="order_id" value="<%= order.order_id %>">
-            <input type="hidden" name="receiver_id" value="<%= order.user_id === user.user_id ? order.seller_id : order.user_id %>">
+            <input type="hidden" name="receiver_id" value="<%= order.user_id === user.user_id ? sellerUserId : order.user_id %>">
             <input type="text" name="message" placeholder="Write a message..." required>
             <button type="submit">Send message</button>
         </form>

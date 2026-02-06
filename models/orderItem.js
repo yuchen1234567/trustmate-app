@@ -11,7 +11,7 @@ class OrderItem {
 
     static async getByOrder(orderId) {
         const [rows] = await db.query(
-            `SELECT oi.*, s.title, s.description, s.image, sel.business_name
+            `SELECT oi.*, s.title, s.description, s.image, s.seller_id, sel.business_name, sel.user_id AS seller_user_id
              FROM order_items oi
              JOIN services s ON oi.service_id = s.service_id
              LEFT JOIN sellers sel ON s.seller_id = sel.seller_id
