@@ -6,6 +6,60 @@
             <p>Clear, dependable connections with verified professionals.</p>
         </div>
     </footer>
+
+    <div class="chatbot">
+        <button class="chatbot-toggle" id="chatbot-toggle" aria-expanded="false" aria-controls="chatbot-panel">
+            Chat
+        </button>
+
+        <div class="chatbot-panel" id="chatbot-panel" aria-hidden="true">
+            <div class="chatbot-header">
+                <div class="chatbot-title">TrustMate Assistant</div>
+                <button class="chatbot-close" id="chatbot-close" aria-label="Close chat">x</button>
+            </div>
+
+            <div class="chatbot-body">
+                <div class="chatbot-message chatbot-message--bot">
+                    Hi! I'm TrustMate Assistant. Choose a question below or type your question in the chat.
+                </div>
+
+                <div class="chatbot-faq">
+                    <button class="chatbot-faq-item" data-faq="order">How do I place an order?</button>
+                    <div class="chatbot-faq-answer" data-faq-answer="order">
+                        To place an order, add items to your cart and proceed to checkout. Follow the payment instructions to complete your purchase.
+                    </div>
+
+                    <button class="chatbot-faq-item" data-faq="payment">What payment methods are supported?</button>
+                    <div class="chatbot-faq-answer" data-faq-answer="payment">
+                        We currently support online payments. If you encounter issues, please contact our support team.
+                    </div>
+
+                    <button class="chatbot-faq-item" data-faq="refund">Can I request a refund?</button>
+                    <div class="chatbot-faq-answer" data-faq-answer="refund">
+                        Refunds are subject to our refund policy. Please ensure your order meets the refund criteria before submitting a request.
+                    </div>
+
+                    <button class="chatbot-faq-item" data-faq="contact">How do I contact TrustMate?</button>
+                    <div class="chatbot-faq-answer" data-faq-answer="contact">
+                        You can reach our support team via email at trustmate@mail.com.
+                    </div>
+                </div>
+
+                <div class="chatbot-log" id="chatbot-log" aria-live="polite"></div>
+            </div>
+
+            <form class="chatbot-form" id="chatbot-form">
+                <input
+                    type="text"
+                    id="chatbot-input"
+                    name="chatbot-input"
+                    placeholder="Type your question..."
+                    autocomplete="off"
+                    aria-label="Chat question" />
+                <button type="submit" class="chatbot-send">Send</button>
+            </form>
+        </div>
+    </div>
     
     <script src="/js/main.js"></script>
 </body>

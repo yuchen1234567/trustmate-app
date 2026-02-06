@@ -192,6 +192,95 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    const chatbotToggle = document.getElementById('chatbot-toggle');
+    const chatbotPanel = document.getElementById('chatbot-panel');
+    const chatbotClose = document.getElementById('chatbot-close');
+    const chatbotForm = document.getElementById('chatbot-form');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotLog = document.getElementById('chatbot-log');
+
+    if (chatbotToggle && chatbotPanel && chatbotForm && chatbotInput && chatbotLog) {
+        const faqMap = {
+            order: {
+                question: 'How do I place an order?',
+                answer: 'To place an order, add items to your cart and proceed to checkout. Follow the payment instructions to complete your purchase.'
+            },
+            payment: {
+                question: 'What payment methods are supported?',
+                answer: 'We currently support online payments. If you encounter issues, please contact our support team.'
+            },
+            refund: {
+                question: 'Can I request a refund?',
+                answer: 'Refunds are subject to our refund policy. Please ensure your order meets the refund criteria before submitting a request.'
+            },
+            contact: {
+                question: 'How do I contact TrustMate?',
+                answer: 'You can reach our support team via email at trustmate@mail.com.'
+            }
+        };
+
+        const fallbackMessage = 'I\'m unable to help with that request right now. Please contact our support team at trustmate@mail.com for further assistance.';
+
+        const openChatbot = () => {
+            chatbotPanel.classList.add('is-open');
+            chatbotPanel.setAttribute('aria-hidden', 'false');
+            chatbotToggle.setAttribute('aria-expanded', 'true');
+        };
+
+        const closeChatbot = () => {
+            chatbotPanel.classList.remove('is-open');
+            chatbotPanel.setAttribute('aria-hidden', 'true');
+            chatbotToggle.setAttribute('aria-expanded', 'false');
+        };
+
+        const appendMessage = (text, role) => {
+            const msg = document.createElement('div');
+            msg.className = `chatbot-message ${role === 'user' ? 'chatbot-message--user' : 'chatbot-message--bot'}`;
+            msg.textContent = text;
+            chatbotLog.appendChild(msg);
+            chatbotLog.scrollTop = chatbotLog.scrollHeight;
+        };
+
+        chatbotToggle.addEventListener('click', () => {
+            if (chatbotPanel.classList.contains('is-open')) {
+                closeChatbot();
+            } else {
+                openChatbot();
+            }
+        });
+
+        if (chatbotClose) {
+            chatbotClose.addEventListener('click', closeChatbot);
+        }
+
+        document.querySelectorAll('.chatbot-faq-item').forEach((item) => {
+            item.addEventListener('click', () => {
+                const key = item.dataset.faq;
+                const answerEl = document.querySelector(`.chatbot-faq-answer[data-faq-answer="${key}"]`);
+                if (!answerEl) {
+                    return;
+                }
+                answerEl.classList.toggle('is-open');
+            });
+        });
+
+        chatbotForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const question = chatbotInput.value.trim();
+            if (!question) {
+                return;
+            }
+
+            appendMessage(question, 'user');
+            chatbotInput.value = '';
+
+            const normalized = question.toLowerCase();
+            const matched = Object.values(faqMap).find((entry) => entry.question.toLowerCase() === normalized);
+            const response = matched ? matched.answer : fallbackMessage;
+            appendMessage(response, 'bot');
+        });
+    }
 });
 
 // Add CSS for ripple effect
