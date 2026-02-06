@@ -3901,12 +3901,12 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
 }
 
 .chatbot-toggle {
-    background: #0f172a;
+    background: #16a34a;
     color: #fff;
     border: none;
     border-radius: 999px;
-    padding: 12px 20px;
-    font-size: 14px;
+    padding: 18px 32px;
+    font-size: 18px;
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
@@ -3915,9 +3915,9 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
 .chatbot-panel {
     position: absolute;
     right: 0;
-    bottom: 56px;
-    width: 320px;
-    max-height: 460px;
+    bottom: 64px;
+    width: 420px;
+    max-height: 620px;
     display: none;
     flex-direction: column;
     background: #fff;
@@ -3941,7 +3941,7 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
 }
 
 .chatbot-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
 }
 
@@ -3954,16 +3954,16 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
 }
 
 .chatbot-body {
-    padding: 12px 14px;
+    padding: 16px 18px;
     overflow-y: auto;
 }
 
 .chatbot-message {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.4;
     background: #f1f5f9;
     color: #0f172a;
-    padding: 10px 12px;
+    padding: 12px 14px;
     border-radius: 12px;
     margin-bottom: 12px;
 }
@@ -3978,19 +3978,19 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
     background: #fff;
     border: 1px solid rgba(15, 23, 42, 0.12);
     border-radius: 10px;
-    padding: 8px 10px;
+    padding: 10px 12px;
     text-align: left;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
 }
 
 .chatbot-faq-answer {
     display: none;
-    font-size: 13px;
+    font-size: 14px;
     color: #334155;
     line-height: 1.4;
-    padding: 8px 10px;
+    padding: 10px 12px;
     background: #f8fafc;
     border-radius: 10px;
     border: 1px solid rgba(15, 23, 42, 0.08);
@@ -4014,7 +4014,7 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
 .chatbot-form {
     display: flex;
     gap: 8px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     border-top: 1px solid rgba(15, 23, 42, 0.1);
     background: #fff;
 }
@@ -4023,8 +4023,8 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
     flex: 1;
     border: 1px solid rgba(15, 23, 42, 0.2);
     border-radius: 10px;
-    padding: 8px 10px;
-    font-size: 13px;
+    padding: 10px 12px;
+    font-size: 14px;
 }
 
 .chatbot-send {
@@ -4032,16 +4032,17 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
     color: #fff;
     border: none;
     border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: 10px 14px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
 }
 
 @media (max-width: 640px) {
     .chatbot-panel {
-        width: 92vw;
-        right: -6px;
+        width: 94vw;
+        right: -8px;
+        max-height: 70vh;
     }
 }
  

@@ -1,6 +1,12 @@
 <%- include('partials/navbar') %>
 
 <div class="service-detail-page">
+    <% if (errorMessage) { %>
+        <div class="error-message"><%= errorMessage %></div>
+    <% } %>
+    <% if (successMessage) { %>
+        <div class="success-message"><%= successMessage %></div>
+    <% } %>
     <div class="service-detail-container">
         <div class="service-main-section">
             <div class="service-header-card">
@@ -58,6 +64,15 @@
                 <% if (user) { %>
                     <form action="/cart/add" method="POST" class="order-form">
                         <input type="hidden" name="service_id" value="<%= service.service_id %>">
+
+                        <div class="form-group">
+                            <label for="booking_date" class="form-label">
+                                <span class="label-icon">📅</span>
+                                Booking Date
+                            </label>
+                            <input type="date" id="booking_date" name="booking_date" class="quantity-input-large" required>
+                            <small id="booking-date-feedback" class="review-meta"></small>
+                        </div>
                         
                         <div class="form-group">
                             <label for="quantity" class="form-label">
@@ -209,5 +224,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    window.__serviceAvailability = {
+        availableDates: <%- JSON.stringify(typeof availableDates !== 'undefined' ? availableDates : []) %>,
+        unavailableDates: <%- JSON.stringify(typeof unavailableDates !== 'undefined' ? unavailableDates : []) %>
+    };
+</script>
 
 <%- include('partials/footer') %>

@@ -2,6 +2,7 @@ const Service = require('../models/service');
 const Category = require('../models/category');
 const Review = require('../models/review');
 const Seller = require('../models/seller');
+const SellerAvailability = require('../models/sellerAvailability');
 
 // Show all services (homepage)
 exports.index = async (req, res) => {
@@ -34,7 +35,31 @@ exports.show = async (req, res) => {
             }
         }
 
-        res.render('serviceDetail', { service, reviews, avgRating, canReply });
+        const availability = await SellerAvailability.getBySeller(service.seller_id);
+        const toDateKey = (value) => {
+            const date = value instanceof Date ? value : new Date(value);
+            if (Number.isNaN(date.getTime())) {
+                return null;
+            }
+            return date.toISOString().slice(0, 10);
+        };
+        const availableDates = availability
+            .filter(item => item.status === 'available')
+            .map(item => toDateKey(item.availability_date))
+            .filter(Boolean);
+        const unavailableDates = availability
+            .filter(item => item.status === 'unavailable')
+            .map(item => toDateKey(item.availability_date))
+            .filter(Boolean);
+
+        res.render('serviceDetail', {
+            service,
+            reviews,
+            avgRating,
+            canReply,
+            availableDates,
+            unavailableDates
+        });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error loading service');

@@ -18,6 +18,9 @@
     <% if (typeof error !== 'undefined' && error) { %>
         <div class="error-message"><%= error %></div>
     <% } %>
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="error-message"><%= errorMessage %></div>
+    <% } %>
     
     <% if (cartItems.length === 0) { %>
         <div class="empty-state">
@@ -43,6 +46,10 @@
                                     <p class="item-seller">
                                         <span class="seller-icon">🏪</span>
                                         <%= item.business_name %>
+                                    </p>
+                                    <p class="item-seller">
+                                        <span class="seller-icon">📅</span>
+                                        <%= item.booking_date ? new Date(item.booking_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'No date selected' %>
                                     </p>
                                 </div>
                             </div>

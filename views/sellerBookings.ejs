@@ -37,6 +37,7 @@
                                     <div>
                                         <strong><%= item.title %></strong>
                                         (x<%= item.quantity %>) - $<%= typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price || 0).toFixed(2) %>
+                                        <div>Booking: <%= item.booking_date ? new Date(item.booking_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A' %></div>
                                     </div>
                                 <% }); %>
                             </td>

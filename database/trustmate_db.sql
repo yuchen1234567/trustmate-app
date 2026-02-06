@@ -77,6 +77,23 @@ INSERT INTO `sellers` VALUES (1, 3, 'Jane\'s Cleaning Services', 'Professional c
 INSERT INTO `sellers` VALUES (2, 4, 'Bob\'s Tech Solutions', 'Web development and programming services', 1, '2026-01-20 23:57:08');
 
 -- ----------------------------
+-- Table structure for seller_availability (depends on sellers)
+-- ----------------------------
+DROP TABLE IF EXISTS `seller_availability`;
+CREATE TABLE `seller_availability`  (
+  `availability_id` int NOT NULL AUTO_INCREMENT,
+  `seller_id` int NOT NULL,
+  `availability_date` date NOT NULL,
+  `status` enum('available','unavailable') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'available',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`availability_id`) USING BTREE,
+  UNIQUE INDEX `uniq_seller_date`(`seller_id` ASC, `availability_date` ASC) USING BTREE,
+  INDEX `seller_id`(`seller_id` ASC) USING BTREE,
+  CONSTRAINT `seller_availability_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `sellers` (`seller_id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for services (FOURTH - depends on sellers and categories)
 -- ----------------------------
 DROP TABLE IF EXISTS `services`;
@@ -115,6 +132,7 @@ CREATE TABLE `cart`  (
   `cart_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `service_id` int NOT NULL,
+  `booking_date` date NOT NULL,
   `quantity` int NULL DEFAULT 1,
   `added_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`cart_id`) USING BTREE,
@@ -132,7 +150,7 @@ CREATE TABLE `orders`  (
   `order_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `total_amount` decimal(10, 2) NOT NULL,
-  `status` enum('pending','accepted','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'pending',
+  `status` enum('pending_payment','pending','accepted','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'pending_payment',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`order_id`) USING BTREE,
   INDEX `user_id`(`user_id` ASC) USING BTREE,
@@ -188,6 +206,7 @@ CREATE TABLE `order_items`  (
   `service_id` int NOT NULL,
   `quantity` int NOT NULL,
   `price` decimal(10, 2) NOT NULL,
+  `booking_date` date NOT NULL,
   PRIMARY KEY (`order_item_id`) USING BTREE,
   INDEX `order_id`(`order_id` ASC) USING BTREE,
   INDEX `service_id`(`service_id` ASC) USING BTREE,
@@ -196,10 +215,10 @@ CREATE TABLE `order_items`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- Records of order_items
-INSERT INTO `order_items` VALUES (1, 1, 1, 1, 50.00);
-INSERT INTO `order_items` VALUES (2, 2, 3, 1, 500.00);
-INSERT INTO `order_items` VALUES (3, 3, 2, 3, 75.00);
-INSERT INTO `order_items` VALUES (4, 4, 2, 1, 75.00);
+INSERT INTO `order_items` VALUES (1, 1, 1, 1, 50.00, '2026-01-25');
+INSERT INTO `order_items` VALUES (2, 2, 3, 1, 500.00, '2026-01-26');
+INSERT INTO `order_items` VALUES (3, 3, 2, 3, 75.00, '2026-01-27');
+INSERT INTO `order_items` VALUES (4, 4, 2, 1, 75.00, '2026-01-28');
 
 -- ----------------------------
 -- Table structure for reviews (EIGHTH - depends on orders, users, services)

@@ -103,6 +103,10 @@
                                     <span class="pricing-label">Quantity</span>
                                     <span class="pricing-value">×<%= item.quantity %></span>
                                 </div>
+                                <div class="pricing-detail">
+                                    <span class="pricing-label">Booking Date</span>
+                                    <span class="pricing-value"><%= item.booking_date ? new Date(item.booking_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A' %></span>
+                                </div>
                                 <div class="pricing-detail subtotal">
                                     <span class="pricing-label">Subtotal</span>
                                     <span class="pricing-value">$<%= typeof item.price === 'number' ? (item.price * item.quantity).toFixed(2) : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %></span>

@@ -1,11 +1,11 @@
 const db = require('../db');
 
 class Cart {
-    static async add(userId, serviceId, quantity = 1) {
+    static async add(userId, serviceId, bookingDate, quantity = 1) {
         // Check if item already exists in cart
         const [existing] = await db.query(
-            'SELECT * FROM cart WHERE user_id = ? AND service_id = ?',
-            [userId, serviceId]
+            'SELECT * FROM cart WHERE user_id = ? AND service_id = ? AND booking_date = ?',
+            [userId, serviceId, bookingDate]
         );
 
         if (existing.length > 0) {
@@ -18,8 +18,8 @@ class Cart {
         } else {
             // Insert new item
             const [result] = await db.query(
-                'INSERT INTO cart (user_id, service_id, quantity) VALUES (?, ?, ?)',
-                [userId, serviceId, quantity]
+                'INSERT INTO cart (user_id, service_id, booking_date, quantity) VALUES (?, ?, ?, ?)',
+                [userId, serviceId, bookingDate, quantity]
             );
             return result.insertId;
         }
@@ -27,7 +27,7 @@ class Cart {
 
     static async getByUser(userId) {
         const [rows] = await db.query(
-            `SELECT c.*, s.title, s.description, s.price, s.image, sel.business_name
+            `SELECT c.*, s.title, s.description, s.price, s.image, s.seller_id, sel.business_name
              FROM cart c
              JOIN services s ON c.service_id = s.service_id
              LEFT JOIN sellers sel ON s.seller_id = sel.seller_id

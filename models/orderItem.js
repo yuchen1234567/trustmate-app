@@ -1,10 +1,10 @@
 const db = require('../db');
 
 class OrderItem {
-    static async create(orderId, serviceId, quantity, price) {
+    static async create(orderId, serviceId, quantity, price, bookingDate) {
         const [result] = await db.query(
-            'INSERT INTO order_items (order_id, service_id, quantity, price) VALUES (?, ?, ?, ?)',
-            [orderId, serviceId, quantity, price]
+            'INSERT INTO order_items (order_id, service_id, quantity, price, booking_date) VALUES (?, ?, ?, ?, ?)',
+            [orderId, serviceId, quantity, price, bookingDate]
         );
         return result.insertId;
     }
@@ -19,6 +19,22 @@ class OrderItem {
             [orderId]
         );
         return rows;
+    }
+
+    static async hasPaidBooking(serviceId, bookingDate) {
+        const [rows] = await db.query(
+            `SELECT 1
+             FROM order_items oi
+             JOIN orders o ON oi.order_id = o.order_id
+             JOIN payments p ON p.order_id = o.order_id
+             WHERE oi.service_id = ?
+               AND oi.booking_date = ?
+               AND p.status = 'paid'
+               AND o.status <> 'cancelled'
+             LIMIT 1`,
+            [serviceId, bookingDate]
+        );
+        return rows.length > 0;
     }
 
     static async delete(id) {

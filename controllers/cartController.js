@@ -1,4 +1,7 @@
 const Cart = require('../models/cart');
+const Service = require('../models/service');
+const SellerAvailability = require('../models/sellerAvailability');
+const OrderItem = require('../models/orderItem');
 
 // Show cart
 exports.index = async (req, res) => {
@@ -20,9 +23,32 @@ exports.index = async (req, res) => {
 exports.add = async (req, res) => {
     try {
         const userId = req.session.user.user_id;
-        const { service_id, quantity } = req.body;
-        
-        await Cart.add(userId, service_id, quantity || 1);
+        const { service_id, quantity, booking_date } = req.body;
+
+        if (!booking_date) {
+            req.session.errorMessage = 'Please select a booking date before adding to cart.';
+            return res.redirect(`/services/${service_id}`);
+        }
+
+        const service = await Service.findById(service_id);
+        if (!service) {
+            req.session.errorMessage = 'Service not found.';
+            return res.redirect('/services');
+        }
+
+        const isAvailable = await SellerAvailability.isAvailable(service.seller_id, booking_date);
+        if (!isAvailable) {
+            req.session.errorMessage = 'Selected date is unavailable. Please choose another date.';
+            return res.redirect(`/services/${service_id}`);
+        }
+
+        const hasConflict = await OrderItem.hasPaidBooking(service_id, booking_date);
+        if (hasConflict) {
+            req.session.errorMessage = 'Selected date is already booked. Please choose another date.';
+            return res.redirect(`/services/${service_id}`);
+        }
+
+        await Cart.add(userId, service_id, booking_date, quantity || 1);
         
         // Set success message
         req.session.successMessage = 'Service added to cart successfully!';

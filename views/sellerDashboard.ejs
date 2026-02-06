@@ -27,6 +27,39 @@
         <a href="/seller/bookings" class="btn-secondary">View Bookings</a>
     </div>
     
+    <div class="dashboard-actions">
+        <h2>Set your availability</h2>
+        <p>Select dates you can take bookings. Mark dates unavailable when you are off.</p>
+
+        <form action="/seller/availability" method="POST" class="availability-form">
+            <div class="form-group">
+                <label for="availability_date">Date</label>
+                <input type="date" id="availability_date" name="availability_date" required>
+            </div>
+            <input type="hidden" name="status" id="availability_status" value="available">
+            <div class="dashboard-actions">
+                <button type="submit" class="btn-primary" data-status="available">Mark Available</button>
+                <button type="submit" class="btn-secondary" data-status="unavailable">Block Unavailable</button>
+            </div>
+        </form>
+
+        <div class="recent-services">
+            <h2>Saved availability</h2>
+            <% if (!availability || availability.length === 0) { %>
+                <p>No availability saved yet.</p>
+            <% } else { %>
+                <div class="services-grid">
+                    <% availability.forEach(slot => { %>
+                        <div class="service-card">
+                            <h3><%= new Date(slot.availability_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></h3>
+                            <p class="status">Status: <%= slot.status %></p>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
     <div class="recent-services">
         <h2>Your Services</h2>
         <% if (services.length === 0) { %>

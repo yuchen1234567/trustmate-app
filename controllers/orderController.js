@@ -2,6 +2,7 @@ const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const Cart = require('../models/cart');
 const Payment = require('../models/payment');
+const SellerAvailability = require('../models/sellerAvailability');
 const Review = require('../models/review');
 const Fraud = require('../models/fraud');
 
@@ -56,12 +57,28 @@ exports.create = async (req, res) => {
         }
         
         const total = await Cart.getTotal(userId);
+        for (const item of cartItems) {
+            if (!item.booking_date) {
+                req.session.errorMessage = 'All services require a booking date.';
+                return res.redirect('/cart');
+            }
+            const isAvailable = await SellerAvailability.isAvailable(item.seller_id, item.booking_date);
+            if (!isAvailable) {
+                req.session.errorMessage = `Booking date unavailable for ${item.title}.`;
+                return res.redirect('/cart');
+            }
+            const hasConflict = await OrderItem.hasPaidBooking(item.service_id, item.booking_date);
+            if (hasConflict) {
+                req.session.errorMessage = `Booking date already taken for ${item.title}.`;
+                return res.redirect('/cart');
+            }
+        }
         const orderId = await Order.create(userId, total);
         await Order.updateStatus(orderId, 'pending_payment');
 
         // Create order items
         for (const item of cartItems) {
-            await OrderItem.create(orderId, item.service_id, item.quantity, item.price);
+            await OrderItem.create(orderId, item.service_id, item.quantity, item.price, item.booking_date);
         }
 
         await flagHighValueOrder(userId, orderId, total);

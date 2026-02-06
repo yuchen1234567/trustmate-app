@@ -64,7 +64,7 @@ class Order {
                     p.provider AS payment_provider,
                     p.payment_reference,
                     u.username, u.email,
-                    oi.order_item_id, oi.service_id, oi.quantity, oi.price,
+                    oi.order_item_id, oi.service_id, oi.quantity, oi.price, oi.booking_date,
                     s.title
              FROM orders o
              JOIN order_items oi ON oi.order_id = o.order_id

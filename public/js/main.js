@@ -189,9 +189,72 @@ document.addEventListener('DOMContentLoaded', function() {
             
             input.addEventListener('focus', function() {
                 this.style.borderColor = '#667eea';
+        });
+    });
+
+    // Seller availability form buttons
+    document.querySelectorAll('.availability-form').forEach(form => {
+        const statusInput = form.querySelector('#availability_status');
+        const dateInput = form.querySelector('input[type="date"]');
+        if (dateInput) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            dateInput.min = `${yyyy}-${mm}-${dd}`;
+        }
+        form.querySelectorAll('button[data-status]').forEach(button => {
+            button.addEventListener('click', () => {
+                if (statusInput) {
+                    statusInput.value = button.dataset.status;
+                }
             });
         });
     });
+
+    // Service booking date validation
+    if (window.__serviceAvailability) {
+        const bookingInput = document.getElementById('booking_date');
+        const feedback = document.getElementById('booking-date-feedback');
+        const addToCartForm = document.querySelector('.order-form');
+        const availableDates = new Set(window.__serviceAvailability.availableDates || []);
+        const unavailableDates = new Set(window.__serviceAvailability.unavailableDates || []);
+        const allowAllFuture = availableDates.size === 0 && unavailableDates.size === 0;
+
+        if (bookingInput && addToCartForm) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            bookingInput.min = `${yyyy}-${mm}-${dd}`;
+
+            const setFormState = (isValid, message) => {
+                if (feedback) {
+                    feedback.textContent = message || '';
+                }
+                const submit = addToCartForm.querySelector('button[type="submit"]');
+                if (submit) {
+                    submit.disabled = !isValid;
+                }
+            };
+
+            setFormState(false, 'Please select a booking date.');
+
+            bookingInput.addEventListener('change', () => {
+                const selected = bookingInput.value;
+                if (!selected) {
+                    setFormState(false, 'Please select a booking date.');
+                    return;
+                }
+                if (!allowAllFuture && !availableDates.has(selected)) {
+                    setFormState(false, 'Selected date is unavailable. Choose another date.');
+                    return;
+                }
+                setFormState(true, '');
+            });
+        }
+    }
+});
 
     const chatbotToggle = document.getElementById('chatbot-toggle');
     const chatbotPanel = document.getElementById('chatbot-panel');

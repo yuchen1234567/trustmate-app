@@ -2,6 +2,7 @@ const Seller = require('../models/seller');
 const Service = require('../models/service');
 const User = require('../models/user');
 const Fraud = require('../models/fraud');
+const SellerAvailability = require('../models/sellerAvailability');
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -199,8 +200,9 @@ exports.dashboard = async (req, res) => {
         
         req.session.sellerId = seller.seller_id;
         const services = await Service.getBySellerCombined(seller.seller_id);
+        const availability = await SellerAvailability.getBySeller(seller.seller_id);
         
-        res.render("sellerDashboard", { seller, services });
+        res.render("sellerDashboard", { seller, services, availability });
     } catch (error) {
         console.error(error);
         res.redirect('/');
@@ -255,7 +257,8 @@ exports.bookings = async (req, res) => {
                 service_id: row.service_id,
                 title: row.title,
                 quantity: row.quantity,
-                price: row.price
+                price: row.price,
+                booking_date: row.booking_date
             });
             return acc;
         }, {});
@@ -291,5 +294,27 @@ exports.acceptBooking = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.redirect('/seller/bookings');
+    }
+};
+
+// Update seller availability
+exports.updateAvailability = async (req, res) => {
+    try {
+        const userId = req.session.user.user_id;
+        const seller = await Seller.findByUserId(userId);
+        if (!seller) {
+            return res.status(403).send('Access denied. Seller only.');
+        }
+
+        const { availability_date, status } = req.body;
+        if (!availability_date || !['available', 'unavailable'].includes(status)) {
+            return res.redirect('/seller/dashboard');
+        }
+
+        await SellerAvailability.upsert(seller.seller_id, availability_date, status);
+        res.redirect('/seller/dashboard');
+    } catch (error) {
+        console.error(error);
+        res.redirect('/seller/dashboard');
     }
 };

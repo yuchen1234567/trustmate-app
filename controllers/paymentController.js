@@ -5,6 +5,7 @@ const Payment = require('../models/payment');
 const Fraud = require('../models/fraud');
 const nets = require('../services/nets');
 const paymentService = require('../services/paymentService');
+const SellerAvailability = require('../models/sellerAvailability');
 
 const HIGH_VALUE_THRESHOLD = 2000;
 
@@ -49,11 +50,28 @@ const createOrderFromCart = async (userId, { provider = 'nets', currency = 'SGD'
 
     const resolvedCurrency = paymentService.resolveCurrency(currency);
     const total = await Cart.getTotal(userId);
+    for (const item of cartItems) {
+        if (!item.booking_date) {
+            throw new Error('Missing booking date for cart item.');
+        }
+        const isAvailable = await SellerAvailability.isAvailable(item.seller_id, item.booking_date);
+        if (!isAvailable) {
+            const error = new Error(`Booking date unavailable for ${item.title}.`);
+            error.code = 'BOOKING_DATE_UNAVAILABLE';
+            throw error;
+        }
+        const hasConflict = await OrderItem.hasPaidBooking(item.service_id, item.booking_date);
+        if (hasConflict) {
+            const error = new Error(`Booking date already taken for ${item.title}.`);
+            error.code = 'BOOKING_DATE_TAKEN';
+            throw error;
+        }
+    }
     const orderId = await Order.create(userId, total);
     await Order.updateStatus(orderId, 'pending_payment');
 
     for (const item of cartItems) {
-        await OrderItem.create(orderId, item.service_id, item.quantity, item.price);
+        await OrderItem.create(orderId, item.service_id, item.quantity, item.price, item.booking_date);
     }
 
     await Payment.create({
@@ -127,6 +145,10 @@ exports.startNetsPayment = async (req, res) => {
         });
     } catch (error) {
         console.error('NETS start payment error:', error);
+        if (error.code === 'BOOKING_DATE_UNAVAILABLE' || error.code === 'BOOKING_DATE_TAKEN') {
+            req.session.errorMessage = error.message;
+            return res.redirect('/cart');
+        }
         if (orderId) {
             try {
                 await Payment.updateByOrderId(orderId, { status: 'failed' });
@@ -363,6 +385,10 @@ exports.createStripeCheckout = async (req, res) => {
         return res.redirect(session.url);
     } catch (error) {
         console.error('Stripe checkout error:', error);
+        if (error.code === 'BOOKING_DATE_UNAVAILABLE' || error.code === 'BOOKING_DATE_TAKEN') {
+            req.session.errorMessage = error.message;
+            return res.redirect('/cart');
+        }
         if (orderId) {
             await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
             await Order.updateStatus(orderId, 'cancelled');
@@ -465,6 +491,10 @@ exports.createPayPalOrder = async (req, res) => {
         res.json({ id: order.result.id });
     } catch (error) {
         console.error('PayPal order creation error:', error);
+        if (error.code === 'BOOKING_DATE_UNAVAILABLE' || error.code === 'BOOKING_DATE_TAKEN') {
+            req.session.errorMessage = error.message;
+            return res.status(400).json({ error: error.message });
+        }
         if (orderId) {
             await Payment.updateByOrderId(orderId, { status: 'failed', escrow_status: 'none' });
             await Order.updateStatus(orderId, 'cancelled');

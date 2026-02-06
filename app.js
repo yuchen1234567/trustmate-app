@@ -50,11 +50,13 @@ const chatController = require('./controllers/chatController');
 const paymentController = require('./controllers/paymentController');
 const feedbackController = require('./controllers/feedbackController');
 const adminFeedbackController = require("./controllers/adminFeedbackController");
+const sellerRoutes = require('./routes/sellerRoutes');
 
 const adminReportsRoutes = require("./models/adminReports");
 app.use("/admin", adminReportsRoutes);
 const feedbackRoutes = require("./models/feedback");
 app.use("/", feedbackRoutes);
+app.use('/seller', sellerRoutes);
 
 // ===== Seller Service Catalog Routes (no routes folder) =====
 const sellerCatalogController = require("./controllers/sellerCatalogController");
