@@ -1,0 +1,221 @@
+<%- include('partials/navbar') %>
+
+<div style="max-width: 980px; margin: 40px auto; padding: 0 16px;">
+  <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px;">
+    <div>
+      <h1 style="margin:0; font-size:28px;">Pay with Airwallex</h1>
+      <p style="margin:8px 0 0; color:var(--text-muted); font-size:14px;">Complete payment for Order #<%= order.order_id %>.</p>
+    </div>
+    <a href="/orders/<%= order.order_id %>" style="text-decoration:none; font-weight:800; color:var(--accent);">Back to Order</a>
+  </div>
+
+  <% if (errorMessage) { %>
+    <div style="background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:12px 14px; border-radius:12px; margin-bottom:14px;">
+      <%= errorMessage %>
+    </div>
+  <% } %>
+
+  <div style="display:grid; grid-template-columns: 1.4fr 1fr; gap:18px;">
+    <!-- Order Summary -->
+    <div style="background:var(--surface); border-radius:16px; padding:22px; border:1px solid var(--border-soft); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);">
+      <h2 style="margin:0 0 14px; font-size:18px;">Order Summary</h2>
+
+      <div style="border:1px solid var(--border-soft); border-radius:14px; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+          <tbody>
+            <% orderItems.forEach(item => { %>
+              <tr>
+                <td style="padding:12px 14px; border-bottom:1px solid var(--border-soft);">
+                  <div style="font-weight:700; color:var(--text-primary);"><%= item.title %></div>
+                  <div style="color:var(--text-muted); font-size:12px;">Qty: <%= item.quantity %></div>
+                  <div style="color:var(--text-muted); font-size:12px;">Date: <%= item.booking_date ? new Date(item.booking_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A' %></div>
+                </td>
+                <td style="padding:12px 14px; text-align:right; border-bottom:1px solid var(--border-soft); white-space:nowrap; font-weight:700;">
+                  <%= currency %> <%= typeof item.price === 'number'
+                    ? (item.price * item.quantity).toFixed(2)
+                    : (parseFloat(item.price || 0) * item.quantity).toFixed(2) %>
+                </td>
+              </tr>
+            <% }); %>
+
+            <tr>
+              <td style="padding:14px; font-weight:800; font-size:14px;">Total</td>
+              <td style="padding:14px; text-align:right; font-weight:900; font-size:16px; white-space:nowrap;">
+                <%= currency %> <%= Number(total || 0).toFixed(2) %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:12px; color:var(--text-muted); font-size:12px;">
+        Prices shown include quantity calculation.
+      </div>
+    </div>
+
+    <!-- Payment Methods -->
+    <div style="background:var(--surface); border-radius:16px; padding:22px; border:1px solid var(--border-soft); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);">
+      <h2 style="margin:0 0 10px; font-size:18px;">Pay Now</h2>
+
+      <div style="display:grid; gap:12px;">
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">Card (Airwallex)</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Pay with credit/debit card using embedded Airwallex fields.</p>
+          <% if (locals.airwallexConfigured) { %>
+            <div id="airwallex-card-element"
+              style="padding:10px 12px; border:1px solid var(--border-soft); border-radius:12px; background:#fff; margin-bottom:10px;"></div>
+            <button id="airwallex-pay-button" type="button"
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:800; cursor:pointer;">
+              Pay with Airwallex
+            </button>
+            <div id="airwallex-message" style="display:none; margin-top:10px; color:#ef4444; font-size:13px;"></div>
+          <% } else { %>
+            <button type="button" disabled
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:#94a3b8; color:#fff; font-weight:800;">
+              Airwallex Not Configured
+            </button>
+          <% } %>
+        </div>
+
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">WeChat Pay (Airwallex)</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Scan a QR code with WeChat to complete payment.</p>
+          <% if (locals.airwallexConfigured) { %>
+            <form action="/payments/airwallex/apm/start" method="POST">
+              <input type="hidden" name="orderId" value="<%= order.order_id %>">
+              <input type="hidden" name="method" value="wechatpay">
+              <button type="submit"
+                style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:800; cursor:pointer;">
+                Pay with WeChat Pay
+              </button>
+            </form>
+          <% } else { %>
+            <button type="button" disabled
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:#94a3b8; color:#fff; font-weight:800;">
+              Airwallex Not Configured
+            </button>
+          <% } %>
+        </div>
+
+        <div style="border:1px solid var(--border-soft); border-radius:12px; padding:12px;">
+          <div style="font-weight:800; margin-bottom:6px;">Alipay (Airwallex)</div>
+          <p style="margin:0 0 10px; color:var(--text-muted); font-size:13px;">Scan a QR code with Alipay to complete payment.</p>
+          <% if (locals.airwallexConfigured) { %>
+            <form action="/payments/airwallex/apm/start" method="POST">
+              <input type="hidden" name="orderId" value="<%= order.order_id %>">
+              <input type="hidden" name="method" value="alipaycn">
+              <button type="submit"
+                style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:800; cursor:pointer;">
+                Pay with Alipay
+              </button>
+            </form>
+          <% } else { %>
+            <button type="button" disabled
+              style="width:100%; padding:10px 14px; border:none; border-radius:12px; background:#94a3b8; color:#fff; font-weight:800;">
+              Airwallex Not Configured
+            </button>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (locals.airwallexConfigured) { %>
+  <script src="https://checkout.airwallex.com/assets/elements.bundle.min.js"></script>
+  <script>
+    (function () {
+      const currency = '<%= currency %>';
+      const env = '<%= locals.airwallexEnv %>';
+      const orderId = <%= Number(order.order_id) %>;
+
+      const payButton = document.getElementById('airwallex-pay-button');
+      const message = document.getElementById('airwallex-message');
+
+      if (!payButton || !message || typeof Airwallex === 'undefined') {
+        return;
+      }
+
+      const setMessage = (text) => {
+        message.textContent = text || '';
+        message.style.display = text ? 'block' : 'none';
+      };
+
+      const pollFinalize = async (intentId, { timeoutMs = 120000, intervalMs = 2500 } = {}) => {
+        const start = Date.now();
+        while (Date.now() - start < timeoutMs) {
+          const res = await fetch('/payments/airwallex/finalize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ intentId })
+          });
+          const data = await res.json();
+
+          if (data && data.success) {
+            return data;
+          }
+
+          if (data && data.pending) {
+            await new Promise(r => setTimeout(r, intervalMs));
+            continue;
+          }
+
+          throw new Error((data && data.error) ? data.error : 'Unable to verify payment');
+        }
+
+        throw new Error('Payment is taking longer than expected. Please check your order status and try again.');
+      };
+
+      Airwallex.init({
+        env,
+        origin: window.location.origin
+      });
+
+      const cardElement = Airwallex.createElement('card');
+      cardElement.mount('airwallex-card-element');
+
+      let submitting = false;
+
+      payButton.addEventListener('click', async function () {
+        if (submitting) return;
+
+        submitting = true;
+        payButton.disabled = true;
+        setMessage('');
+
+        try {
+          const startRes = await fetch('/payments/airwallex/create-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, currency })
+          });
+          const startData = await startRes.json();
+          if (!startRes.ok) {
+            throw new Error(startData.error || 'Unable to start Airwallex payment');
+          }
+
+          const confirmResult = await Airwallex.confirmPaymentIntent({
+            element: cardElement,
+            intent_id: startData.intentId,
+            client_secret: startData.clientSecret
+          });
+
+          if (confirmResult && confirmResult.error) {
+            throw new Error(confirmResult.error.message || 'Payment failed');
+          }
+
+          const finalizeData = await pollFinalize(startData.intentId);
+          window.location.href = '/orders/' + finalizeData.orderId;
+        } catch (err) {
+          setMessage(err && err.message ? err.message : 'Payment failed. Please try again.');
+          payButton.disabled = false;
+        } finally {
+          submitting = false;
+        }
+      });
+    })();
+  </script>
+<% } %>
+
+<%- include('partials/footer') %>
+

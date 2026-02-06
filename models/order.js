@@ -41,6 +41,25 @@ class Order {
         return rows;
     }
 
+    static async findLatestPendingPaymentByUser(userId) {
+        const [rows] = await db.query(
+            `SELECT o.*,
+                    COALESCE(p.status, 'unpaid') AS payment_status,
+                    COALESCE(p.escrow_status, 'none') AS escrow_status,
+                    p.provider AS payment_provider,
+                    p.payment_reference
+             FROM orders o
+             LEFT JOIN payments p ON p.order_id = o.order_id
+             WHERE o.user_id = ?
+               AND o.status = 'pending_payment'
+               AND COALESCE(p.status, 'unpaid') <> 'paid'
+             ORDER BY o.created_at DESC
+             LIMIT 1`,
+            [userId]
+        );
+        return rows[0] || null;
+    }
+
     static async countHighValueByUserWithin(userId, minAmount, minutes) {
         const [rows] = await db.query(
             `SELECT COUNT(*) AS count

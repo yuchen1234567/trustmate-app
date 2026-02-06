@@ -9,6 +9,7 @@ const app = express();
 
 const stripeConfigured = !!process.env.STRIPE_SECRET_KEY;
 const paypalConfigured = !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+const airwallexConfigured = !!(process.env.AIRWALLEX_CLIENT_ID && process.env.AIRWALLEX_API_KEY);
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +34,8 @@ app.use(setUserLocals);
 app.use((req, res, next) => {
     res.locals.stripeConfigured = stripeConfigured;
     res.locals.paypalConfigured = paypalConfigured;
+    res.locals.airwallexConfigured = airwallexConfigured;
+    res.locals.airwallexEnv = process.env.AIRWALLEX_ENV || 'demo';
     next();
 });
 
@@ -129,6 +132,13 @@ app.get('/payments/stripe/cancel', isAuthenticated, paymentController.stripeCanc
 // Payment routes (PayPal)
 app.post('/payments/paypal/create', isAuthenticated, paymentController.createPayPalOrder);
 app.post('/payments/paypal/capture', isAuthenticated, paymentController.capturePayPalOrder);
+
+// Payment routes (Airwallex)
+app.get('/payments/airwallex/pay/:orderId', isAuthenticated, paymentController.showAirwallexPayPage);
+app.post('/payments/airwallex/create-intent', isAuthenticated, paymentController.createAirwallexPaymentIntent);
+app.post('/payments/airwallex/apm/start', isAuthenticated, paymentController.startAirwallexApmPayment);
+app.post('/payments/airwallex/finalize', isAuthenticated, paymentController.finalizeAirwallexPayment);
+app.get('/payments/airwallex/return', isAuthenticated, paymentController.airwallexReturn);
 
 // Review routes
 app.get('/reviews/create/:orderId', isAuthenticated, reviewController.showCreate);

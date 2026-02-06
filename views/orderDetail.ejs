@@ -133,6 +133,13 @@
                                 <span class="btn-text">Pay with NETS QR</span>
                             </button>
                         </form>
+
+                        <% if (airwallexConfigured) { %>
+                            <a href="/payments/airwallex/pay/<%= order.order_id %>" class="action-btn action-pay">
+                                <span class="btn-icon">ðŸ’³</span>
+                                <span class="btn-text">Pay with Airwallex</span>
+                            </a>
+                        <% } %>
                     <% } %>
                     
                     <% if (order.status === 'pending' || order.status === 'accepted') { %>
