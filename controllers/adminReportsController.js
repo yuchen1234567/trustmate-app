@@ -83,7 +83,7 @@ exports.salesReport = async (req, res) => {
       [startMysql, endMysql]
     );
 
-    // Debug（可留可删）
+    // Debug
     console.log("DEBUG totalOrders =", totalOrders);
     console.log("DEBUG totalRevenue =", totalRevenue);
     console.log("DEBUG avgOrderValue =", avgOrderValue);
